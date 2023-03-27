@@ -1,10 +1,11 @@
 Distributed convoy for a certain target:
 	- A set of vehicles has to protect a sensible moving target accordingly to the einvironment
         - Use GPS for the vehicles and sonar to detect the einvironment (walls)
+	- In this case every vehicle can detect the einvironment and select a level of danger
+	  in order to have a different disposition of the agents
 
 Distributed system for autonomous encirclement:
 	- A set of vehicles has to guide a group of person/sheep in a specific direction target
 	- Use GPS for the vehicles and sonar/UWB/relative measures to track people
-	- In this case every vehicle can detect the einvironment and select a level of danger
-	  in order to have a different disposition of the agents
+	
 
