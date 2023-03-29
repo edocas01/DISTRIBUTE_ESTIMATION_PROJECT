@@ -3,7 +3,13 @@ Distributed convoy for a certain target:
         - Use GPS for the vehicles and sonar to detect the einvironment (walls)
 	- In this case every vehicle can detect the einvironment and select a level of danger
 	  in order to have a different disposition of the agents
-
+	- kalman filter of each robot to localize itself plus a kalman filter to localize the target. The control
+	  has to be distributed in order to follow the trajectory of the target.
+	- possible tests:
+			-- see in static condition different shape of perimeter
+			-- see in static condition what happens if a new agent is introduced
+			-- see if an agent expires (dies)
+			-- dynamic performance in case of obstacles (if possible)
 Distributed system for autonomous encirclement:
 	- A set of vehicles has to guide a group of person/sheep in a specific direction target
 	- Use GPS for the vehicles and sonar/UWB/relative measures to track people
