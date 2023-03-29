@@ -8,5 +8,6 @@ Cooperative Encirclement of Autonomous
 Mobile Multi-Agents_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9044350)
 - [_Distributed encirclement control of multi-agent
 systems_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7231770)
-
+- [Distributed Kalman Filters for Relative
+Formation Control of Multi-agent systems](https://arxiv.org/pdf/2110.06332.pdf)
 
