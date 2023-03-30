@@ -10,6 +10,7 @@ Distributed convoy for a certain target:
 			-- see in static condition what happens if a new agent is introduced
 			-- see if an agent expires (dies)
 			-- dynamic shape according to targe trajectory
+			-- USARE GPS o no?
 			
 Distributed system for autonomous encirclement:
 	- A set of vehicles has to guide a group of person/sheep in a specific direction target
