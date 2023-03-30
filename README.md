@@ -10,6 +10,8 @@ Mobile Multi-Agents_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9
 systems_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7231770)
 - [_Distributed Kalman Filters for Relative
 Formation Control of Multi-agent systems_](https://arxiv.org/pdf/2110.06332.pdf)
+- [_Proportional-Integral Formation Control for Multi-Agent Systems with
+Time-Varying Attitudes under Relative Measurements_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8899676)
 
 # Link to report
 [_overleaf link_](https://it.overleaf.com/project/64243c090d15dc331d68df30)
