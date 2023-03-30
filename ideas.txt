@@ -11,6 +11,15 @@ Distributed convoy for a certain target:
 			-- see if an agent expires (dies)
 			-- dynamic shape according to targe trajectory
 			-- USARE GPS o no?
+
+MAIN IDEA:- moving target that follow an unknown trajectory.
+	  - each robot has GPS and relative measure system (to distributely localize the target and measure
+            distance with other agents)
+          - each robot has to do a centralized kalman filter to localize himself
+          - each robot has to contribute to a distributed kalman filter to localize the target
+          - each robot has to measure the distance with other robots to maintaina certain formation
+	  - each robot has to move accordingly to the target recent motion 
+
 			
 Distributed system for autonomous encirclement:
 	- A set of vehicles has to guide a group of person/sheep in a specific direction target
