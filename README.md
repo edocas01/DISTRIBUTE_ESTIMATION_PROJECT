@@ -2,7 +2,7 @@
 This repository contains the code developed by Edoardo Castioni and Massimiliano Pranzo for the project of the "Intelligent distributed system" of professor Fontanelli.
 
 
-# Papers and related works
+# Papers and related works.
 - [_Distributed Optimal Deployment on a Circle for
 Cooperative Encirclement of Autonomous
 Mobile Multi-Agents_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9044350)
@@ -13,5 +13,5 @@ Formation Control of Multi-agent systems_](https://arxiv.org/pdf/2110.06332.pdf)
 - [_Proportional-Integral Formation Control for Multi-Agent Systems with
 Time-Varying Attitudes under Relative Measurements_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8899676)
 
-# Link to report
+# Link to report.
 [_overleaf link_](https://it.overleaf.com/project/64243c090d15dc331d68df30)
