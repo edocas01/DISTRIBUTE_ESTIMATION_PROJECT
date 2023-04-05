@@ -1,5 +1,9 @@
 # DISTRIBUTE_ESTIMATION_PROJECT
 This repository contains the code developed by Edoardo Castioni and Massimiliano Pranzo for the project of the "Intelligent distributed system" of professor Fontanelli.
+The project consist in the distributed encirclement of a moving target (person, wheeled robot, ...) via a set of agents that can interact with each other in a confined range. The main problem is to dispose the agents in a predefined (or not) formation and equally spaced. This requirements need the design of two different controller:
+  - One for the formation control: this controller exploits the Voroni tasselation in order to consider a confined range of communication and avoid possible obstacles.
+  - One for the euqally spacing control: this controller has to be designed via a curviliear abscissa avoiding as much as possible agents "overtakeing"
+   
 
 
 # Papers and related works.
