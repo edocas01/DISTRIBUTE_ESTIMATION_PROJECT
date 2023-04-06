@@ -1,0 +1,9 @@
+clc
+close all
+clearvars
+
+%% Entities definition
+% Robots
+R1 = ROBOT();
+R1.setx(1)
+R1
