@@ -7,6 +7,7 @@ The project consist in the distributed encirclement of a moving target (person, 
 
 
 # Papers and related works.
+## General papers
 - [_Distributed Optimal Deployment on a Circle for
 Cooperative Encirclement of Autonomous
 Mobile Multi-Agents_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9044350)
@@ -16,6 +17,9 @@ systems_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7231770)
 Formation Control of Multi-agent systems_](https://arxiv.org/pdf/2110.06332.pdf)
 - [_Proportional-Integral Formation Control for Multi-Agent Systems with
 Time-Varying Attitudes under Relative Measurements_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8899676)
+
+## Voroni tassellation
+- [_Multi-Robot Formation Control Based on CVT Algorithm and Health Optimization Management_](https://www.mdpi.com/2076-3417/12/2/755)
 
 # Link to report.
 [_overleaf link_](https://it.overleaf.com/project/64243c090d15dc331d68df30)
