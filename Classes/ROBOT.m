@@ -1,21 +1,45 @@
-classdef ROBOT
-	properties
-		x           % x location
-        y           % y location
-        ComRadius   % Communication radius
-	end
-	methods 
-        % Define the position
-        function obj = setPosition(obj, valx, valy)
-			obj.x = valx;
-			obj.y = valy;
-        end
-        
-        % Define communication radius
-        function obj = setComRadius(obj, val_radius)
-			obj.ComRadius = val_radius;
-		end
-			
-	end
-	
+classdef ROBOT < handle
+%{
+
+      _   _   _        _ _           _            
+     / \ | |_| |_ _ __(_) |__  _   _| |_ ___  ___ 
+    / _ \| __| __| '__| | '_ \| | | | __/ _ \/ __|
+   / ___ \ |_| |_| |  | | |_) | |_| | ||  __/\__ \
+  /_/   \_\__|\__|_|  |_|_.__/ \__,_|\__\___||___/
+                                                  
+%}
+
+properties
+	x	 					% x position
+  ComRadius   % Communication radius
 end
+
+%{
+   ____        _     _ _        __  __                _                  
+  |  _ \ _   _| |__ | (_) ___  |  \/  | ___ _ __ ___ | |__   ___ _ __ ___ 
+  | |_) | | | | '_ \| | |/ __| | |\/| |/ _ \ '_ ` _ \| '_ \ / _ \ '__/ __|
+  |  __/| |_| | |_) | | | (__  | |  | |  __/ | | | | | |_) |  __/ |  \__ \
+  |_|    \__,_|_.__/|_|_|\___| |_|  |_|\___|_| |_| |_|_.__/ \___|_|  |___/
+                                                                        
+%}
+methods 
+    function obj = ROBOT()
+				obj.x = 0;
+				obj.y = 0;
+				obj.ComRadius = 0;
+		end
+
+
+
+%{
+   ____       _            _         __  __                _                   
+  |  _ \ _ __(_)_   ____ _| |_ ___  |  \/  | ___ _ __ ___ | |__   ___ _ __ ___ 
+  | |_) | '__| \ \ / / _` | __/ _ \ | |\/| |/ _ \ '_ ` _ \| '_ \ / _ \ '__/ __|
+  |  __/| |  | |\ V / (_| | ||  __/ | |  | |  __/ | | | | | |_) |  __/ |  \__ \
+  |_|   |_|  |_| \_/ \__,_|\__\___| |_|  |_|\___|_| |_| |_|_.__/ \___|_|  |___/
+                                                                               
+%}
+	
+end % methods
+	
+end % classdef
