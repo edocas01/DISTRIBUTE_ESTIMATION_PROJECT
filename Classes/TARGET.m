@@ -9,8 +9,7 @@ classdef TARGET < handle
                                                   
 %}
 properties
-	x           % x location
-    y           % y location
+    x           % x location
     ComRadius    % Communication radius
 end
 
