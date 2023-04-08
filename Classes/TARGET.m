@@ -8,10 +8,11 @@ classdef TARGET < handle
   /_/   \_\__|\__|_|  |_|_.__/ \__,_|\__\___||___/
                                                   
 %}
-properties
-    x           % x location
-    ComRadius    % Communication radius
-end
+
+  properties
+    x						% x position
+    ComRadius   % Communication radius
+  end
 
 %{
    ____        _     _ _        __  __                _                  
@@ -21,15 +22,18 @@ end
   |_|    \__,_|_.__/|_|_|\___| |_|  |_|\___|_| |_| |_|_.__/ \___|_|  |___/
                                                                         
 %}
+  methods 
+      % This function will be called only 1 time, then the position will be controlled by the internal dynamics
+      function obj = Initialize(obj,val_x, val_y, val_ComRadius)
+          obj.x(1) = val_x;
+          obj.x(2) = val_y;
+          obj.ComRadius = val_ComRadius;
+      end
 
-methods 
-    % Define the position
-    function obj = TARGET(x,y,ComRadius)
-        obj.x = x;
-        obj.y = y;
-        obj.ComRadius = ComRadius;
-    end
-    
+  end
+
+
+
 %{
    ____       _            _         __  __                _                   
   |  _ \ _ __(_)_   ____ _| |_ ___  |  \/  | ___ _ __ ___ | |__   ___ _ __ ___ 
@@ -37,6 +41,5 @@ methods
   |  __/| |  | |\ V / (_| | ||  __/ | |  | |  __/ | | | | | |_) |  __/ |  \__ \
   |_|   |_|  |_| \_/ \__,_|\__\___| |_|  |_|\___|_| |_| |_|_.__/ \___|_|  |___/
                                                                                
-%}    
-end % methods
+%}
 end % classdef

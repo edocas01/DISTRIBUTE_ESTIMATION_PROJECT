@@ -9,10 +9,11 @@ classdef ROBOT < handle
                                                   
 %}
 
-properties
-	x	 					% x position
-  ComRadius   % Communication radius
-end
+  properties
+    id          % robot id
+    x	 					% x position
+    ComRadius   % Communication radius
+  end
 
 %{
    ____        _     _ _        __  __                _                  
@@ -22,12 +23,16 @@ end
   |_|    \__,_|_.__/|_|_|\___| |_|  |_|\___|_| |_| |_|_.__/ \___|_|  |___/
                                                                         
 %}
-methods 
-    function obj = ROBOT()
-				obj.x = 0;
-				obj.y = 0;
-				obj.ComRadius = 0;
-		end
+  methods 
+      % This function will be called only 1 time, then the position will be controlled by the internal dynamics
+      function obj = Initialize(obj, val_x, val_y, val_ComRadius, val_id)
+          obj.x(1) = val_x;
+          obj.x(2) = val_y;
+          obj.ComRadius = val_ComRadius;
+          obj.id = val_id;
+      end
+
+  end
 
 
 
@@ -39,7 +44,5 @@ methods
   |_|   |_|  |_| \_/ \__,_|\__\___| |_|  |_|\___|_| |_| |_|_.__/ \___|_|  |___/
                                                                                
 %}
-	
-end % methods
-	
+		
 end % classdef
