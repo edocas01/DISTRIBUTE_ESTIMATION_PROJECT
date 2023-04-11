@@ -119,7 +119,7 @@ clearvars
 addpath("Classes\")
 addpath("Functions\")
 
-rng('default');
+
 
 %% Entities definition
 
@@ -130,18 +130,18 @@ ComRadius_T = 1;
 
 T = TARGET().Initialize(x_T, y_T, ComRadius_T);
 
-% Robots definition
-n_robots = 2;
-ComRadius_vec = [5 5 5 5];
-Robots = cell(n_robots,1);
+% Robots
+n_robot = 6;
+xR_min = -5;
+xR_max = 5;
+yR_min = -5;
+yR_max = 5;
+ComRadius_R = 1 + rand(1, n_robot); % Comunication radii [1 - 2] 
 
-% Robots initialisation
-for i = 1:n_robots
-	dist = 3 + rand(1)*2;
-	% Generate a random angle with a range of pi/2 starting from 0, the from pi /2 to pi and so on
-	th = pi/2 * (i - 1) + (i * pi/2 - pi/2 * (i - 1))  * rand(1);
-	
-	Robots{i} = ROBOT().Initialize(T.x(1) + dist*cos(th), T.x(2) + dist*sin(th), ComRadius_vec(i), i);
+for i = 1 : n_robot
+	R.(strcat("R",num2str(i))) = ROBOT();
+	R.(strcat("R",num2str(i))) = R.(strcat("R",num2str(i))).setPosition(xR_min + (xR_max - xR_min) * rand(), yR_min + (yR_max - yR_min) * rand());
+	R.(strcat("R",num2str(i))) = R.(strcat("R",num2str(i))).setComRadius(ComRadius_R(i));
 end
 
 % Plotting
