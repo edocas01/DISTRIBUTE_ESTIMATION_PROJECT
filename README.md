@@ -21,5 +21,5 @@ Time-Varying Attitudes under Relative Measurements_](https://ieeexplore.ieee.org
 ## Voroni tassellation
 - [_Multi-Robot Formation Control Based on CVT Algorithm and Health Optimization Management_](https://www.mdpi.com/2076-3417/12/2/755)
 
-# Link to report.
+# Link to report
 [_overleaf link_](https://it.overleaf.com/project/64243c090d15dc331d68df30)
