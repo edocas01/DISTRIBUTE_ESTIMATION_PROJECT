@@ -1,19 +1,64 @@
-classdef TARGET
+classdef TARGET < handle
+
+%{
+
+ 
+      _   _   _        _ _           _            
+     / \ | |_| |_ _ __(_) |__  _   _| |_ ___  ___ 
+    / _ \| __| __| '__| | '_ \| | | | __/ _ \/ __|
+   / ___ \ |_| |_| |  | | |_) | |_| | ||  __/\__ \
+  /_/   \_\__|\__|_|  |_|_.__/ \__,_|\__\___||___/
+                                                  
+ 
+
+%}
+
 	properties
-		x           % x location
-        y           % y location
-        ComRadius    % Communication radius
-    end
+		x 				% real position of the target
+	end
+
+%{
+
+ 
+   ____        _     _ _        __  __                _                   
+  |  _ \ _   _| |__ | (_) ___  |  \/  | ___ _ __ ___ | |__   ___ _ __ ___ 
+  | |_) | | | | '_ \| | |/ __| | |\/| |/ _ \ '_ ` _ \| '_ \ / _ \ '__/ __|
+  |  __/| |_| | |_) | | | (__  | |  | |  __/ | | | | | |_) |  __/ |  \__ \
+  |_|    \__,_|_.__/|_|_|\___| |_|  |_|\___|_| |_| |_|_.__/ \___|_|  |___/
+                                                                          
+ 
+
+%}
 
 	methods 
-        % Define the position
-        function obj = setPosition(obj, valx, valy)
-			obj.x = valx;
-			obj.y = valy;
-        end
-        % Define communication radius
-        function obj = setComRadius(obj, val_radius)
-			obj.ComRadius = val_radius;
-        end		
-    end
-end
+		% Iniatialization of the robot
+    	function obj = TARGET(x,y)
+			obj.x = [x;y];
+    	end
+    
+		% Update the position of the robot
+		function obj = dynamics(obj, dx,dy)
+			% Simulate movement of the target
+			obj.x = obj.x + [dx;dy];
+		end
+
+%{
+
+ 
+   ____       _            _         __  __                _                   
+  |  _ \ _ __(_)_   ____ _| |_ ___  |  \/  | ___ _ __ ___ | |__   ___ _ __ ___ 
+  | |_) | '__| \ \ / / _` | __/ _ \ | |\/| |/ _ \ '_ ` _ \| '_ \ / _ \ '__/ __|
+  |  __/| |  | |\ V / (_| | ||  __/ | |  | |  __/ | | | | | |_) |  __/ |  \__ \
+  |_|   |_|  |_| \_/ \__,_|\__\___| |_|  |_|\___|_| |_| |_|_.__/ \___|_|  |___/
+                                                                               
+ 
+
+%}
+        function plot(obj)
+		    plot(obj.x(1), obj.x(2),'or','DisplayName','target');
+		    hold on;
+	    end
+			
+	end % methods
+	
+end % classdef

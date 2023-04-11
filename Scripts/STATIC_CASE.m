@@ -10,7 +10,7 @@ clearvars
 addpath("Classes\")
 addpath("Functions\")
 
-rng('default');
+
 
 %% Entities definition
 % Target
@@ -30,11 +30,7 @@ yR_min = -5;
 yR_max = 5;
 ComRadius_R = 1 + rand(1, n_robot); % Comunication radii [1 - 2] 
 
-for i = 1 : n_robot
-	R.(strcat("R",num2str(i))) = ROBOT();
-	R.(strcat("R",num2str(i))) = R.(strcat("R",num2str(i))).setPosition(xR_min + (xR_max - xR_min) * rand(), yR_min + (yR_max - yR_min) * rand());
-	R.(strcat("R",num2str(i))) = R.(strcat("R",num2str(i))).setComRadius(ComRadius_R(i));
-end
+
 
 %% Plot the entities
 figure(1)
