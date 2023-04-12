@@ -55,7 +55,7 @@ classdef TARGET < handle
 
 %}
         function plot(obj)
-		    plot(obj.x(1), obj.x(2),'or','DisplayName','target');
+		    plot(obj.x(1), obj.x(2),'or','DisplayName','target','MarkerSize',10,'LineWidth',2);
 		    hold on;
 	    end
 			
