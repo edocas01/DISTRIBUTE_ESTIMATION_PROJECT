@@ -6,19 +6,33 @@ addpath('Scripts');
 addpath('Functions');
 addpath('Classes');
 
+% Load config
 config;
+N = 10;
+if N > parameters_simulation.N_MAX
+    N = parameters_simulation.N_MAX;
+end
+
 
 %% Test robot
-rob = ROBOT(0,0,1,1);
-tar = TARGET(0.7,0.5);
+robot = ROBOT(0,0,0.1,1);
+
+time = 0:parameters_simulation.dt:parameters_simulation.tmax;
+for t = 1:length(time)-1
+
+	u = [rand(); rand()];
+	EKF(robot, u);
+
+	err(t,:) = norm(robot.x - robot.x_est);
+    x_true(t,:) = robot.x;
+    x_est(t,:) = robot.x_est;
+
+end
 
 
-figure(1)
-axis equal
-rob.plot()
-tar.plot()
-legend
-
+plot(x_true(:,1),x_true(:,2),'-r')
+hold on
+plot(x_est(:,1),x_est(:,2),'-b')
 
 
 
