@@ -37,6 +37,7 @@ classdef ROBOT < handle
 %         H(k+1) is the jacobian of hk+1(x,epsilon) w.r.t the state e and evaluated in the x_est(k+1) and epsilon = 0
 
 	properties
+		type; 				% type of robot (linear, unicycle, etc.)
 		x_est; 				% estimated state
 		P;       			% covariance matrix of the state
 		ComRadius; 			% communication radius
@@ -65,7 +66,7 @@ classdef ROBOT < handle
 
 	methods 
 		% Iniatialization of the robot
-    function obj = ROBOT(x, y, comradius, id)
+    function obj = ROBOT(x, y, comradius, id, type)
 		obj.x = zeros(2,1); 
 		obj.x(1) = x;
 		obj.x(2) = y;
@@ -81,32 +82,41 @@ classdef ROBOT < handle
 		obj.target_est = zeros(2,1);
 		obj.id = id;
 
-		config;
+		obj.type = type;
         
     end
-    
+
+	     
 	% Update the position of the robot
 	function obj = dynamics(obj, u)
-		% linear dynamics with noise
-		obj.x_est = obj.x_est + u + mvnrnd([0;0], obj.Q)';
+		if obj.type == 'linear'		
+			% linear dynamics with noise
+			obj.x_est = obj.x_est + u + mvnrnd([0;0], obj.Q)';
 
-		% linear dynamics without noise used in the gps measurement
-		obj.x = obj.x + u;
+			% linear dynamics without noise used in the gps measurement
+			obj.x = obj.x + u;
+		end
 	end
 
 	% Jacobian of the state function
 	function J_X = jacobian_state(obj)
-		J_X = eye(2);
+		if obj.type == 'linear'
+			J_X = eye(2);
+		end
 	end
 
 	% Jacobian of the noise function
 	function J_Q = jacobian_noise(obj)
-		J_Q = eye(2);
+		if obj.type == 'linear'
+			J_Q = eye(2);
+		end
 	end
 	
 	% Jacobian of the measurement function
 	function J_H = jacobian_measurement(obj)
-		J_H = eye(2);
+		if obj.type == 'linear'
+			J_H = eye(2);
+		end
 	end
 	
 	% Perform a gps measure considering the real position of the robot
@@ -114,12 +124,7 @@ classdef ROBOT < handle
 		Z_gps = obj.x + mvnrnd([0;0], obj.R_gps)';
 	end
 	
-	% Plot the position of the robot with its communication radius
-	function plot(obj, all_markers)
-		plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'k'), 'DisplayName', ['robot ', num2str(obj.id)]);
-		hold on;
-		Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius, '--k', false);
-	end
+	
 	
 	%{
 	
@@ -133,6 +138,13 @@ classdef ROBOT < handle
 	 
 	
 	%}
+
+	% Plot the position of the robot with its communication radius
+	function plot(obj, all_markers)
+		plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'k'), 'DisplayName', ['robot ', num2str(obj.id)]);
+		hold on;
+		Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius, '--k', false);
+	end
 
 			
 	end % methods
