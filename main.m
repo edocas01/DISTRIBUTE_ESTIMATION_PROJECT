@@ -22,7 +22,7 @@ target = TARGET(0,0);
 time = 0:parameters_simulation.dt:parameters_simulation.tmax;
 for t = 1:length(time)-1
 
-	u = [cosd(t)+ rand(); sind(t)];
+	u = [cosd(t); sind(t)];
 	EKF(robot, u);
 
 	err(t,:) = norm(robot.x - robot.x_est);
