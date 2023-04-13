@@ -15,12 +15,14 @@ end
 
 
 %% Test robot
-robot = ROBOT(0,0,0.1,1);
+% robot needs x0,y0,comradius,id,type
+robot = ROBOT(0,0,0.1,1,'linear');
+target = TARGET(0,0);
 
 time = 0:parameters_simulation.dt:parameters_simulation.tmax;
 for t = 1:length(time)-1
 
-	u = [rand(); rand()];
+	u = [cosd(t); sind(t)];
 	EKF(robot, u);
 
 	err(t,:) = norm(robot.x - robot.x_est);
@@ -30,9 +32,11 @@ for t = 1:length(time)-1
 end
 
 
-plot(x_true(:,1),x_true(:,2),'-r')
+plot(x_true(:,1),x_true(:,2),'-k')
 hold on
 plot(x_est(:,1),x_est(:,2),'-b')
+hold on
+target.plot();
 
 
 
