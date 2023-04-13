@@ -80,6 +80,8 @@ classdef ROBOT < handle
 		
 		obj.target_est = zeros(2,1);
 		obj.id = id;
+
+		config;
         
     end
     

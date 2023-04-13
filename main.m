@@ -20,7 +20,7 @@ robot = ROBOT(0,0,0.1,1);
 time = 0:parameters_simulation.dt:parameters_simulation.tmax;
 for t = 1:length(time)-1
 
-	u = [rand(); rand()];
+	u = [cosd(t); sind(t)];
 	EKF(robot, u);
 
 	err(t,:) = norm(robot.x - robot.x_est);
