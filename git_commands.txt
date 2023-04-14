@@ -1,0 +1,24 @@
+COMMAND TO MAKE STUFF FOR GITHUB IN TERMINAL
+
+Import the changes of branch1 into branch2
+1. git checkout branch2
+2. git merge branch1
+
+Making a commit of all changes and pushing it to github
+1. git add --all
+2. git commit -m "message"
+3. git push
+
+Making a commit of specific file extension
+1. git add *.ext   (e.g. git add *.m)
+2. git commit -m "message"
+3. git push
+
+Making a commit of specific files
+1. git add filename  (e.g. git add main.m)
+2. git add filename2 
+3. git commit -m "message"
+4. git push
+
+See the status of the files wrt the github repo
+1. git status
