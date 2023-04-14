@@ -37,9 +37,9 @@ classdef TARGET < handle
     	end
     
 		% Update the position of the robot
-		function obj = dynamics(obj, dx,dy)
+		function obj = dynamics(obj, u)
 			% Simulate movement of the target
-			obj.x = obj.x + [dx;dy];
+			obj.x = obj.x + [u(1);u(2)];
 		end
 
 %{
