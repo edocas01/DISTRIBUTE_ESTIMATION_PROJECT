@@ -89,7 +89,7 @@ classdef ROBOT < handle
 	     
 	% Update the position of the robot
 	function obj = dynamics(obj, u)
-		if obj.type == 'linear'		
+		if strcmp(obj.type, 'linear')   
 			% linear dynamics with noise
 			obj.x_est = obj.x_est + u + mvnrnd([0;0], obj.Q)';
 
@@ -97,24 +97,24 @@ classdef ROBOT < handle
 			obj.x = obj.x + u;
 		end
 	end
-
+	
 	% Jacobian of the state function
 	function J_X = jacobian_state(obj)
-		if obj.type == 'linear'
+		if strcmp(obj.type, 'linear')
 			J_X = eye(2);
 		end
 	end
 
 	% Jacobian of the noise function
 	function J_Q = jacobian_noise(obj)
-		if obj.type == 'linear'
+		if strcmp(obj.type, 'linear')
 			J_Q = eye(2);
 		end
 	end
 	
 	% Jacobian of the measurement function
 	function J_H = jacobian_measurement(obj)
-		if obj.type == 'linear'
+		if strcmp(obj.type, 'linear')
 			J_H = eye(2);
 		end
 	end
@@ -140,10 +140,15 @@ classdef ROBOT < handle
 	%}
 
 	% Plot the position of the robot with its communication radius
-	function plot(obj, all_markers)
+	function plot(obj, varargin)
+		all_markers = {'o', 's', 'd', '*', '+', 'v', 'x', 'p', '^', '>', '<', 'h', '.', '_', '|'};
 		plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'k'), 'DisplayName', ['robot ', num2str(obj.id)]);
 		hold on;
-		Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius, '--k', false);
+		
+		% -- Plot the communication circle slows down the simulation -- 
+		if ~isempty(varargin) && strcmp(varargin{1}, 'cmrange')
+			Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius, '--k', false);
+		end
 	end
 
 			
