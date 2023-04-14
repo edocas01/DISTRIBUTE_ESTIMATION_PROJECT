@@ -16,7 +16,7 @@ end
 
 %% Test robot
 % robot needs x0,y0,comradius,id,type
-robot = ROBOT(0,0,0.1,1,'linear');
+robot = ROBOT(0,0,0.1,1, parameters_simulation.type_robot);
 target = TARGET(0,0);
 
 time = 0:parameters_simulation.dt:parameters_simulation.tmax;
