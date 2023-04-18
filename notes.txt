@@ -1,0 +1,17 @@
+Try unicycle
+
+Distributed localization of the target:
+	- relative measure between robot-target
+	- distance measure between robot-target
+	- distance measure between robot-target (some robots cannot measure the target)
+
+Obstacles management:
+	- single point o "shape"
+
+Control:
+	- compute the voronoi map 
+
+
+
+DOMANDE:
+- incertezza nella trilaterazione -> jacobiana va calcolata rispetto al target o alla poszione delle ancore

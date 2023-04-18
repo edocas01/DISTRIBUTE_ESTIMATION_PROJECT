@@ -48,12 +48,11 @@ classdef ROBOT < handle
 		Q; 					% Uncertainty matrix of the model
 		
 		target_est; 		% estimated target position (absolute)
+		target_P;			% covariance matrix of the target position
 
 	end
-
 %{
 
- 
    ____        _     _ _        __  __                _                   
   |  _ \ _   _| |__ | (_) ___  |  \/  | ___ _ __ ___ | |__   ___ _ __ ___ 
   | |_) | | | | '_ \| | |/ __| | |\/| |/ _ \ '_ ` _ \| '_ \ / _ \ '__/ __|
@@ -141,9 +140,9 @@ classdef ROBOT < handle
 
 	% Plot the position of the robot with its communication radius
 	function plot(obj, all_markers)
-		plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'k'), 'DisplayName', ['robot ', num2str(obj.id)]);
+		plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['robot ', num2str(obj.id)]);
 		hold on;
-		Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius, '--k', false);
+		Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius, '--b', false);
 	end
 
 			

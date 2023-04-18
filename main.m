@@ -17,8 +17,7 @@ end
 %% Assign trajectory
 % robot needs x0,y0,comradius,id,type
 robot = ROBOT(0,0,0.1,1,'linear');
-target = TARGET(0,0);
-u_target = target_trajectory(parameters_simulation);
+[target, u_target, obstalces] = initialize_env(parameters_simulation);
 
 % time = 0:parameters_simulation.dt:parameters_simulation.tmax;
 time = 0 : parameters_simulation.dt : length(u_target);
@@ -44,6 +43,9 @@ hold on
 plot(x_est(1,:),x_est(2,:),'-b')
 hold on
 plot(traj(1,:),traj(2,:),'-r')
+for i = 1:length(obstalces)
+    plot(obstalces{i}.x(1),obstalces{i}.x(2),'sk')
+end
 
 
 
