@@ -10,7 +10,7 @@ set(0,'DefaultLegendFontSize',16)
 
 parameters_simulation = struct( ...
 	'dt', 0.1, ...   % time step
-	'size_map', 20, ... % size of the map
+	'size_map', 50, ... % size of the map
 	'N_MAX', 15 ...  % maximum number of agents 
 );
 

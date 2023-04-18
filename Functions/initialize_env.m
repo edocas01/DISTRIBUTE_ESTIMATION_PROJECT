@@ -5,7 +5,7 @@ function [target, u_trajectory, obstacles] = initialize_env(param)
 	x = [];
 	y = [];
 
-	fig_1 = figure(1);
+	fig_1 = figure(1); clf;
 	sgtitle("Select points to create obstacles")
 	hold on;
 	grid on;

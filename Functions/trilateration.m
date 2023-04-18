@@ -22,22 +22,22 @@ function A = trilateration(robots,target)
 	% perform the trilateration with the topology matrix
 	for i = 1:n
 		% find the neighbors of the robot (the one tha can communicate with it)
-		neighbors = find(A(i, :));
+		neighbors = sum(A(3,:) == 1);
 		% if the robot has no neighbors, then it cannot find the target
 		if length(neighbors) < 2
 			fprintf("Robot %d has no sufficient neighbors",i);
 			continue;
 		end
 		% perform the trilateration
-		R = ones(neighbors+1, neighbors+1)*0.5;
+		R = ones(neighbors + 1, neighbors + 1) * 0.5;
 		% construct the measurement vector
 		for i = 1:length(neighbors)+1
-			z(i) = norm(robors{i}.x - target.x);
-			H(i,:) = [1/z(i)*(target.x(1) - robots{i}.x(1)), 1/z(i)*(target.x(2) - robots{i}.x(2))];  
+			z(i) = norm(robots{i}.x - target.x);
+			H(i,:) = [1 / z(i) * (target.x(1) - robots{i}.x(1)), 1 / z(i) * (target.x(2) - robots{i}.x(2))];  
 		end
 		
-		robot{i}.target_est = inv(H'*inv(COV)*H)*H'*inv(COV)*z';
-		robot{i}.target_cov = inv(H'*inv(COV)*H);
+		robots{i}.target_est = inv(H' * inv(COV) * H) * H' * inv(COV) * z';
+		robots{i}.target_cov = inv(H' * inv(COV) * H);
 	end
 	
 
