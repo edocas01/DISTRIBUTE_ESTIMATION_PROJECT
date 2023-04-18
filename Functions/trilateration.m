@@ -2,55 +2,58 @@
 % each robot has to communicate with the other robots to find the position of the target and return the covariance
 % matrix of the target position
 
-function A = trilateration(robots,target)
+function A = trilateration(robots, target, param)
 	% Robots is a cell array of robots
 	n = length(robots);
+	% Number of consensous protocols messages
+	m = param.MSG_PROTOCOL;
+	F = cell(n,1);
+	a = cell(n,1);
+	
+	
 	% topology matrix
 	A = zeros(n, n);
 	for i = 1:n
 		for j = i+1:n
-			% if the distance between the two robots is less than the sum of their communication range
+			% if the distance between the two robots is less than their communication range
 			% then they can communicate with each other
-			d =  norm(robots{i}.x - robots{j}.x);
-			A(i, j) = d <= robots{i}.ComRadius;
-			
+			robots_d =  norm(robots{i}.x - robots{j}.x);
+			A(i, j) = robots_d <= robots{i}.ComRadius;
 		end
-	end
+		target_d = norm(robots{i}.x - target.x) + robots{i}.R_dist;
+		target_d_est = norm(robots{i}.x_est - robots{i}.target_est);
+		% jacobian matrix w.r.t. the target position
+		H = [(robots{i}.x_est(1) - robots{i}.target_est(1)) / target_d_est, (robots{i}.x_est(2) - robots{i}.target_est(2)) / target_d_est];
+		% measurement of the distance between the robot and the target
+		z = target_d + H * robots{i}.x_est;
+
+		% initialize the matrices for the maximum degree weighting
+		F{i} = H' * inv(robots{i}.R_dist + H * robots{i}.P * H') * H;
+		a{i} = H' * inv(robots{i}.R_dist + H * robots{i}.P * H') * z;
+	end	
 	% make the matrix symmetric
 	A = A + A';
-
-	% perform the trilateration with the topology matrix
-	for i = 1:n
-		% find the neighbors of the robot (the one tha can communicate with it)
-		neighbors = sum(A(3,:) == 1);
-		% if the robot has no neighbors, then it cannot find the target
-		if length(neighbors) < 2
-			fprintf("Robot %d has no sufficient neighbors",i);
-			continue;
-		end
-		% perform the trilateration
-		R = ones(neighbors + 1, neighbors + 1) * 0.5;
-		% construct the measurement vector
-		for i = 1:length(neighbors)+1
-			z(i) = norm(robots{i}.x - target.x);
-			H(i,:) = [1 / z(i) * (target.x(1) - robots{i}.x(1)), 1 / z(i) * (target.x(2) - robots{i}.x(2))];  
-		end
-		
-		robots{i}.target_est = inv(H' * inv(COV) * H) * H' * inv(COV) * z';
-		robots{i}.target_cov = inv(H' * inv(COV) * H);
+	
+	D = A * ones(n,1);
+	for k = 1:m
+		 % Maximum Degree Weighting
+		 FStore = F;
+		 aStore = a;
+		 for i=1:n
+			 for j=1:n
+				
+				 if A(i,j) == 1
+					 F{i} = F{i} + 1 / (1+max(D)) * (FStore{j} - FStore{i});
+					 a{i} = a{i} + 1 / (1+max(D)) * (aStore{j} - aStore{i});
+				 end
+			 end
+		 end
 	end
+	% set in the robots the target position and the covariance matrix
+	for i = 1:n
+		robots{i}.target_est = inv(F{i}) * a{i};
+	end
+
 	
 
 end
-
-
-%% z = Hx + epsilon
-
-% H is the measurement matrix
-% x is the state vector
-% epsilon is the measurement noise
-
-d = sqrt((xtar - xrob)^2 + (ytar - yrob)^2);
-
-% measurement matrix
-H = [(xtar - xrob)/d, (ytar - yrob)/d];
