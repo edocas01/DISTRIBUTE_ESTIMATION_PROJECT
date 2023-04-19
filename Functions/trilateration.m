@@ -9,10 +9,9 @@ function A = trilateration(robots, target, param)
 	m = param.MSG_PROTOCOL;
 	F = cell(n,1);
 	a = cell(n,1);
-	
-	
 	% topology matrix
 	A = zeros(n, n);
+	for ll = 1:10
 	for i = 1:n
 		for j = i+1:n
 			% if the distance between the two robots is less than their communication range
@@ -23,10 +22,10 @@ function A = trilateration(robots, target, param)
 		target_d = norm(robots{i}.x - target.x) + robots{i}.R_dist;
 		target_d_est = norm(robots{i}.x_est - robots{i}.target_est);
 		% jacobian matrix w.r.t. the target position
-		H = [(robots{i}.x_est(1) - robots{i}.target_est(1)) / target_d_est, (robots{i}.x_est(2) - robots{i}.target_est(2)) / target_d_est];
+		H(1,1) = (robots{i}.x_est(1) - robots{i}.target_est(1)) / target_d_est;
+		H(1,2) = (robots{i}.x_est(2) - robots{i}.target_est(2)) / target_d_est;
 		% measurement of the distance between the robot and the target
-		z = target_d + H * robots{i}.x_est;
-
+		z = target_d;
 		% initialize the matrices for the maximum degree weighting
 		F{i} = H' * inv(robots{i}.R_dist + H * robots{i}.P * H') * H;
 		a{i} = H' * inv(robots{i}.R_dist + H * robots{i}.P * H') * z;
@@ -51,9 +50,11 @@ function A = trilateration(robots, target, param)
 	end
 	% set in the robots the target position and the covariance matrix
 	for i = 1:n
-		robots{i}.target_est = inv(F{i}) * a{i};
-	end
+		tmp = robots{i}.target_P;
+		robots{i}.target_P = inv(robots{i}.target_P + F{i});
+		robots{i}.target_est = robots{i}.target_P * ((tmp) * robots{i}.target_est + a{i});
+		% robots{i}.target_est = inv(F{i})*a{i};
 
-	
+	end
 
 end
