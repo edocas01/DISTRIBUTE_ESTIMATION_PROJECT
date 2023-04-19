@@ -79,7 +79,7 @@ classdef ROBOT < handle
 		obj.Q = (rand(2,2) - 0.5);
 		obj.Q = obj.Q * obj.Q';
 		
-		obj.R_dist = randn()*0.2;			% 0.2 m is the standard deviation of the distance measurement
+		obj.R_dist = randn()^2;			% 0.2 m is the standard deviation of the distance measurement
 		obj.target_est = zeros(2,1);
 		obj.target_P = eye(2);
 		obj.id = id;
