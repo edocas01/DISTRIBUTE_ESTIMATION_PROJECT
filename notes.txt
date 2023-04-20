@@ -15,3 +15,24 @@ Control:
 
 DOMANDE:
 - incertezza nella trilaterazione -> jacobiana va calcolata rispetto al target o alla poszione delle ancore
+
+
+INCONTRO CON FONTANELLI 20/04/2023
+
+	Localizzazione distribuita con solo misure di distanza è impossibile perchè il prolema non è osservabile.
+	Quindi conviene fare come abbiamo fatto con misure relative.
+	Il consenso si può fare solo se gli agenti scambiano la stessa informazione:
+	nel caso in analisi ogni robot deve condividere con gli altri già una stima di posizione del target.
+	
+
+	GLi ostacoli conviene trattarli come misure di segmenti e conosciamo tipo gli angoli cose così 
+	(sarebbe interessante provare ad avere misure di un LIDAR anche per le misure relative tra robots e target)
+
+	Voronoi possiamo definire una gaussiana di peso che ha un massimo in un anello circolare per mantenere una certa distanza
+	e poi volendo un' altra gaussiana per ogni robot per mantere la distanza con gli altri robot.
+	Quindi avremo il centroide di voronoi e poi bisogna fare il controllo.
+	Se il robot è lineare il controllo è banale, altrimenti con un uniciclo il controllo va fatto considerando di generare una 
+	traiettoria oppure facendo un controllo di velocità.
+
+	N.B. le celle di voronoi non sono convesse ma il robot rispetto alla sua posizione le vede convesse. Può raggiungere
+	ogni posizione senza sbattere.

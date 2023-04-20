@@ -26,7 +26,7 @@ for i = 1:N
     robots{i} = ROBOT([3*cosd(360/N*i); 3*sind(360/N*i)], 10, i, 'linear');
 end
 target = TARGET([10,10]);
-centralized_trilateration(robots,target,parameters_simulation);
+trilateration(robots,target,parameters_simulation);
 
 disp(robots{1}.target_est);
 disp(robots{1}.target_P);
