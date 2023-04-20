@@ -45,15 +45,15 @@ classdef ROBOT < handle
 		
 		x; 					% real position of the robot
 		R_gps; 				% GPS measurement covariance matrix
-		Q; 					% Uncertainty matrix of the model
+		Q; 					% Uncertainty matrix of the dynamics model
 		
+		R_dist,             % distance measurement covariance matrix (1x1)
 		target_est; 		% estimated target position (absolute)
+		target_P;			% covariance matrix of the target position
 
 	end
-
 %{
 
- 
    ____        _     _ _        __  __                _                   
   |  _ \ _   _| |__ | (_) ___  |  \/  | ___ _ __ ___ | |__   ___ _ __ ___ 
   | |_) | | | | '_ \| | |/ __| | |\/| |/ _ \ '_ ` _ \| '_ \ / _ \ '__/ __|
@@ -65,24 +65,39 @@ classdef ROBOT < handle
 %}
 
 	methods 
-		% Iniatialization of the robot
-    function obj = ROBOT(x, y, comradius, id, type)
-		obj.x = zeros(2,1); 
-		obj.x(1) = x;
-		obj.x(2) = y;
-		obj.x_est = obj.x;
-		obj.P = eye(2);
-		obj.ComRadius = comradius;	
-		obj.R_gps = (rand(2,2) - 0.5);
-		obj.R_gps = obj.R_gps * obj.R_gps';
-		
-		obj.Q = (rand(2,2) - 0.5);
-		obj.Q = obj.Q * obj.Q';
-		
-		obj.target_est = zeros(2,1);
-		obj.id = id;
+	% Iniatialization of the robot
+    function obj = ROBOT(x, id, type, param)
 
 		obj.type = type;
+		if type == 'linear'	
+			obj.x = zeros(2,1); 
+			obj.x(1) = x(1);
+			obj.x(2) = x(2);
+			obj.x_est = obj.x;
+			obj.P = eye(2);
+			obj.Q = (rand(2,2) - 0.5) * param.std_relative_sensor;
+			obj.Q = obj.Q * obj.Q';
+		else if type == 'unicycle'
+			obj.x = zeros(3,1); 
+			obj.x(1) = x(1);
+			obj.x(2) = x(2);
+			obj.x(3) = x(3);
+			obj.x_est = obj.x;
+			obj.P = eye(3);
+			obj.Q = (rand(3,3) - 0.5) * param.std_relative_sensor;
+			obj.Q = obj.Q * obj.Q';
+		end
+			
+		obj.ComRadius = rand()*(param.MAX_RADIUS - param.MIN_RADIUS) + param.MIN_RADIUS;
+		obj.id = id;
+
+		obj.R_gps = (rand(2,2) - 0.5) * param.std_gps;	% 1 m is the standard deviation of the gps measurement
+		obj.R_gps = obj.R_gps * obj.R_gps';
+		
+		obj.R_dist = (rand(2,2) - 0.5) * param.std_relative_sensor;
+		obj.R_dist = obj.R_dist * obj.R_dist';
+		obj.target_est = zeros(2,1);
+		obj.target_P = eye(2);
         
     end
 
@@ -92,16 +107,28 @@ classdef ROBOT < handle
 		if strcmp(obj.type, 'linear')   
 			% linear dynamics with noise
 			obj.x_est = obj.x_est + u + mvnrnd([0;0], obj.Q)';
-
 			% linear dynamics without noise used in the gps measurement
 			obj.x = obj.x + u;
+		else if obj.type == 'unicycle'
+			% rotation matrix 3x3
+			R = [cos(obj.x_est(3)), -sin(obj.x_est(3)), 0;
+				 sin(obj.x_est(3)),  cos(obj.x_est(3)), 0;
+				 0, 0, 1];
+			% unicycle dynamics with noise
+			obj.x_est = obj.x_est + R*u + mvnrnd([0;0;0], obj.Q)';
+			% unicycle dynamics without noise used in the gps measurement
+			obj.x = obj.x + R*u;
 		end
 	end
 	
 	% Jacobian of the state function
 	function J_X = jacobian_state(obj)
-		if strcmp(obj.type, 'linear')
+		if obj.type == 'linear'
 			J_X = eye(2);
+		else if obj.type == 'unicycle'
+			J_X = [1, 0, -obj.x_est(2)*u(1) - obj.x_est(1)*u(2);
+				   0, 1,  obj.x_est(1)*u(1) - obj.x_est(2)*u(2);
+				   0, 0,  1];
 		end
 	end
 
@@ -109,6 +136,8 @@ classdef ROBOT < handle
 	function J_Q = jacobian_noise(obj)
 		if strcmp(obj.type, 'linear')
 			J_Q = eye(2);
+		else if obj.type == 'unicycle'
+			J_Q = eye(3);
 		end
 	end
 	
@@ -140,15 +169,10 @@ classdef ROBOT < handle
 	%}
 
 	% Plot the position of the robot with its communication radius
-	function plot(obj, varargin)
-		all_markers = {'o', 's', 'd', '*', '+', 'v', 'x', 'p', '^', '>', '<', 'h', '.', '_', '|'};
-		plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'k'), 'DisplayName', ['robot ', num2str(obj.id)]);
+	function plot(obj, all_markers)
+		plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['robot ', num2str(obj.id)]);
 		hold on;
-		
-		% -- Plot the communication circle slows down the simulation -- 
-		if ~isempty(varargin) && strcmp(varargin{1}, 'cmrange')
-			Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius, '--k', false);
-		end
+		Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius, '--k', false);
 	end
 
 			

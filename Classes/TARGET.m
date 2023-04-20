@@ -32,8 +32,8 @@ classdef TARGET < handle
 
 	methods 
 		% Iniatialization of the robot
-    	function obj = TARGET(x,y)
-			obj.x = [x; y];
+    	function obj = TARGET(x)
+			obj.x = [x(1);x(2)];
     	end
     
 		% Update the position of the robot
