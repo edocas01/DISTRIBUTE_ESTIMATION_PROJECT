@@ -67,15 +67,28 @@ classdef ROBOT < handle
 	methods 
 	% Iniatialization of the robot
     function obj = ROBOT(x, id, type, param)
+
 		obj.type = type;
-		obj.x = zeros(2,1); 
-		obj.x(1) = x(1);
-		obj.x(2) = x(2);
-		obj.x_est = obj.x;
-		obj.P = eye(2);
+		if type == 'linear'	
+			obj.x = zeros(2,1); 
+			obj.x(1) = x(1);
+			obj.x(2) = x(2);
+			obj.x_est = obj.x;
+			obj.P = eye(2);
+			obj.Q = (rand(2,2) - 0.5) * param.std_relative_sensor;
+			obj.Q = obj.Q * obj.Q';
+		else if type == 'unicycle'
+			obj.x = zeros(3,1); 
+			obj.x(1) = x(1);
+			obj.x(2) = x(2);
+			obj.x(3) = x(3);
+			obj.x_est = obj.x;
+			obj.P = eye(3);
+			obj.Q = (rand(3,3) - 0.5) * param.std_relative_sensor;
+			obj.Q = obj.Q * obj.Q';
+		end
+			
 		obj.ComRadius = rand()*(param.MAX_RADIUS - param.MIN_RADIUS) + param.MIN_RADIUS;
-		obj.Q = (rand(2,2) - 0.5) * param.std_relative_sensor;
-		obj.Q = obj.Q * obj.Q';
 		obj.id = id;
 
 		obj.R_gps = (rand(2,2) - 0.5) * param.std_gps;	% 1 m is the standard deviation of the gps measurement
@@ -94,18 +107,30 @@ classdef ROBOT < handle
 		if obj.type == 'linear'		
 			% linear dynamics with noise
 			obj.x_est = obj.x_est + u + mvnrnd([0;0], obj.Q)';
-
 			% linear dynamics without noise used in the gps measurement
 			obj.x = obj.x + u;
+		else if obj.type == 'unicycle'
+			% rotation matrix 3x3
+			R = [cos(obj.x_est(3)), -sin(obj.x_est(3)), 0;
+				 sin(obj.x_est(3)),  cos(obj.x_est(3)), 0;
+				 0, 0, 1];
+			% unicycle dynamics with noise
+			obj.x_est = obj.x_est + R*u + mvnrnd([0;0;0], obj.Q)';
+			% unicycle dynamics without noise used in the gps measurement
+			obj.x = obj.x + R*u;
 		end
 	end
 	
 
 
 	% Jacobian of the state function
-	function J_X = jacobian_state(obj)
+	function J_X = jacobian_state(obj,u)
 		if obj.type == 'linear'
 			J_X = eye(2);
+		else if obj.type == 'unicycle'
+			J_X = [1, 0, -obj.x_est(2)*u(1) - obj.x_est(1)*u(2);
+				   0, 1,  obj.x_est(1)*u(1) - obj.x_est(2)*u(2);
+				   0, 0,  1];
 		end
 	end
 
@@ -113,6 +138,8 @@ classdef ROBOT < handle
 	function J_Q = jacobian_noise(obj)
 		if obj.type == 'linear'
 			J_Q = eye(2);
+		else if obj.type == 'unicycle'
+			J_Q = eye(3);
 		end
 	end
 	

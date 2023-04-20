@@ -1,7 +1,7 @@
 % Font configuration
-% set(0,'defaulttextinterpreter','latex')
-% set(groot, 'defaultAxesTickLabelInterpreter','latex');
-% set(groot, 'defaultLegendInterpreter','latex');
+set(0,'defaulttextinterpreter','latex')
+set(groot, 'defaultAxesTickLabelInterpreter','latex');
+set(groot, 'defaultLegendInterpreter','latex');
 % 
 % set(0,'DefaultFigureWindowStyle','docked');
 % set(0,'defaultAxesFontSize',  16)
@@ -17,7 +17,7 @@ parameters_simulation = struct( ...
 	'title_flags', 					false, 			... % to print the central strings
 	... % Robot parameters 	
 	'MIN_RADIUS', 					0.8, 			... % minimum radius of the communication range (m)
-	'MAX_RADIUS', 					2, 				... % maximum radius of the communication range (m)
+	'MAX_RADIUS', 					5, 				... % maximum radius of the communication range (m)
 	'std_gps', 						1, 				... % standard deviation of the GPS (m)
 	'std_robots_model', 			1, 				... % standard deviation of the robot model (m)
 	'std_relative_sensor', 			1,      		... % standard deviation of the relative sensor (m)

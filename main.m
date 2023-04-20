@@ -15,7 +15,7 @@ addpath('Classes');
 
 % Load config
 config;
-N = 3;
+N = 5;
 if N > parameters_simulation.N_MAX
     N = parameters_simulation.N_MAX;
 end
