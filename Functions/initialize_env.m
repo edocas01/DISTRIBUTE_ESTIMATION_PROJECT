@@ -24,7 +24,7 @@ function [target, u_trajectory, obstacles] = initialize_env(param)
 		plot(x, y, 'sk');
 		idx = idx + 1;
 	end
-	print_title("Acquired obstacles");
+	print_title("Acquired obstacles",param.title_flags);
 	
 	sgtitle("Select points to create trajectory")
 	% Set the target trajectory
@@ -41,7 +41,7 @@ function [target, u_trajectory, obstacles] = initialize_env(param)
 	end
 	
 	close(fig_1);
-	print_title("Acquired trajectory");
+	print_title("Acquired trajectory",param.title_flags);
 
 	n = length(x);
 
@@ -62,6 +62,6 @@ function [target, u_trajectory, obstacles] = initialize_env(param)
     end
 
 	% generate the target
-	target = TARGET(x(1),y(1));
+	target = TARGET([x(1),y(1)]);
 
 end

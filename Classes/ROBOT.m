@@ -66,25 +66,25 @@ classdef ROBOT < handle
 
 	methods 
 	% Iniatialization of the robot
-    function obj = ROBOT(x, comradius, id, type)
+    function obj = ROBOT(x, id, type, param)
+		obj.type = type;
 		obj.x = zeros(2,1); 
 		obj.x(1) = x(1);
 		obj.x(2) = x(2);
 		obj.x_est = obj.x;
 		obj.P = eye(2);
-		obj.ComRadius = comradius;	
-		obj.R_gps = (rand(2,2) - 0.5) * 1;	% 1 m is the standard deviation of the gps measurement
-		obj.R_gps = obj.R_gps * obj.R_gps';
-		
-		obj.Q = (rand(2,2) - 0.5);
+		obj.ComRadius = rand()*(param.MAX_RADIUS - param.MIN_RADIUS) + param.MIN_RADIUS;
+		obj.Q = (rand(2,2) - 0.5) * param.std_relative_sensor;
 		obj.Q = obj.Q * obj.Q';
-		
-		obj.R_dist = randn()^2;			% 0.2 m is the standard deviation of the distance measurement
-		obj.target_est = zeros(2,1);
-		obj.target_P = eye(2);
 		obj.id = id;
 
-		obj.type = type;
+		obj.R_gps = (rand(2,2) - 0.5) * param.std_gps;	% 1 m is the standard deviation of the gps measurement
+		obj.R_gps = obj.R_gps * obj.R_gps';
+		
+		obj.R_dist = (rand(2,2) - 0.5) * param.std_relative_sensor;
+		obj.R_dist = obj.R_dist * obj.R_dist';
+		obj.target_est = zeros(2,1);
+		obj.target_P = eye(2);
         
     end
 
