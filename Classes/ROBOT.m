@@ -45,15 +45,15 @@ classdef ROBOT < handle
 		
 		x; 					% real position of the robot
 		R_gps; 				% GPS measurement covariance matrix
-		Q; 					% Uncertainty matrix of the model
+		Q; 					% Uncertainty matrix of the dynamics model
 		
+		R_dist,             % distance measurement covariance matrix (1x1)
 		target_est; 		% estimated target position (absolute)
+		target_P;			% covariance matrix of the target position
 
 	end
-
 %{
 
- 
    ____        _     _ _        __  __                _                   
   |  _ \ _   _| |__ | (_) ___  |  \/  | ___ _ __ ___ | |__   ___ _ __ ___ 
   | |_) | | | | '_ \| | |/ __| | |\/| |/ _ \ '_ ` _ \| '_ \ / _ \ '__/ __|
@@ -65,21 +65,23 @@ classdef ROBOT < handle
 %}
 
 	methods 
-		% Iniatialization of the robot
-    function obj = ROBOT(x, y, comradius, id, type)
+	% Iniatialization of the robot
+    function obj = ROBOT(x, comradius, id, type)
 		obj.x = zeros(2,1); 
-		obj.x(1) = x;
-		obj.x(2) = y;
+		obj.x(1) = x(1);
+		obj.x(2) = x(2);
 		obj.x_est = obj.x;
 		obj.P = eye(2);
 		obj.ComRadius = comradius;	
-		obj.R_gps = (rand(2,2) - 0.5);
+		obj.R_gps = (rand(2,2) - 0.5) * 1;	% 1 m is the standard deviation of the gps measurement
 		obj.R_gps = obj.R_gps * obj.R_gps';
 		
 		obj.Q = (rand(2,2) - 0.5);
 		obj.Q = obj.Q * obj.Q';
 		
+		obj.R_dist = randn()^2;			% 0.2 m is the standard deviation of the distance measurement
 		obj.target_est = zeros(2,1);
+		obj.target_P = eye(2);
 		obj.id = id;
 
 		obj.type = type;
@@ -97,6 +99,8 @@ classdef ROBOT < handle
 			obj.x = obj.x + u;
 		end
 	end
+	
+
 
 	% Jacobian of the state function
 	function J_X = jacobian_state(obj)
@@ -141,9 +145,9 @@ classdef ROBOT < handle
 
 	% Plot the position of the robot with its communication radius
 	function plot(obj, all_markers)
-		plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'k'), 'DisplayName', ['robot ', num2str(obj.id)]);
+		plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['robot ', num2str(obj.id)]);
 		hold on;
-		Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius, '--k', false);
+		Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius, '--b', false);
 	end
 
 			
