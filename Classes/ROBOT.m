@@ -51,6 +51,8 @@ classdef ROBOT < handle
 		target_est; 		% estimated target position (absolute)
 		target_P;			% covariance matrix of the target position
 
+		target_est_hist;	% history of the target estimation
+		target_P_hist;		% history of the target covariance matrix
 	end
 %{
 
@@ -69,7 +71,7 @@ classdef ROBOT < handle
     function obj = ROBOT(x, id, type, param)
 
 		obj.type = type;
-		if type == 'linear'	
+		if strcmp(obj.type, 'linear')
 			obj.x = zeros(2,1); 
 			obj.x(1) = x(1);
 			obj.x(2) = x(2);
@@ -77,7 +79,7 @@ classdef ROBOT < handle
 			obj.P = eye(2);
 			obj.Q = (rand(2,2) - 0.5) * param.std_relative_sensor;
 			obj.Q = obj.Q * obj.Q';
-		else if type == 'unicycle'
+		elseif strcmp(obj.type, 'unicycle')
 			obj.x = zeros(3,1); 
 			obj.x(1) = x(1);
 			obj.x(2) = x(2);
@@ -109,7 +111,7 @@ classdef ROBOT < handle
 			obj.x_est = obj.x_est + u + mvnrnd([0;0], obj.Q)';
 			% linear dynamics without noise used in the gps measurement
 			obj.x = obj.x + u;
-		else if obj.type == 'unicycle'
+		elseif strcmp(obj.type, 'unicycle')
 			% rotation matrix 3x3
 			R = [cos(obj.x_est(3)), -sin(obj.x_est(3)), 0;
 				 sin(obj.x_est(3)),  cos(obj.x_est(3)), 0;
@@ -123,9 +125,9 @@ classdef ROBOT < handle
 	
 	% Jacobian of the state function
 	function J_X = jacobian_state(obj)
-		if obj.type == 'linear'
+		if strcmp(obj.type, 'linear')
 			J_X = eye(2);
-		else if obj.type == 'unicycle'
+		elseif strcmp(obj.type, 'unicycle')
 			J_X = [1, 0, -obj.x_est(2)*u(1) - obj.x_est(1)*u(2);
 				   0, 1,  obj.x_est(1)*u(1) - obj.x_est(2)*u(2);
 				   0, 0,  1];
@@ -136,7 +138,7 @@ classdef ROBOT < handle
 	function J_Q = jacobian_noise(obj)
 		if strcmp(obj.type, 'linear')
 			J_Q = eye(2);
-		else if obj.type == 'unicycle'
+		elseif strcmp(obj.type, 'unicycle')
 			J_Q = eye(3);
 		end
 	end
@@ -169,12 +171,18 @@ classdef ROBOT < handle
 	%}
 
 	% Plot the position of the robot with its communication radius
-	function plot(obj, all_markers)
-		plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['robot ', num2str(obj.id)]);
+	function plot(obj, all_markers, color_matrix, plot_circle)
+		plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['robot ', num2str(obj.id)], 'MarkerSize', 10, 'Color', color_matrix(obj.id,:));
 		hold on;
-		Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius, '--k', false);
+		if plot_circle
+			Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius, '--k', false);
+		end
 	end
 
+	function Clear_Targ_Estimates(obj)
+		obj.target_est = zeros(2,1);
+		obj.target_P = eye(2);
+	end
 			
 	end % methods
 	

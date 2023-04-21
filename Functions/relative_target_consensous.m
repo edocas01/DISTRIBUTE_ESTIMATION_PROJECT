@@ -8,6 +8,12 @@ function relative_target_consensous(robots, target, param)
 	a = cell(n,1);
 	% topology matrix
 	A = zeros(n, n);
+
+	% Save the estimation history in the robots
+	for i = 1:n
+		robots{i}.target_est_hist = zeros(2, m+2);
+		robots{i}.target_P_hist = cell(1, m+2);
+	end
 	
 	for i = 1:n
 		count = 0;
@@ -35,6 +41,8 @@ function relative_target_consensous(robots, target, param)
 		% initialize the matrices for the maximum degree weighting
 		F{i} = H' * inv(robots{i}.R_dist + H * robots{i}.P * H') * H;
 		a{i} = H' * inv(robots{i}.R_dist + H * robots{i}.P * H') * z;
+		robots{i}.target_est_hist(:, 1) = inv(F{i}) * a{i};
+		robots{i}.target_P_hist{1} = inv(F{i});
 	end
 	
 	D = A * ones(n,1);
@@ -48,8 +56,10 @@ function relative_target_consensous(robots, target, param)
 				 if A(i,j) == 1
 					F{i} = F{i} + 1 / (1+max(D)) * (FStore{j} - FStore{i});
 					a{i} = a{i} + 1 / (1+max(D)) * (aStore{j} - aStore{i});
-				 end
-			 end
+				end
+			end
+			robots{i}.target_est_hist(:, k+1) = inv(F{i}) * a{i};
+			robots{i}.target_P_hist{k+1} = inv(F{i});
 		 end
 	end
 	% set in the robots the target position and the covariance matrix
@@ -59,7 +69,8 @@ function relative_target_consensous(robots, target, param)
 		% robots{i}.target_est = robots{i}.target_P * ((tmp) * robots{i}.target_est + a{i});
 		robots{i}.target_est = inv(F{i})*a{i};
 		robots{i}.target_P = inv(F{i});
-
+		robots{i}.target_est_hist(:, k+2) = robots{i}.target_est;
+		robots{i}.target_P_hist{k+2} = robots{i}.target_P;
 	end
 
 end

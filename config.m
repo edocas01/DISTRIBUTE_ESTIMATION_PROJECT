@@ -25,4 +25,24 @@ parameters_simulation = struct( ...
 	'MSG_PROTOCOL', 				50				... % protocol used for message passing
 	);
 
+% Define the colors in a matrix 15 by 3 (RGB) without red
+color_matrix = [ ...
+				[0, 0, 1]; 			... % blue
+				[0, 1, 0]; 			... % green
+				[0, 1, 1]; 			... % cyan
+				[1, 0, 1]; 			... % magenta
+				[1, 0.5, 0]; 		... % orange
+				[0, 0, 0.5]; 		... % dark blue
+				[0, 0.5, 0]; 		... % dark green
+				[0, 0.5, 0.5]; 		... % dark cyan
+				[0.5, 0, 0]; 		... % dark red
+				[0.5, 0, 0.5]; 		... % dark magenta
+				[0.5, 0.5, 0]; 		... % dark yellow
+				[0.5, 0.5, 0.5]; 	... % dark gray
+				[0.5, 0.25, 0]; 	... % dark brown
+				[1, 0.75, 0.5]; 	... % light orange
+				[0.75, 0.75, 0.75]; ... % light gray
+				];
+
+
 all_markers = {'o', 's', 'd', '*', '+', 'v', 'x', 'p', '^', '>', '<', 'h', '.', '_', '|'};
