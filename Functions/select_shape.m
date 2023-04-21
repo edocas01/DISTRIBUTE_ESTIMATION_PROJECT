@@ -9,37 +9,54 @@ function R = select_shape(N_robots, type, shape, center_point, distance, randdis
 		case 'circle'
 			for i = 1:N_robots
 				if randdistance
-					distance = distance + rand() * distance / 32;
+					radius = distance + (-1 + 2 * rand()) * distance / 8;
+				else
+					radius = distance;
 				end
-				x = center_point(1) + distance * cos(2 * pi * i / N_robots);
-				y = center_point(2) + distance * sin(2 * pi * i / N_robots);
+				x = center_point(1) + radius * cos(2 * pi * i / N_robots);
+				y = center_point(2) + radius * sin(2 * pi * i / N_robots);
 				R{i} = ROBOT([x, y], i, type(i), param);
 			end			
 		case 'square' % place the robots in the vertices of a square
 			for i = 1:N_robots
+				diagonal = distance * sqrt(2);
 				if randdistance
-					distance = distance + rand() * distance / 32;
+					fr = distance / 8;
+					A = center_point + [ diagonal ,  diagonal] + fr * (-1 + 2 * rand(1, 2)); 
+					B = center_point + [-diagonal ,  diagonal] + fr * (-1 + 2 * rand(1, 2));
+					C = center_point + [-diagonal , -diagonal] + fr * (-1 + 2 * rand(1, 2));
+					D = center_point + [ diagonal , -diagonal] + fr * (-1 + 2 * rand(1, 2));
+				else
+					A = center_point + [ diagonal ,  diagonal]; 
+					B = center_point + [-diagonal ,  diagonal];
+					C = center_point + [-diagonal , -diagonal];
+					D = center_point + [ diagonal , -diagonal];
 				end
+				% square vertex
+				vertex = [A; B; C; D];
+				% Mid points
+				E = (A + D) / 2;
+				F = (A + B) / 2;
+				G = (B + C) / 2;
+				H = (C + D) / 2;
+				midpoints = [E; F; G; H];
+				% Mid mid points
+				I = (E + A) / 2;
+				J = (F + A) / 2;
+				K = (B + F) / 2;
+				L = (B + G) / 2;
+				M = (C + G) / 2;
+				N = (C + H) / 2;
+				O = (D + H) / 2;
+				midmidpoints = [I; J; K; L; M; N; O];
 				if i <= 4
-					x = center_point(1) + distance * cos(pi / 4 + pi / 2 * (i - 1));
-					y = center_point(2) + distance * sin(pi / 4 + pi / 2 * (i - 1));
+					R{i} = ROBOT(vertex(i, :), i, type(i), param);
 				elseif i <= 8
-					x = center_point(1) + (distance * sin(pi / 4)) * cos(pi / 2 + pi / 2 * (i - 1));
-					y = center_point(2) + (distance * sin(pi / 4)) * sin(pi / 2 + pi / 2 * (i - 1));
-				elseif i <= 10
-					x = center_point(1) + (distance * sin(pi / 4) / cos(atan(1 / 2))) * cos((pi / 2 - atan(1 / 2)) + 2 * atan(1 / 2) * (i - 9) );
-					y = center_point(2) + (distance * sin(pi / 4) / cos(atan(1 / 2))) * sin((pi / 2 - atan(1 / 2)) + 2 * atan(1 / 2) * (i - 9) );
-				elseif i <= 12
-					x = center_point(1) + (distance * sin(pi / 4) / cos(atan(1 / 2))) * cos((pi - atan(1 / 2)) + 2 * atan(1 / 2) * (i - 11));
-					y = center_point(2) + (distance * sin(pi / 4) / cos(atan(1 / 2))) * sin((pi - atan(1 / 2)) + 2 * atan(1 / 2) * (i - 11));
-				elseif i <= 14
-					x = center_point(1) + (distance * sin(pi / 4) / cos(atan(1 / 2))) * cos((3 * pi / 2 - atan(1 / 2)) + 2 * atan(1 / 2) * (i - 13));
-					y = center_point(2) + (distance * sin(pi / 4) / cos(atan(1 / 2))) * sin((3 * pi / 2 - atan(1 / 2)) + 2 * atan(1 / 2) * (i - 13));
+					R{i} = ROBOT(midpoints(i - 4, :), i, type(i), param);
 				elseif i <= 15
-					x = center_point(1) + (distance * sin(pi / 4) / cos(atan(1 / 2))) * cos((-atan(1 / 2)) + 0*2 * atan(1 / 2) * (i - 14));
-					y = center_point(2) + (distance * sin(pi / 4) / cos(atan(1 / 2))) * sin((-atan(1 / 2)) + 0*2 * atan(1 / 2) * (i - 14));
+					R{i} = ROBOT(midmidpoints(i - 8, :), i, type(i), param);
 				end
-				R{i} = ROBOT([x, y], i, type(i), param);
+				% R{i} = ROBOT([x, y], i, type(i), param);
 			end
 		case 'triangle'
 			% do something
