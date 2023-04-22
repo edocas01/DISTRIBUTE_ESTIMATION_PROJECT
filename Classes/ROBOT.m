@@ -44,6 +44,7 @@ classdef ROBOT < handle
 		id; 				% id of the robot
 		
 		x; 					% real position of the robot
+		x_in; 				% initial (real) position of the robot 
 		R_gps; 				% GPS measurement covariance matrix
 		Q; 					% Uncertainty matrix of the dynamics model
 		
@@ -51,8 +52,11 @@ classdef ROBOT < handle
 		target_est; 		% estimated target position (absolute)
 		target_P;			% covariance matrix of the target position
 
-		target_est_hist;	% history of the target estimation
-		target_P_hist;		% history of the target covariance matrix
+		target_est_hist;
+		target_P_hist;
+
+		target_est_hist_messages;	% history of the target estimation
+		target_P_hist_messages;		% history of the target covariance matrix
 	end
 %{
 
@@ -75,6 +79,7 @@ classdef ROBOT < handle
 			obj.x = zeros(2,1); 
 			obj.x(1) = x(1);
 			obj.x(2) = x(2);
+			obj.x_in = obj.x; % Save initial position in case of initiailzation
 			obj.x_est = obj.x;
 			obj.P = eye(2);
 			obj.Q = (rand(2,2) - 0.5) * param.std_relative_sensor;
@@ -84,6 +89,7 @@ classdef ROBOT < handle
 			obj.x(1) = x(1);
 			obj.x(2) = x(2);
 			obj.x(3) = x(3);
+			obj.x_in = obj.x;
 			obj.x_est = obj.x;
 			obj.P = eye(3);
 			obj.Q = (rand(3,3) - 0.5) * param.std_relative_sensor;
@@ -100,7 +106,14 @@ classdef ROBOT < handle
 		obj.R_dist = obj.R_dist * obj.R_dist';
 		obj.target_est = zeros(2,1);
 		obj.target_P = eye(2);
-        
+
+		% To track the estimation after the consensus algorithm is completed
+		obj.target_est_hist = [];
+		obj.target_P_hist = {};
+
+		% To track the estimation during the iterations of the consensus algorithm
+        obj.target_est_hist_messages = [];
+		obj.target_P_hist_messages = {};
     end
 
 	     
@@ -179,10 +192,23 @@ classdef ROBOT < handle
 		end
 	end
 
+	function Initialize_Position(obj)
+		obj.x = obj.x_in;
+	end
+	
 	function Clear_Targ_Estimates(obj)
 		obj.target_est = zeros(2,1);
 		obj.target_P = eye(2);
 	end
+
+	function Clear_Targ_Estimates_Hist(obj)
+		obj.target_est_hist = [];
+		obj.target_P_hist = {};
+		obj.target_est_hist_messages = [];
+		obj.target_P_hist_messages = {};
+	end
+
+
 			
 	end % methods
 	

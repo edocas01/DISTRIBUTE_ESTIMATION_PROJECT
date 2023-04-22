@@ -3,8 +3,6 @@ function R = select_shape(N_robots, type, shape, center_point, distance, randdis
 	if (~isvector(type)) || (length(type) ~= N_robots)
 		error('Insert a dimension %d vector of dynamics type', N_robots)
 	end
-	% 27 degrees in radians
-
 	switch shape
 		case 'circle'
 			for i = 1:N_robots
@@ -17,7 +15,7 @@ function R = select_shape(N_robots, type, shape, center_point, distance, randdis
 				y = center_point(2) + radius * sin(2 * pi * i / N_robots);
 				R{i} = ROBOT([x, y], i, type(i), param);
 			end			
-		case 'square' % place the robots in the vertices of a square
+		case 'square'
 			for i = 1:N_robots
 				diagonal = distance * sqrt(2);
 				if randdistance
@@ -32,17 +30,17 @@ function R = select_shape(N_robots, type, shape, center_point, distance, randdis
 					C = center_point + [-diagonal , -diagonal];
 					D = center_point + [ diagonal , -diagonal];
 				end
-				% square vertex
-				vertex = [A; B; C; D];
-				% Mid points
-				E = (A + D) / 2;
-				F = (A + B) / 2;
-				G = (B + C) / 2;
-				H = (C + D) / 2;
-				midpoints = [E; F; G; H];
-				% Mid mid points
-				I = (E + A) / 2;
-				J = (F + A) / 2;
+				% square vertex            % B----K----F----J----A
+				vertex = [A; B; C; D];     % |                   |
+				% Mid points               % L				     I
+				E = (A + D) / 2;           % |                   |       
+				F = (A + B) / 2;           % G                   E   
+				G = (B + C) / 2;           % |                   |    
+				H = (C + D) / 2;           % M					 |    
+				midpoints = [E; F; G; H];  % |                   |         
+				% Mid mid points           % C----N----H----O----D    
+				I = (E + A) / 2;                    
+				J = (F + A) / 2;                
 				K = (B + F) / 2;
 				L = (B + G) / 2;
 				M = (C + G) / 2;

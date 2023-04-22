@@ -1,5 +1,6 @@
 % This function is used to generate the obstacles and the target with its trajectory
-function [target, u_trajectory, obstacles] = initialize_env(param)
+function [target, trajectory, u_trajectory, obstacles] = initialize_env(param)
+	trajectory = [];
     u_trajectory = [];
 	obstacles = {};
 	x = [];
@@ -41,8 +42,8 @@ function [target, u_trajectory, obstacles] = initialize_env(param)
 	end
 	
 	close(fig_1);
-	print_title("Acquired trajectory",param.title_flags);
-
+	print_title("Acquired trajectory", param.title_flags);
+	trajectory = [x;y];
 	n = length(x);
 
 	% inputs for the target

@@ -9,11 +9,6 @@ function distributed_KF(robots, target, param)
 	% topology matrix
 	A = zeros(n, n);
 
-	% Save the estimation history in the robots
-	for i = 1:n
-		robots{i}.target_est_hist = zeros(2, m+1);
-		robots{i}.target_P_hist = cell(1, m+1);
-	end
 	
 	for i = 1:n
 		count = 0;
@@ -66,8 +61,8 @@ function distributed_KF(robots, target, param)
 		targ_P_prior = robots{i}.target_P;
 		targ_est_prior = robots{i}.target_est;
 		% Update
-		robots{i}.target_P = inv(targ_P_prior * + F{i}) ;
-		robots{i}.target_est = robots{i}.target_P * (targ_P_prior * targ_est_prior + a{i});
+		robots{i}.target_P = inv(targ_P_prior + n * F{i}) ;
+		robots{i}.target_est = robots{i}.target_P * (targ_P_prior * targ_est_prior + n * a{i});
 	end
 
 
