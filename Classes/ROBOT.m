@@ -44,6 +44,7 @@ classdef ROBOT < handle
 		id; 				% id of the robot
 		
 		x; 					% real position of the robot
+		x_in; 				% initial (real) position of the robot 
 		R_gps; 				% GPS measurement covariance matrix
 		Q; 					% Uncertainty matrix of the dynamics model
 		
@@ -51,6 +52,11 @@ classdef ROBOT < handle
 		target_est; 		% estimated target position (absolute)
 		target_P;			% covariance matrix of the target position
 
+		target_est_hist;    % history of the target estimation
+		target_P_hist;		% history of the target covariance matrix
+		
+		target_est_hist_messages;	% history of the target estimation
+		target_P_hist_messages;		% history of the target covariance matrix
 	end
 %{
 
@@ -66,59 +72,93 @@ classdef ROBOT < handle
 
 	methods 
 	% Iniatialization of the robot
-    function obj = ROBOT(x, comradius, id, type)
-		obj.x = zeros(2,1); 
-		obj.x(1) = x(1);
-		obj.x(2) = x(2);
-		obj.x_est = obj.x;
-		obj.P = eye(2);
-		obj.ComRadius = comradius;	
-		obj.R_gps = (rand(2,2) - 0.5) * 1;	% 1 m is the standard deviation of the gps measurement
-		obj.R_gps = obj.R_gps * obj.R_gps';
-		
-		obj.Q = (rand(2,2) - 0.5);
-		obj.Q = obj.Q * obj.Q';
-		
-		obj.R_dist = randn()^2;			% 0.2 m is the standard deviation of the distance measurement
-		obj.target_est = zeros(2,1);
-		obj.target_P = eye(2);
-		obj.id = id;
+    function obj = ROBOT(x, id, type, param)
 
 		obj.type = type;
-        
+		if strcmp(obj.type, 'linear')
+			obj.x = zeros(2,1); 
+			obj.x(1) = x(1);
+			obj.x(2) = x(2);
+			obj.x_in = obj.x; % Save initial position in case of initiailzation
+			obj.x_est = obj.x;
+			obj.P = eye(2);
+			obj.Q = (rand(2,2) - 0.5) * param.std_relative_sensor;
+			obj.Q = obj.Q * obj.Q';
+		elseif strcmp(obj.type, 'unicycle')
+			obj.x = zeros(3,1); 
+			obj.x(1) = x(1);
+			obj.x(2) = x(2);
+			obj.x(3) = x(3);
+			obj.x_in = obj.x;
+			obj.x_est = obj.x;
+			obj.P = eye(3);
+			obj.Q = (rand(3,3) - 0.5) * param.std_relative_sensor;
+			obj.Q = obj.Q * obj.Q';
+		end
+			
+		obj.ComRadius = rand()*(param.MAX_RADIUS - param.MIN_RADIUS) + param.MIN_RADIUS;
+		obj.id = id;
+
+		obj.R_gps = (rand(2,2) - 0.5) * param.std_gps;	% 1 m is the standard deviation of the gps measurement
+		obj.R_gps = obj.R_gps * obj.R_gps';
+		
+		obj.R_dist = (rand(2,2) - 0.5) * param.std_relative_sensor;
+		obj.R_dist = obj.R_dist * obj.R_dist';
+		obj.target_est = zeros(2,1);
+		obj.target_P = eye(2);
+
+		% To track the estimation after the consensus algorithm is completed
+		obj.target_est_hist = [];
+		obj.target_P_hist = {};
+
+		% To track the estimation during the iterations of the consensus algorithm
+        obj.target_est_hist_messages = [];
+		obj.target_P_hist_messages = {};
     end
 
 	     
 	% Update the position of the robot
 	function obj = dynamics(obj, u)
-		if obj.type == 'linear'		
+		if strcmp(obj.type, 'linear')   
 			% linear dynamics with noise
 			obj.x_est = obj.x_est + u + mvnrnd([0;0], obj.Q)';
-
 			% linear dynamics without noise used in the gps measurement
 			obj.x = obj.x + u;
+		elseif strcmp(obj.type, 'unicycle')
+			% rotation matrix 3x3
+			R = [cos(obj.x_est(3)), -sin(obj.x_est(3)), 0;
+				 sin(obj.x_est(3)),  cos(obj.x_est(3)), 0;
+				 0, 0, 1];
+			% unicycle dynamics with noise
+			obj.x_est = obj.x_est + R*u + mvnrnd([0;0;0], obj.Q)';
+			% unicycle dynamics without noise used in the gps measurement
+			obj.x = obj.x + R*u;
 		end
 	end
 	
-
-
 	% Jacobian of the state function
 	function J_X = jacobian_state(obj)
-		if obj.type == 'linear'
+		if strcmp(obj.type, 'linear')
 			J_X = eye(2);
+		elseif strcmp(obj.type, 'unicycle')
+			J_X = [1, 0, -obj.x_est(2)*u(1) - obj.x_est(1)*u(2);
+				   0, 1,  obj.x_est(1)*u(1) - obj.x_est(2)*u(2);
+				   0, 0,  1];
 		end
 	end
 
 	% Jacobian of the noise function
 	function J_Q = jacobian_noise(obj)
-		if obj.type == 'linear'
+		if strcmp(obj.type, 'linear')
 			J_Q = eye(2);
+		elseif strcmp(obj.type, 'unicycle')
+			J_Q = eye(3);
 		end
 	end
 	
 	% Jacobian of the measurement function
 	function J_H = jacobian_measurement(obj)
-		if obj.type == 'linear'
+		if strcmp(obj.type, 'linear')
 			J_H = eye(2);
 		end
 	end
@@ -144,13 +184,30 @@ classdef ROBOT < handle
 	%}
 
 	% Plot the position of the robot with its communication radius
-	function plot(obj, all_markers)
-		plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['robot ', num2str(obj.id)]);
+	function plot(obj, all_markers, color_matrix, plot_circle)
+		plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['robot ', num2str(obj.id)], 'MarkerSize', 10, 'Color', color_matrix(obj.id,:));
 		hold on;
-		Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius, '--b', false);
+		if plot_circle
+			Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius, '--k', false);
+		end
 	end
 
-			
+	function Initialize_Position(obj)
+		obj.x = obj.x_in;
+	end
+	
+	function Clear_Targ_Estimates(obj)
+		obj.target_est = zeros(2,1);
+		obj.target_P = eye(2);
+	end
+
+	function Clear_Targ_Estimates_Hist(obj)
+		obj.target_est_hist = [];
+		obj.target_P_hist = {};
+		obj.target_est_hist_messages = [];
+		obj.target_P_hist_messages = {};
+	end
+		
 	end % methods
 	
 end % classdef

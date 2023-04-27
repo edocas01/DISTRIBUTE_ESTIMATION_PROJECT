@@ -36,3 +36,27 @@ INCONTRO CON FONTANELLI 20/04/2023
 
 	N.B. le celle di voronoi non sono convesse ma il robot rispetto alla sua posizione le vede convesse. Può raggiungere
 	ogni posizione senza sbattere.
+
+
+
+
+TODO:
+far vedere performance di ogni setp:
+	Localizzazione
+	stima target
+	controllo
+	...
+fare stessa simulazione con diverso numero di ROBOT
+far vedere cosa "vede" ad esempio il robot 1 durante le simulazioni come sono le incertezze e cose così
+fare unicicli  
+fare laserscan
+valutare piu forme
+far vedere le performance (definire dei parametri)
+far vedere voronoi
+estrazione features di ostacoli (eventuali pareti ...)
+
+SE aggiungo o tolgo robot cosa succede
+
+alcuni robot più lenti di altri
+
+far vedere i potenziali delle gaussiane

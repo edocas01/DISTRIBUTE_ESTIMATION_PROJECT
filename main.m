@@ -1,3 +1,7 @@
+% Syntax Functions
+% ROBOT(x, y, comradius, id, type) 	type can be 'linear'
+
+
 clc;
 clear;
 close all;
@@ -7,7 +11,7 @@ addpath('Functions');
 addpath('Classes');
 
 % Syntax classes
-% ROBOT(x, y, comradius, id, type)      type = 'linear' or 'unicycle'
+% ROBOT(x, y, comradius, id, type, param)      type = 'linear' or 'unicycle'
 % ROBOT.dynamics(u)                     u = input vector
 % ROBOT.plot(all_markers)
 % TARGET(x,y)
@@ -15,7 +19,7 @@ addpath('Classes');
 
 % Load config
 config;
-N = 10;
+N = 5;
 if N > parameters_simulation.N_MAX
     N = parameters_simulation.N_MAX;
 end
@@ -23,20 +27,42 @@ end
 %% Initialize robots
 robots = cell(1,N);
 for i = 1:N
-    robots{i} = ROBOT([3*cosd(360/N*i); 3*sind(360/N*i)], 10, i, 'linear');
+    robots{i} = ROBOT([cosd(360/N*i); sind(360/N*i)], i, 'linear', parameters_simulation);
 end
-target = TARGET([10,10]);
-trilateration(robots,target,parameters_simulation);
-
-disp(robots{1}.target_est);
-disp(robots{1}.target_P);
-disp(robots{3}.target_est);
-disp(robots{3}.target_P);
+[target, u_target, obstacles] = initialize_env(parameters_simulation);
+time = 0 : parameters_simulation.dt : length(u_target);
+for t = 1:length(u_target)
+    target.dynamics(u_target(:,t));
+    traj(:,t) = target.x;
+    relative_target_consensous(robots,target,parameters_simulation);
+    traj_est(:,t,1) = robots{1}.target_est;
+    traj_est(:,t,2) = robots{2}.target_est;
+end
+plot(traj(1,:),traj(2,:),'r');
+hold on
+plot(traj_est(1,:,1),traj_est(2,:,1),'b');
+hold on
+plot(traj_est(1,:,2),traj_est(2,:,2),'g');
+plot_obstacles(obstacles);
 for i = 1:N
     robots{i}.plot(all_markers)
     hold on
 end
-target.plot()
+% 
+% target = TARGET([1;4]);
+% target.plot()
+% legend
+% relative_target_consensous(robots,target,parameters_simulation);
+
+% disp(robots{1}.target_est);
+% disp(robots{1}.target_P);
+% disp(robots{3}.target_est);
+% disp(robots{3}.target_P);
+% for i = 1:N
+%     robots{i}.plot(all_markers)
+%     hold on
+% end
+% target.plot()
 
 % min_map_width = -parameters_simulation.size_map;
 % max_map_width = parameters_simulation.size_map;

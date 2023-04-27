@@ -15,6 +15,7 @@ classdef TARGET < handle
 
 	properties
 		x 				% real position of the target
+		x_in 			% initial position of the target
 	end
 
 %{
@@ -34,12 +35,13 @@ classdef TARGET < handle
 		% Iniatialization of the robot
     	function obj = TARGET(x)
 			obj.x = [x(1);x(2)];
+			obj.x_in = [x(1);x(2)];
     	end
     
 		% Update the position of the robot
 		function obj = dynamics(obj, u)
 			% Simulate movement of the target
-			obj.x = obj.x + [u(1);u(2)];
+			obj.x = obj.x + [u(1); u(2)];
 		end
 
 %{
@@ -58,7 +60,10 @@ classdef TARGET < handle
 		    plot(obj.x(1), obj.x(2),'or','DisplayName','target','MarkerSize',10,'LineWidth',2);
 		    hold on;
 	    end
-			
+		
+		function Initialize_Position(obj)
+			obj.x = obj.x_in;
+		end
 	end % methods
 	
 end % classdef
