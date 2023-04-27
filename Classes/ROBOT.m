@@ -52,9 +52,9 @@ classdef ROBOT < handle
 		target_est; 		% estimated target position (absolute)
 		target_P;			% covariance matrix of the target position
 
-		target_est_hist;
-		target_P_hist;
-
+		target_est_hist;    % history of the target estimation
+		target_P_hist;		% history of the target covariance matrix
+		
 		target_est_hist_messages;	% history of the target estimation
 		target_P_hist_messages;		% history of the target covariance matrix
 	end
@@ -207,9 +207,7 @@ classdef ROBOT < handle
 		obj.target_est_hist_messages = [];
 		obj.target_P_hist_messages = {};
 	end
-
-
-			
+		
 	end % methods
 	
 end % classdef

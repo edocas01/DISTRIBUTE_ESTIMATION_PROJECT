@@ -9,7 +9,7 @@ function distributed_KF(robots, target, param)
 	% topology matrix
 	A = zeros(n, n);
 
-	
+
 	for i = 1:n
 		count = 0;
 		for j = 1:n
@@ -47,11 +47,13 @@ function distributed_KF(robots, target, param)
 		 for i=1:n
 			 for j=1:n
 				
-				 if A(i,j) == 1
+				if A(i,j) == 1
 					F{i} = F{i} + 1 / (1+max(D)) * (FStore{j} - FStore{i});
 					a{i} = a{i} + 1 / (1+max(D)) * (aStore{j} - aStore{i});
 				end
 			end
+			robots{i}.target_est_hist_messages(:, k+1) = inv(F{i}) * a{i};
+			robots{i}.target_P_hist_messages{k+1} = inv(F{i});
 		 end
 	end
 

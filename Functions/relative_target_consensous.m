@@ -46,9 +46,9 @@ function relative_target_consensous(robots, target, param)
 		 FStore = F;
 		 aStore = a;
 		 for i=1:n
-			 for j=1:n
+			for j=1:n
 				
-				 if A(i,j) == 1
+				if A(i,j) == 1
 					F{i} = F{i} + 1 / (1+max(D)) * (FStore{j} - FStore{i});
 					a{i} = a{i} + 1 / (1+max(D)) * (aStore{j} - aStore{i});
 				end
@@ -59,9 +59,6 @@ function relative_target_consensous(robots, target, param)
 	end
 	% set in the robots the target position and the covariance matrix
 	for i = 1:n
-		% tmp = robots{i}.target_P;
-		% robots{i}.target_P = inv(robots{i}.target_P + F{i});
-		% robots{i}.target_est = robots{i}.target_P * ((tmp) * robots{i}.target_est + a{i});
 		robots{i}.target_est = inv(F{i})*a{i};
 		robots{i}.target_P = inv(F{i});
 	end
