@@ -39,3 +39,7 @@ end
 % find the points that are not conisdered in vin_noinf but are in v
 
 
+% compute voronoi and voronoin
+% find all the valid points in voronoin
+% compute the intersections between the "infinite" points and the circle
+% inteserection between the 2 polylines
