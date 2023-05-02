@@ -63,5 +63,7 @@ far vedere i potenziali delle gaussiane
 
 
 Ci si puo muovere fino a metà del raggio di comunicazione per essere sicuri di non sbattere con altri robot
-inoltre se un robot è dentro il mio raggio posso unire la mia informazione sulla sua posizione con la sua 
-informazione sulla sua posizione se lui è in grado di darmela. Limitare anche la cella considerando l'ingombro del robot
+
+
+Inoltre se un robot è dentro il mio raggio posso unire la mia informazione sulla sua posizione con la sua 
+informazione sulla sua posizione se lui è in grado di darmela. Limitare anche la cella considerando l'ingombro del robotimage.png

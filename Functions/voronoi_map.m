@@ -37,26 +37,26 @@ function voronoi_map(robots, obstacles)
 
 		% Control the number of neighbors and manage the cases
 		if len_neighbors == 0 % no other agents -> go with sensing range only
-			[pointsx, pointsy] = Circle(robots{i}.x(1), robots{i}.x(2), Rs);
+			[pointsx, pointsy] = Circle(robots{i}.x_est(1), robots{i}.x_est(2), Rs);
     		robots{i}.voronoi = polyshape(pointsx, pointsy);
 		elseif len_neighbors == 1 % only one agent -> take the line in the middle of the agents
-			dir = robots{robots{i}.neighbors}.x - robots{i}.x; % direction of the line from robot to neighbor
+			dir = robots{robots{i}.neighbors}.x_est - robots{i}.x_est; % direction of the line from robot to neighbor
 			dir = dir/norm(dir);                % normalization of the line
 			norm_dir = [-dir(2); dir(1)];       % normal to dir (i.e. line in the middle of the agents)
-			M =  mean([robots{i}.x'; robots{robots{i}.neighbors}.x'], 1)'; % middle point
-			dist_points = sqrt(Rs^2 - norm(M - robots{i}.x)^2); % distance between the middle point and the intersection points
+			M =  mean([robots{i}.x_est'; robots{robots{i}.neighbors}.x_est'], 1)'; % middle point
+			dist_points = sqrt(Rs^2 - norm(M - robots{i}.x_est)^2); % distance between the middle point and the intersection points
 			A = M + norm_dir*dist_points;      % circle-middle line intersection sx
 			B = M - norm_dir*dist_points;      % circle-middle line intersection dx
 			
-			points = circle_sector(robots{i}.x(1), robots{i}.x(2), A, B); % points of the circular sector of interest
+			points = circle_sector(robots{i}.x_est(1), robots{i}.x_est(2), A, B); % points of the circular sector of interest
 			robots{i}.voronoi = polyshape(points(:,1),points(:,2)); 
 		else
 			% Save the positions of the agents and their neighbors in P (NOTE: the first row is the position of the agent itself)
-			P(1,:) = robots{i}.x;
+			P(1,:) = robots{i}.x_est;
 			for j = 1:len_neighbors
 				% Perform the measure on the neighbor
 				% neighbor in agent reference frame
-				neighbor_measure = (robots{robots{i}.neighbors(j)}.x - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
+				neighbor_measure = (robots{robots{i}.neighbors(j)}.x_est - robots{i}.x_est) + mvnrnd([0;0], robots{i}.R_dist)';
 				% neighbor in world frame
 				z1 = neighbor_measure + robots{i}.x_est;
 				cov1 = robots{i}.R_dist + robots{i}.P;
@@ -165,7 +165,7 @@ function voronoi_map(robots, obstacles)
 			% take the point of V associated to the agent itself in the order given by k
 			poly_voronoi = polyshape(V(C{1}(k), 1), V(C{1}(k), 2));
 			% create the polyshape of the sensing circle
-			[pointsx, pointsy] = Circle(robots{i}.x(1), robots{i}.x(2), Rs);
+			[pointsx, pointsy] = Circle(robots{i}.x_est(1), robots{i}.x_est(2), Rs);
 			poly_circle = polyshape(pointsx,pointsy);
 			% find the intersection between the two polyshapes
 			robots{i}.voronoi = intersect(poly_circle, poly_voronoi);
