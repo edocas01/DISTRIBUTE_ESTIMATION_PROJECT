@@ -3,13 +3,15 @@ close all;
 clearvars;
 config;
 N = 10;
-range = 2;
+range = 20;
 figure();
 hold on
 axis equal
 for i = 1:N
-	x = cosd(360/N*i)*range;
-    y = sind(360/N*i)*range;
+% 	x = cosd(360/N*i)*range;
+%   y = sind(360/N*i)*range;
+    x = (rand() -0.5)*range;
+    y = (rand() -0.5)*range;
 	robots{i} = ROBOT([x;y], i, 'linear', parameters_simulation);
     robots{i}.plot(all_markers,color_matrix,false);
 end

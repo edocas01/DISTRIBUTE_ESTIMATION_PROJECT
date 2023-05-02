@@ -33,6 +33,7 @@ function voronoi_map(robots, obstacles)
 		Rs = robots{i}.ComRadius/2;
 		% TODO:
 		% - consider the volume of the robot
+		% - make the points closer according to the uncertainty
 
 		% Control the number of neighbors and manage the cases
 		if len_neighbors == 0 % no other agents -> go with sensing range only
