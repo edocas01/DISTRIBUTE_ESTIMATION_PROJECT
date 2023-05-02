@@ -53,12 +53,33 @@ function voronoi_map(robots, obstacles)
 			% Save the positions of the agents and their neighbors in P (NOTE: the first row is the position of the agent itself)
 			P(1,:) = robots{i}.x;
 			for j = 1:len_neighbors
-				P(j+1,:) = robots{robots{i}.neighbors(j)}.x;  
+				% Perform the measure on the neighbor
+				% neighbor in agent reference frame
+				neighbor_measure = (robots{robots{i}.neighbors(j)}.x - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
+				% neighbor in world frame
+				z1 = neighbor_measure + robots{i}.x_est;
+				cov1 = robots{i}.R_dist + robots{i}.P;
+				% if the neighbor cannot communicate with the agent then the agent uses only its measurement
+				P(j+1,:) = z1; 
+				% if the neighbor can communicate with the agent then they can mean their estimate 
+				robots_d = norm(robots{i}.x - robots{robots{i}.neighbors(j)}.x);
+				if robots_d <= robots{robots{i}.neighbors(j)}.ComRadius
+					% bayesian mean between the agent and the neighbor estimate on neighbor position
+					z2 = robots{robots{i}.neighbors(j)}.x_est;
+					cov2 = robots{robots{i}.neighbors(j)}.P; 
+					z = [z1;z2];
+					H = [eye(2); eye(2)];
+					C = [cov1, zeros(2); zeros(2), cov2];
+					P(j+1,:) = inv(H'*inv(C)*H)*H'*inv(C)*z;
+				end 
 			end
+			% TODO:
+			% - make the points closer to the agent if they are uncertain
 			% Add the tatget to the points
 			P = [P; robots{i}.target_est'];
 			% TODO:
 			% - consider the obstacles
+			
 			% Compute the voronoi tesselation
 
 			% NOTE:
@@ -143,8 +164,8 @@ function voronoi_map(robots, obstacles)
 			% take the point of V associated to the agent itself in the order given by k
 			poly_voronoi = polyshape(V(C{1}(k), 1), V(C{1}(k), 2));
 			% create the polyshape of the sensing circle
-			points = circle(robots{i}.x(1), robots{i}.x(2), Rs);
-			poly_circle = polyshape(points(:,1),points(:,2));
+			[pointsx, pointsy] = Circle(robots{i}.x(1), robots{i}.x(2), Rs);
+			poly_circle = polyshape(pointsx,pointsy);
 			% find the intersection between the two polyshapes
 			robots{i}.voronoi = intersect(poly_circle, poly_voronoi);
 		end
@@ -154,18 +175,20 @@ end
 
 
 
+
 %{
 
  
-   _____                 _   _                 
-  |  ___|   _ _ __   ___| |_(_) ___  _ __  ___ 
-  | |_ | | | | '_ \ / __| __| |/ _ \| '_ \/ __|
-  |  _|| |_| | | | | (__| |_| | (_) | | | \__ \
-  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-                                               
+   ___       _                        _  	 _____                 _   _                 
+  |_ _|_ __ | |_ ___ _ __ _ __   __ _| | 	|  ___|   _ _ __   ___| |_(_) ___  _ __  ___ 
+   | || '_ \| __/ _ \ '__| '_ \ / _` | | 	| |_ | | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+   | || | | | ||  __/ |  | | | | (_| | | 	|  _|| |_| | | | | (__| |_| | (_) | | | \__ \
+  |___|_| |_|\__\___|_|  |_| |_|\__,_|_| 	|_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+                                                                                      
  
 
 %}
+
 
 function [p_circle] = circle_sector(x_center, y_center, A, B)
 	% This function reports the point of a circle

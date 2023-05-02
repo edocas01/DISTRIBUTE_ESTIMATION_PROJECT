@@ -3,7 +3,7 @@ close all;
 clearvars;
 config;
 N = 10;
-range = 4;
+range = 2;
 figure();
 hold on
 axis equal

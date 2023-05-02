@@ -20,7 +20,7 @@ parameters_simulation = struct( ...
 	'MAX_RADIUS', 					10, 				... % maximum radius of the communication range (m)
 	'std_gps', 						1, 				... % standard deviation of the GPS (m)
 	'std_robots_model', 			1, 				... % standard deviation of the robot model (m)
-	'std_relative_sensor', 			1,      		... % standard deviation of the relative sensor (m)
+	'std_relative_sensor', 			0.3,      		... % standard deviation of the relative sensor (m)
 	'MAX_VOLUME',					0.5, 			... % maximum radius of the robot volume (m)
 	'MIN_VOLUME',					0.1, 			... % minimum radius of the robot volume (m)
 	... % Consensous parameters	
