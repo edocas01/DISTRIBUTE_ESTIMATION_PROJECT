@@ -57,6 +57,11 @@ classdef ROBOT < handle
 		
 		target_est_hist_messages;	% history of the target estimation
 		target_P_hist_messages;		% history of the target covariance matrix
+
+		neighbors; 			% list of the neighbors of the robot
+		voronoi; 			% polyshape of the voronoi region of the robot
+		volume; 			% volume occupied by the robot
+
 	end
 %{
 
@@ -114,6 +119,11 @@ classdef ROBOT < handle
 		% To track the estimation during the iterations of the consensus algorithm
         obj.target_est_hist_messages = [];
 		obj.target_P_hist_messages = {};
+
+		% To compute voronoi
+		obj.neighbors = ["init"];
+		obj.voronoi = [];
+		obj.volume = rand() * (param.MAX_VOLUME - param.MIN_VOLUME) + param.MIN_VOLUME;
     end
 
 	     
@@ -184,11 +194,15 @@ classdef ROBOT < handle
 	%}
 
 	% Plot the position of the robot with its communication radius
+	% TODO:
+	% - Add the possibility to plot the covariance ellipse
+	% - Add the volume of the robot
 	function plot(obj, all_markers, color_matrix, plot_circle)
 		plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['robot ', num2str(obj.id)], 'MarkerSize', 10, 'Color', color_matrix(obj.id,:));
 		hold on;
 		if plot_circle
-			Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius, '--k', false);
+			[x,y] = Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius);
+			plot(x,y, '--k', 'HandleVisibility', 'off');
 		end
 	end
 

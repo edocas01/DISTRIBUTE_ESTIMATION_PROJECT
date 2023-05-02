@@ -1,45 +1,23 @@
-close all;
 clc;
+close all;
 clearvars;
-
-points = 10;
-range = 5;
-for i = 1:points
-	x(i) = (rand() - 0.5)*range;
-	y(i) = (rand() - 0.5)*range;
+config;
+N = 10;
+range = 4;
+figure();
+hold on
+axis equal
+for i = 1:N
+	x = cosd(360/N*i)*range;
+    y = sind(360/N*i)*range;
+	robots{i} = ROBOT([x;y], i, 'linear', parameters_simulation);
+    robots{i}.plot(all_markers,color_matrix,false);
 end
+target = TARGET([0;0]);
+plot(target.x(1), target.x(2),'.r')
+relative_target_consensous(robots, target, parameters_simulation);
+voronoi_map(robots);
 
-P = [x', y'];
-% Find the voroni map
-[vin,cin] = voronoin(P);
-[vx,vy] = voronoi(x,y);
-
-figure()
-plot(vx,vy,'b')
-hold on 
-plot(x, y, 'or');
-plot(vin(:,1), vin(:,2), 'ok')
-% define of the vertex of voronoi in a matrix
-v = zeros(length(vx(1,:))*2,2);
-v = [vx(1,:)', vy(1,:)'; vx(2,:)', vy(2,:)'];
-% remove the duplicate points
-v = unique(v, 'rows');
-plot(v(:,1), v(:,2), '.g');
-
-% remove the first element of vin if it's infinite
-vin_noinf = vin;
-cin_noinf = cin;
-if (isinf(vin(1,1)) || isinf(vin(1,2)))
-	vin_noinf(1,:) = [];
-	for i = 1:length(cin)
-		cin_noinf{i}(find(cin{i} == 1)) = [];
-	end
+for i = 1:N
+    plot(robots{i}.voronoi)
 end
-
-% find the points that are not conisdered in vin_noinf but are in v
-
-
-% compute voronoi and voronoin
-% find all the valid points in voronoin
-% compute the intersections between the "infinite" points and the circle
-% inteserection between the 2 polylines
