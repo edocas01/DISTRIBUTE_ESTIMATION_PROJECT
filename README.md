@@ -19,6 +19,9 @@ Formation Control of Multi-agent systems_](https://arxiv.org/pdf/2110.06332.pdf)
 Time-Varying Attitudes under Relative Measurements_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8899676)
 
 ## Voroni tassellation
+- Effect of Rc and Rc/2
+![Rs effect](effect_of_Rs.jpg)
+
 - [_Multi-Robot Formation Control Based on CVT Algorithm and Health Optimization Management_](https://www.mdpi.com/2076-3417/12/2/755)
 - [_hanting_based_on_voronoi_](https://github.com/wanghuohuo0716/hanting_based_on_voronoi/tree/master)
 - [_A FORMATION CONTROL ALGORITHM USING
