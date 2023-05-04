@@ -8,9 +8,9 @@ function relative_target_consensous(robots, target, param)
 	a = cell(n,1);
 	% topology matrix
 	A = zeros(n, n);
-
 	
 	for i = 1:n
+		robots{i}.neighbors = [];
 		count = 0;
 		for j = 1:n
 			% if robots j is in the communication radius of robot i
@@ -22,6 +22,7 @@ function relative_target_consensous(robots, target, param)
 			if robots_d <= robots{i}.ComRadius
 				A(i, j) = 1;
 				count = count + 1;
+				robots{i}.neighbors = [robots{i}.neighbors, j];
 			end
 		end
 		if count == 0

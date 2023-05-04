@@ -1,6 +1,5 @@
-% Syntax Functions
-% ROBOT(x, y, comradius, id, type) 	type can be 'linear'
-
+%% Syntax functions
+% Robot_cell_array = select_shape(N_robots, type_dynamics, shape, center_point, distance, randdistance, param)
 
 clc;
 clear;
@@ -10,116 +9,260 @@ addpath('Scripts');
 addpath('Functions');
 addpath('Classes');
 
-% Syntax classes
-% ROBOT(x, y, comradius, id, type, param)      type = 'linear' or 'unicycle'
-% ROBOT.dynamics(u)                     u = input vector
-% ROBOT.plot(all_markers)
-% TARGET(x,y)
-
-
-% Load config
+%% ----------------------- %
+%  DEFINE DEFAULT SETTINGS %
+%  ----------------------- %
 config;
-N = 5;
+parameters_simulation
+
+N = 10; % Number of robots
 if N > parameters_simulation.N_MAX
-    N = parameters_simulation.N_MAX;
+	warning('Too many robots. There will be created %d robots', parameters_simulation.N_MAX);
 end
 
-%% Initialize robots
-robots = cell(1,N);
+%% ---------------------- %
+%  INITIALIZE ENVIRONMENT %
+%  ---------------------- %
+type_dynamics = repmat("linear", 1, N);
+dist = 1;
+center_point = [0, 0];
+R = select_shape(N, type_dynamics, "square", center_point, dist, true, parameters_simulation);
+[target, trajectory, u_trajectory, obstacles] = initialize_env(parameters_simulation);
+
+
+% ---------------------
+% Initial configuration
+figure(1); clf;
+hold on; grid on;
+axis equal;
+
+xlim("padded")
+ylim("padded")
 for i = 1:N
-    robots{i} = ROBOT([cosd(360/N*i); sind(360/N*i)], i, 'linear', parameters_simulation);
+	R{i}.plot(all_markers, color_matrix, false);
 end
-[target, u_target, obstacles] = initialize_env(parameters_simulation);
-time = 0 : parameters_simulation.dt : length(u_target);
-for t = 1:length(u_target)
-    target.dynamics(u_target(:,t));
-    traj(:,t) = target.x;
-    relative_target_consensous(robots,target,parameters_simulation);
-    traj_est(:,t,1) = robots{1}.target_est;
-    traj_est(:,t,2) = robots{2}.target_est;
+target.plot();
+for i = 1:length(obstacles)
+	obstacles{i}.plot();
 end
-plot(traj(1,:),traj(2,:),'r');
-hold on
-plot(traj_est(1,:,1),traj_est(2,:,1),'b');
-hold on
-plot(traj_est(1,:,2),traj_est(2,:,2),'g');
-plot_obstacles(obstacles);
+plot(trajectory(1,:), trajectory(2,:), '--r', 'LineWidth', 2);
+hold off;
+
+
+%% -------------------------------------------------- %
+%  STATIC LOCALIZATION WITH MAXIMUM DEGREE CONSENSOUS  %
+%  -------------------------------------------------- %
+target.Initialize_Position();
 for i = 1:N
-    robots{i}.plot(all_markers)
-    hold on
+	R{i}.Clear_Targ_Estimates();
+	R{i}.Clear_Targ_Estimates_Hist();
+	R{i}.Initialize_Position();
 end
-% 
-% target = TARGET([1;4]);
-% target.plot()
-% legend
-% relative_target_consensous(robots,target,parameters_simulation);
+relative_target_consensous(R, target, parameters_simulation)
 
-% disp(robots{1}.target_est);
-% disp(robots{1}.target_P);
-% disp(robots{3}.target_est);
-% disp(robots{3}.target_P);
-% for i = 1:N
-%     robots{i}.plot(all_markers)
-%     hold on
-% end
-% target.plot()
+% Estimation error 
+figure(2); clf;
+hold on; grid on;
+xlim("padded")
+ylim("padded")
+for i = 1:N
+	errx = R{i}.target_est_hist_messages(1,:) - target.x(1);
+	plot(errx, 'Color', color_matrix(i,:));
+end
+xlabel("Consensous iteration")
+ylabel("Error in x (m)")
+hold off;
 
-% min_map_width = -parameters_simulation.size_map;
-% max_map_width = parameters_simulation.size_map;
-% min_map_height = -parameters_simulation.size_map;
-% max_map_height = parameters_simulation.size_map;
-% ComRadius = 0.5;
+figure(3); clf;
+hold on; grid on;
+xlim("padded")
+ylim("padded")
+for i = 1:N
+	erry = R{i}.target_est_hist_messages(2,:) - target.x(2);
+	plot(erry, 'Color', color_matrix(i,:));
+end
+xlabel("Consensous iteration")
+ylabel("Error in y (m)")
+hold off;
 
-% %% Initialize robots
-% robots = cell(1,N);
-% for i = 1:N
-%     % This should set x and y in -50 and 50 but it doesn't (to be solved)
-%     xtmp = (max_map_width - min_map_width) * rand() + min_map_width;
-%     ytmp = (max_map_height - min_map_height) * rand() + min_map_height;
-%     % intialize each robot in a random point of the map 
-%     robot = ROBOT(xtmp, ytmp, ComRadius, i, 'linear');
-%     robots{i} = robot;
-% end
-% % Assign trajectory
-% [target, u_target, obstacles] = initialize_env(parameters_simulation);
+%% -------------------------------------------------- %
+%  STATIC LOCALIZATION WITH DISTRIBUTED KALMAN FILTER %
+%  -------------------------------------------------- %
+% Ther robots and the target don't move
+target.Initialize_Position();
+for i = 1:N
+	R{i}.Clear_Targ_Estimates();
+	R{i}.Clear_Targ_Estimates_Hist();
+	R{i}.Initialize_Position();
+end
+distributed_KF(R, target, parameters_simulation);
 
-% %%
-% % time = 0:parameters_simulation.dt:parameters_simulation.tmax;
-% time = 0 : parameters_simulation.dt : length(u_target);
-% x_true = zeros(2, length(u_target));
-% x_est = zeros(2, length(u_target));
-% traj = zeros(2, length(u_target));
+% Estimated target position
+figure(4); clf;
+hold on; grid on;
+xlim("padded")
+ylim("padded")
+for i = 1:N
+	errx = abs(R{i}.target_est(1) - target.x(1));
+	stem(R{i}.id, errx, 'Color', color_matrix(i,:));
+end
+xlabel("Robot")
+ylabel("$|$ Error in x $|$ (m)")
+hold off;
 
-% for t = 1:length(u_target)
-%     target.dynamics(u_target(:,t));
-    
-%     for i = 1:N
-%         EKF(robots{i}, u_target(:,t));
-%     end
+figure(5); clf;
+hold on; grid on;
+xlim("padded")
+ylim("padded")
+for i = 1:N
+	erry = abs(R{i}.target_est(2) - target.x(2));
+	stem(R{i}.id, erry, 'Color', color_matrix(i,:));
+end
+xlabel("Robot")
+ylabel("$|$ Error in y $|$ (m)")
 
-% 	% err(t,:) = norm(robot.x - robot.x_est);
-%     traj(:,t) = target.x;
+%% ---------------------------------------------------------- %
+%  ESTIMATION OF MOVING TARGET WITH MAXIMUM DEGREE CONSENSOUS %
+%  ---------------------------------------------------------- %
+% The robots don't move, only the target moves.
+target.Initialize_Position();
+for i = 1:N
+	R{i}.Clear_Targ_Estimates();
+	R{i}.Clear_Targ_Estimates_Hist();
+	R{i}.Initialize_Position();
+end
+time = length(u_trajectory);
+traj_step = zeros(2, length(u_trajectory));
+traj_step(:,1) = target.x;
+for j = 1:N
+	R{j}.target_est_hist(:,1) = R{j}.target_est;
+end
 
-% end
+for i = 2:time 
+	% Update target position
+	target.dynamics(u_trajectory(:,i));
+	traj_step(:,i) = target.x;
+	% Update target estimation
+	relative_target_consensous(R, target, parameters_simulation);
+	% Update history of target estimation
+	for j = 1:N
+		R{j}.target_est_hist(:,i) = R{j}.target_est;
+	end
+	
+end
 
-% figure(2); clf
-% axis(parameters_simulation.size_map*[-1 1 -1 1])
-% hold on
-% grid on
-% axis
-% plot(traj(1,:),traj(2,:),'-r')
-% for i = 1:N
-%     plot(robots{i}.x_est(1,:),robots{i}.x_est(2,:),'ok')
-%     robots{i}.plot(all_markers)
-% end
-% for i = 1:length(obstacles)
-%     plot(obstacles{i}.x(1),obstacles{i}.x(2),'sk')
-% end
-% hold off
+% -------------------------------
+% Estimated trajectory and errors
+figure(6); clf;
+subplot(3,1,1)
+hold on; grid on;
+xlim("padded")
+ylim("padded")
+title("Trajectory estimation with maximum degree consensous")
+for i = 1:N
+	plot(R{i}.target_est_hist(1,:), R{i}.target_est_hist(2,:), 'Color', color_matrix(i,:));
+end
+plot(trajectory(1,:), trajectory(2,:), '--r', 'LineWidth', 2);
+xlabel("x (m)")
+ylabel("y (m)")
+hold off;
 
-% %% This has to be done before updating dynamics of the robots
-% figure(3); clf
-% [vx, vy] = voronoi_map(robots, obstacles);
-% hold on;
-% plot (vx, vy, "r");
-% hold off
+subplot(3,1,2)
+hold on; grid on;
+xlim("padded")
+ylim("padded")
+for i = 1:N
+	errx = R{i}.target_est_hist(1,:) - traj_step(1,:);
+	plot(errx, 'Color', color_matrix(i,:));
+end
+xlabel("Time (s)")
+ylabel("Error in x (m)")
+hold off;
+
+subplot(3,1,3)
+hold on; grid on;
+xlim("padded")
+ylim("padded")
+for i = 1:N
+	erry = R{i}.target_est_hist(2,:) - traj_step(2,:);
+	plot(erry, 'Color', color_matrix(i,:));
+end
+xlabel("Time (s)")
+ylabel("Error in y (m)")
+hold off;
+
+
+%% ---------------------------------------------------------- %
+%  ESTIMATION OF MOVING TARGET WITH DISTRIBUTED KALMAN FILTER %
+%  ---------------------------------------------------------- %
+% The robots don't move, only the target moves.
+target.Initialize_Position();
+for i = 1:N
+	R{i}.Clear_Targ_Estimates();
+	R{i}.Clear_Targ_Estimates_Hist();
+	R{i}.Initialize_Position();
+end
+time = length(u_trajectory);
+traj_step = zeros(2, length(u_trajectory));
+traj_step(:,1) = target.x;
+for j = 1:N
+	R{j}.target_est_hist(:,1) = R{j}.target_est;
+end
+
+for i = 2:time 
+	% Update target position
+	target.dynamics(u_trajectory(:,i));
+	traj_step(:,i) = target.x;
+	% Update target estimation
+	distributed_KF(R, target, parameters_simulation);
+	% Update history of target estimation
+	for j = 1:N
+		R{j}.target_est_hist(:,i) = R{j}.target_est;
+	end
+
+end
+
+% --------------------
+% Estimated trajectory
+
+figure(7); clf;
+subplot(3,1,1)
+hold on; grid on;
+xlim("padded")
+ylim("padded")
+title("Trajectory estimation with distributed Kalman filter")
+for i = 1:N
+	plot(R{i}.target_est_hist(1,:), R{i}.target_est_hist(2,:), 'Color', color_matrix(i,:));
+end
+plot(trajectory(1,:), trajectory(2,:), '--r', 'LineWidth', 2);
+xlabel("x (m)")
+ylabel("y (m)")
+hold off;
+
+subplot(3,1,2)
+hold on; grid on;
+xlim("padded")
+ylim("padded")
+for i = 1:N
+	errx = R{i}.target_est_hist(1,:) - traj_step(1,:);
+	plot(errx, 'Color', color_matrix(i,:));
+end
+xlabel("Time (s)")
+ylabel("Error in x (m)")
+hold off;
+
+subplot(3,1,3)
+hold on; grid on;
+xlim("padded")
+ylim("padded")
+for i = 1:N
+	erry = R{i}.target_est_hist(2,:) - traj_step(2,:);
+	plot(erry, 'Color', color_matrix(i,:));
+end
+xlabel("Time (s)")
+ylabel("Error in y (m)")
+hold off;
+
+
+
+
