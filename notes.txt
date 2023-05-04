@@ -72,3 +72,15 @@ informazione sulla sua posizione se lui è in grado di darmela. Limitare anche l
 Kp is at maximum equal to 1/dt:
 - u = kp*(pi - ci) 
 - dx = u * dt = kp*(pi - ci)*dt <= pi - ci => kp <= 1/dt
+
+
+INCONTRO CON FONTANELLI 04/05/2023
+
+il robot ha una velocità massima e di conseguenza so lo spostamento massimo del robot che puo avvenire
+in un time step. Quindi o riduco la cella oppure aumento l'ingombro del robot
+La legge di controllo delle slide funziona se è tempo continuo. se ho tempo discreto o riduco le celle o gonfio i robot.
+
+la legge di controllo nel caso di un uniciclo deve garantirmi di stare nella cella quindi devo impostare una
+omega massima e agire su v lineare di conseguenza.
+
+Per considerare l'incertezza posso avvicinare i robot di un certo fattore di copertura.
