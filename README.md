@@ -26,6 +26,6 @@ Time-Varying Attitudes under Relative Measurements_](https://ieeexplore.ieee.org
 - [_A FORMATION CONTROL ALGORITHM USING
 VORONOI REGIONS_](http://www.diva-portal.org/smash/get/diva2:497416/FULLTEXT01.pdf)
 - [_Voronoi-based Multi-robot Collision Avoidance with Localization Uncertainty_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9596826)
-_[_A unified Lloyd-based framework for multi-agent collective behaviours_](https://reader.elsevier.com/reader/sd/pii/S092188902200118X?token=B5D1670BA7325F1655FAA961B4F7BDDC9475B8436B0C118C7C6CE9B201E1E65307B84852433BD65F981A5C75C89217F2&originRegion=eu-west-1&originCreation=20230504085906)
+- [_A unified Lloyd-based framework for multi-agent collective behaviours_](https://reader.elsevier.com/reader/sd/pii/S092188902200118X?token=B5D1670BA7325F1655FAA961B4F7BDDC9475B8436B0C118C7C6CE9B201E1E65307B84852433BD65F981A5C75C89217F2&originRegion=eu-west-1&originCreation=20230504085906)
 # Link to report
 [_overleaf link_](https://it.overleaf.com/project/64243c090d15dc331d68df30)
