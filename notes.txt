@@ -79,8 +79,17 @@ INCONTRO CON FONTANELLI 04/05/2023
 il robot ha una velocità massima e di conseguenza so lo spostamento massimo del robot che puo avvenire
 in un time step. Quindi o riduco la cella oppure aumento l'ingombro del robot
 La legge di controllo delle slide funziona se è tempo continuo. se ho tempo discreto o riduco le celle o gonfio i robot.
+Se limito kp allora posso stare dentro la cella (che deve comunque essere modificata con un certo ingombro).
 
 la legge di controllo nel caso di un uniciclo deve garantirmi di stare nella cella quindi devo impostare una
 omega massima e agire su v lineare di conseguenza.
 
 Per considerare l'incertezza posso avvicinare i robot di un certo fattore di copertura.
+
+Per garantire i requirements:
+
+- limitare kp come detto sopra
+- ridurre la cella del raggio del robot (svantaggio -> cella piccola, vantaggio -> semplice la gestione e non si necessita
+  di ulteriori informazioni degli altri)
+- aumentare il raggio di ingombro del robot di una quantità pari a vmax * dt (massimo spazio che può percorrere
+  in un time step)
