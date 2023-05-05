@@ -92,4 +92,4 @@ Per garantire i requirements:
 - ridurre la cella del raggio del robot (svantaggio -> cella piccola, vantaggio -> semplice la gestione e non si necessita
   di ulteriori informazioni degli altri)
 - aumentare il raggio di ingombro del robot di una quantità pari a vmax * dt (massimo spazio che può percorrere
-  in un time step)
+  in un time step) -> riduco la cella solo se è possibile che io esca, altrimenti la lascio "grande"
