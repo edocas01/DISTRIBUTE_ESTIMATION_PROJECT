@@ -48,6 +48,7 @@ classdef ROBOT < handle
 		R_gps; 				% GPS measurement covariance matrix
 		Q; 					% Uncertainty matrix of the dynamics model
 		
+		H; 					% jacobian of the measurement model
 		R_dist,             % distance measurement covariance matrix (1x1)
 		target_est; 		% estimated target position (absolute)
 		target_P;			% covariance matrix of the target position
@@ -104,9 +105,12 @@ classdef ROBOT < handle
 		obj.ComRadius = rand()*(param.MAX_RADIUS - param.MIN_RADIUS) + param.MIN_RADIUS;
 		obj.id = id;
 
+		% Measurement model on the absolute position GPS
 		obj.R_gps = (rand(2,2) - 0.5) * param.std_gps;	% 1 m is the standard deviation of the gps measurement
 		obj.R_gps = obj.R_gps * obj.R_gps';
 		
+		% Measurement model on the relative position
+		obj.H = eye(2);
 		obj.R_dist = (rand(2,2) - 0.5) * param.std_relative_sensor;
 		obj.R_dist = obj.R_dist * obj.R_dist';
 		obj.target_est = zeros(2,1);
