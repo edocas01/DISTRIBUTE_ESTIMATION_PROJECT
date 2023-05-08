@@ -3,49 +3,42 @@ addpath('Functions')
 
 P1 = [0.5, 0.3;
      0.3, 0.5];
-P2 = [0.5, 0.3;
-     0.3, 0.5];
+P2 = [0.5, 0.2;
+     0.2, 0.5];
 
-c1 = [1; -2];
+c1 = [1; 3];
 [pts1, rx1, ry1, th1] = ellipse(c1, P1);
 Rth1 = [cos(th1), -sin(th1);
         sin(th1), cos(th1)];
 
 % All possible relative ellipse's relative positions        
-c2 = [7; 8]; 
+c2 = [7; 8];
 c2 = [-7; 8]; 
 c2 = [-7;-8]; 
-% c2 = [7; -8]; 
-
-% BISOGNA SOLO CAPIRE QUANDO AGGIUNGERE PI A PHI E QUANDO NO 
-% IN BASE A COME SONO MESSE LE ELLISSI 
+c2 = [7; -8]; 
 
 [pts2, rx2, ry2, th2] = ellipse(c2, P2);
 Rth2 = [cos(th2), -sin(th2);
         sin(th2), cos(th2)];
 
-dir = c2 - c1;
-alpha = mod(atan2(dir(2), dir(1)), pi);
 
-ang = (alpha - th1);
-phi = atan(rx1 / ry1 * tan(ang));
-phi = phi;
-if c1(1) > c2(1) && alpha - th1 > pi/2
-    phi = phi + pi;
-end
-
+% Ellipse 1
+c2_in1 = Rth1' * (c2 - c1);
+dir = c2_in1;
+alpha = mod(atan2(dir(2), dir(1)), 2 * pi); % Real angle at which c2 is seen by c1
+phi = atan(rx1 / ry1 * tan(alpha)); % Fake angle to get the correct radius
+dist = sqrt(rx1^2 * cos(phi)^2 + ry1^2 * sin(phi)^2);
 gain = 1;
-pt_inter1 = c1 + Rth1 * gain * [rx1 * cos(phi); ry1 * sin(phi)];
+pt_inter1 = c1 + Rth1 * gain * dist * [cos(alpha); sin(alpha)];
 
-ang = alpha - th2;
-phi = atan(rx2 / ry2 * tan(ang));
-phi = phi + pi;
-if c2(1) < c1(1) && alpha - th2 > pi/2
-    phi = phi + pi;
-end
-
+% Ellipse 2
+c1_in2 = Rth2' * (c1 - c2);
+dir = c1_in2;
+alpha = mod(atan2(dir(2), dir(1)), 2 * pi); % Real angle at which c1 is seen by c2
+phi = atan(rx2 / ry2 * tan(alpha)); % Fake angle to get the correct radius
+dist = sqrt(rx2^2 * cos(phi)^2 + ry2^2 * sin(phi)^2);
 gain = 1;
-pt_inter2 = c2 + Rth2 * gain * [rx2 * cos(phi); ry2 * sin(phi)];
+pt_inter2 = c2 + Rth2 * gain * dist * [cos(alpha); sin(alpha)];
 
 figure(1); clf; axis equal; grid on
 xlim("padded")
@@ -58,6 +51,8 @@ plot(pts1(1,:), pts1(2,:), 'r-')
 plot(pts2(1,:), pts2(2,:), 'b-')
 plot(pt_inter1(1), pt_inter1(2), 'k*')
 plot(pt_inter2(1), pt_inter2(2), 'k*')
+plot([c1(1), pt_inter1(1)], [c1(2), pt_inter1(2)], 'r-')
+plot([c2(1), pt_inter2(1)], [c2(2), pt_inter2(2)], 'b-')
 hold off
 
 
