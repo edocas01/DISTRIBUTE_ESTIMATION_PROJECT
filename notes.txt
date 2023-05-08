@@ -93,3 +93,10 @@ Per garantire i requirements:
   di ulteriori informazioni degli altri)
 - aumentare il raggio di ingombro del robot di una quantità pari a vmax * dt (massimo spazio che può percorrere
   in un time step) -> riduco la cella solo se è possibile che io esca, altrimenti la lascio "grande"
+
+
+GESTIONE INCERTEZZA:
+
+- nel caso io veda un robot -> lo avvicino di una distanza pari al doppio della somma delle incertezze in quella specifica
+							   direzione
+
