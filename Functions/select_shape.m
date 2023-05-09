@@ -1,19 +1,19 @@
-function R = select_shape(N_robots, type, shape, center_point, distance, randdistance, param)
+function R = select_shape(N_robots, dyn_type, shape, center_point, distance, randdistance, param)
 	R = cell(1, N_robots);
-	if (~isvector(type)) || (length(type) ~= N_robots)
+	if (~isvector(dyn_type)) || (length(dyn_type) ~= N_robots)
 		error('Insert a dimension %d vector of dynamics type', N_robots)
 	end
 	switch shape
 		case 'circle'
 			for i = 1:N_robots
 				if randdistance
-					radius = distance + (-1 + 2 * rand()) * distance / 8;
+					radius = distance + (-1 + 2 * rand()) * distance / 4;
 				else
 					radius = distance;
 				end
 				x = center_point(1) + radius * cos(2 * pi * i / N_robots);
 				y = center_point(2) + radius * sin(2 * pi * i / N_robots);
-				R{i} = ROBOT([x, y], i, type(i), param);
+				R{i} = ROBOT([x, y], i, dyn_type(i), param);
 			end			
 		case 'square'
 			for i = 1:N_robots
@@ -48,13 +48,13 @@ function R = select_shape(N_robots, type, shape, center_point, distance, randdis
 				O = (D + H) / 2;
 				midmidpoints = [I; J; K; L; M; N; O];
 				if i <= 4
-					R{i} = ROBOT(vertex(i, :), i, type(i), param);
+					R{i} = ROBOT(vertex(i, :), i, dyn_type(i), param);
 				elseif i <= 8
-					R{i} = ROBOT(midpoints(i - 4, :), i, type(i), param);
+					R{i} = ROBOT(midpoints(i - 4, :), i, dyn_type(i), param);
 				elseif i <= 15
-					R{i} = ROBOT(midmidpoints(i - 8, :), i, type(i), param);
+					R{i} = ROBOT(midmidpoints(i - 8, :), i, dyn_type(i), param);
 				end
-				% R{i} = ROBOT([x, y], i, type(i), param);
+				% R{i} = ROBOT([x, y], i, dyn_type(i), param);
 			end
 		case 'triangle'
 			% do something

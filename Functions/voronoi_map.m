@@ -3,6 +3,7 @@ function voronoi_map(robots, obstacles)
 	% If the neighbors are not initialized, initialize them
 	if strcmp(robots{1}.neighbors, 'init')
 		for i = 1:N
+			robots{i}.neighbors = [];
 			for j = 1:N
 				% if robots j is in the communication radius of robot i
 				% then then i can communicate with j
