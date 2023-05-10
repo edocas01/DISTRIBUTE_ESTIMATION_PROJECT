@@ -57,7 +57,7 @@ function voronoi_map(robots, obstacles)
 			for j = 1:len_neighbors
 				% Perform the measure on the neighbor
 				% neighbor in agent reference frame
-				neighbor_measure = (robots{robots{i}.neighbors(j)}.x_est - robots{i}.x_est) + mvnrnd([0;0], robots{i}.R_dist)';
+				neighbor_measure = (robots{robots{i}.neighbors(j)}.x - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
 				% neighbor in world frame
 				z1 = neighbor_measure + robots{i}.x_est;
 				cov1 = robots{i}.R_dist + robots{i}.P;
