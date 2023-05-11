@@ -10,7 +10,7 @@ function [pts, rx, ry, th] = ellipse(c, P)
 
 	th = atan2(rx_dir(2), rx_dir(1));
 
-	npts = 100;
+	npts = 30;
 	t = linspace(0, 2 * pi, npts);
 	Rth = [cos(th) -sin(th); sin(th) cos(th)];
 	c = [c(1); c(2)];
