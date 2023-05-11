@@ -60,8 +60,10 @@ classdef ROBOT < handle
 		target_P_hist_messages;		% history of the target covariance matrix
 
 		neighbors; 			% list of the neighbors of the robot
+		neighbors_pos; 		% list of the neighbors positions (also target)
 		voronoi; 			% polyshape of the voronoi region of the robot
 		volume; 			% volume occupied by the robot
+		vmax; 				% maximum velocity of the robot
 
 	end
 %{
@@ -90,6 +92,7 @@ classdef ROBOT < handle
 			obj.P = eye(2);
 			obj.Q = (rand(2,2) - 0.5) * param.std_relative_sensor;
 			obj.Q = obj.Q * obj.Q';
+			obj.vmax = rand()*param.MAX_LINEAR_VELOCITY;
 		elseif strcmp(obj.type, 'unicycle')
 			obj.x = zeros(3,1); 
 			obj.x(1) = x(1);
@@ -100,6 +103,7 @@ classdef ROBOT < handle
 			obj.P = eye(3);
 			obj.Q = (rand(3,3) - 0.5) * param.std_relative_sensor;
 			obj.Q = obj.Q * obj.Q';
+			obj.vmax = [rand()*param.MAX_LINEAR_VELOCITY; rand()*param.MAX_ANGULAR_VELOCITY];
 		end
 			
 		obj.ComRadius = rand()*(param.MAX_RADIUS - param.MIN_RADIUS) + param.MIN_RADIUS;
@@ -126,6 +130,7 @@ classdef ROBOT < handle
 
 		% To compute voronoi
 		obj.neighbors = ["init"];
+		obj.neighbors_pos = [];
 		obj.voronoi = [];
 		obj.volume = rand() * (param.MAX_VOLUME - param.MIN_VOLUME) + param.MIN_VOLUME;
     end

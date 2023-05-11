@@ -23,6 +23,8 @@ parameters_simulation = struct( ...
 	'std_relative_sensor', 			0.3,      		... % standard deviation of the relative sensor (m)
 	'MAX_VOLUME',					0.5, 			... % maximum radius of the robot volume (m)
 	'MIN_VOLUME',					0.1, 			... % minimum radius of the robot volume (m)
+	'MAX_LINEAR_VELOCITY', 			1, 				... % maximum linear velocity (m/s)
+	'MAX_ANGULAR_VELOCITY', 		pi/2, 			... % maximum angular velocity (rad/s)
 	... % Consensous parameters	
 	'MSG_PROTOCOL', 				50				... % protocol used for message passing
 	);

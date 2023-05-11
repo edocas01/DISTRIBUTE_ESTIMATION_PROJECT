@@ -1,6 +1,9 @@
-function voronoi_map(robots, obstacles)
+function voronoi_map(param, robots, obstacles)
 	N = length(robots);
-	% If the neighbors are not initialized, initialize them
+	% If the neighbors are not initialized, initialize them and move them according to:
+	% - the uncertainty of j
+	% - the uncertainty of i
+	% - the encumbrance of i
 	if strcmp(robots{1}.neighbors, 'init')
 		for i = 1:N
 			robots{i}.neighbors = [];
@@ -10,12 +13,20 @@ function voronoi_map(robots, obstacles)
 				if j ~= i
 					robots_d =  norm(robots{i}.x - robots{j}.x);
 					if robots_d <= robots{i}.ComRadius
-						robots{i}.neighbors = [robots{i}.neighbors, j];
+						robots{i}.neighbors_pos = [robots{i}.neighbors, j];
+
 					end
 				end
 			end
 		end
 	end
+	% add 
+
+	% creare una matrice 3D o un campo del robot dove salviamo le posizioni dei vicini + target
+	% NOTE: il target lo conosciamo già mentre gli altri li misuriamo
+	% avvicinare ogni punto e il target in base all'incertezza
+	% avviciniare i punti con delta e il proprio sigma
+
 
 
 	for i = 1:N
