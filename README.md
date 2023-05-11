@@ -18,6 +18,9 @@ Formation Control of Multi-agent systems_](https://arxiv.org/pdf/2110.06332.pdf)
 - [_Proportional-Integral Formation Control for Multi-Agent Systems with
 Time-Varying Attitudes under Relative Measurements_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8899676)
 
+## Distributed Kalmann Filter
+- [_Distributed Kalman Filters for agents consensus_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7434174)
+
 ## Voroni tassellation
 - Effect of Rc and Rc/2
 ![Rs effect](effect_of_Rs.jpg)

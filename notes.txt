@@ -17,7 +17,7 @@ DOMANDE:
 - incertezza nella trilaterazione -> jacobiana va calcolata rispetto al target o alla poszione delle ancore
 
 
-INCONTRO CON FONTANELLI 20/04/2023
+---------- INCONTRO CON FONTANELLI 20/04/2023 ----------
 
 	Localizzazione distribuita con solo misure di distanza è impossibile perchè il prolema non è osservabile.
 	Quindi conviene fare come abbiamo fatto con misure relative.
@@ -74,7 +74,7 @@ Kp is at maximum equal to 1/dt:
 - dx = u * dt = kp*(pi - ci)*dt <= pi - ci => kp <= 1/dt
 
 
-INCONTRO CON FONTANELLI 04/05/2023
+---------- INCONTRO CON FONTANELLI 04/05/2023 ----------
 
 il robot ha una velocità massima e di conseguenza so lo spostamento massimo del robot che puo avvenire
 in un time step. Quindi o riduco la cella oppure aumento l'ingombro del robot
@@ -129,3 +129,8 @@ RIDUZIONE TOTALE:
 - riduco rs di delta + 3*max(sigmai)
 - NOTA: la cella va ridotta del max(sigmai) poichè il robot potendo in generale ruotare, può far ruotare
   il proprio elissoide in tutte le direzioni -> prendo la circonferenza circoscritta
+
+  
+---------- INCONTRO CON FONTANELLI 11/05/2023 ----------
+Il distributed kalmann filter si può fare anche se le misure sono correlate, la matrice di covarianza non verrà diagonale.
+La riduzione della cella come avevamo pensato va bene.
