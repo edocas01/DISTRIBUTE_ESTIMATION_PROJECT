@@ -125,5 +125,7 @@ DOMANDE DA FARE:
 RIDUZIONE TOTALE:
 
 - posiziono il robot j nel punto più vicino in cui potrebbe cadere (3*sigmaj).
-- creo un punto fittizio avvicinando questo punto di una distanza pari a 2*(sigmai*3 + delta)
-- riduco rs di delta + 3*sigmai
+- creo un punto fittizio avvicinando questo punto di una distanza pari a 2*(max(sigmai)*3 + delta)
+- riduco rs di delta + 3*max(sigmai)
+- NOTA: la cella va ridotta del max(sigmai) poichè il robot potendo in generale ruotare, può far ruotare
+  il proprio elissoide in tutte le direzioni -> prendo la circonferenza circoscritta
