@@ -47,7 +47,7 @@ function distributed_KF(robots, target, param)
 		 for i=1:n
 			 for j=1:n
 				
-				if A(i,j) == 1
+				if A(j,i) == 1
 					F{i} = F{i} + 1 / (1+max(D)) * (FStore{j} - FStore{i});
 					a{i} = a{i} + 1 / (1+max(D)) * (aStore{j} - aStore{i});
 				end

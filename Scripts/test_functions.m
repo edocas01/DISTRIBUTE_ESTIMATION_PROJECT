@@ -29,23 +29,22 @@ robots = cell(1,N);
 for i = 1:N
     robots{i} = ROBOT([cosd(360/N*i); sind(360/N*i)], i, 'linear', parameters_simulation);
 end
-[target, u_target, obstacles] = initialize_env(parameters_simulation);
+robots{1}.ComRadius = 0.1;
+[target, trajectory, u_target, obstacles] = initialize_env(parameters_simulation);
 time = 0 : parameters_simulation.dt : length(u_target);
 for t = 1:length(u_target)
     target.dynamics(u_target(:,t));
     traj(:,t) = target.x;
     relative_target_consensous(robots,target,parameters_simulation);
-    traj_est(:,t,1) = robots{1}.target_est;
-    traj_est(:,t,2) = robots{2}.target_est;
+    traj_est1(:,t) = robots{1}.target_est;
 end
 plot(traj(1,:),traj(2,:),'r');
 hold on
-plot(traj_est(1,:,1),traj_est(2,:,1),'b');
+plot(traj_est1(1,:),traj_est1(2,:),'b');
 hold on
-plot(traj_est(1,:,2),traj_est(2,:,2),'g');
 plot_obstacles(obstacles);
 for i = 1:N
-    robots{i}.plot(all_markers)
+    robots{i}.plot(all_markers,color_matrix,false)
     hold on
 end
 % 

@@ -28,15 +28,32 @@ function relative_target_consensous(robots, target, param)
 		if count == 0
 			warning("Robot " + i + " is not connected to the network");
 		end
-		% target in robot reference frame
-		H = eye(2);
-		target_measure = H * (target.x - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
-		% target world frame
-		z = target_measure + H * robots{i}.x_est;
+
+		% if the target can be measured by the robot
+		dits_robot_target = norm(target.x - robots{i}.x);
+		if dits_robot_target <= robots{i}.ComRadius
+			% target in robot reference frame
+			target_measure = robots{i}.H * (target.x - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
+			% target world frame
+			z = target_measure + robots{i}.H * robots{i}.x_est;
+			% covariance matrix on the target estimate
+			P_target_sensor = robots{i}.R_dist + robots{i}.H * robots{i}.P * robots{i}.H';
+		else
+			% the robot cannot measure the target so it uses the last estimate of the target
+			% and the covariance matrix of the target estimate is set to a high value
+			z = robots{i}.target_est;
+			robots{i}.target_P = robots{i}.target_P * 10;
+			if norm(robots{i}.target_P) >= norm(eye(2)*1000)
+				P_target_sensor = eye(2)*1000;
+			else
+				P_target_sensor = robots{i}.target_P;
+			end
+		end
 		
 		% initialize the matrices for the maximum degree weighting
-		F{i} = H' * inv(robots{i}.R_dist + H * robots{i}.P * H') * H;
-		a{i} = H' * inv(robots{i}.R_dist + H * robots{i}.P * H') * z;
+		F{i} = robots{i}.H' * inv(P_target_sensor) * robots{i}.H;
+		a{i} = robots{i}.H' * inv(P_target_sensor) * z;
+		
 		robots{i}.target_est_hist_messages(:, 1) = inv(F{i}) * a{i};
 		robots{i}.target_P_hist_messages{1} = inv(F{i});
 	end
@@ -48,8 +65,9 @@ function relative_target_consensous(robots, target, param)
 		 aStore = a;
 		 for i=1:n
 			for j=1:n
-				
-				if A(i,j) == 1
+                % the i-th robot information is updated if j can send it to
+                % him
+				if A(j,i) == 1
 					F{i} = F{i} + 1 / (1+max(D)) * (FStore{j} - FStore{i});
 					a{i} = a{i} + 1 / (1+max(D)) * (aStore{j} - aStore{i});
 				end
