@@ -22,7 +22,7 @@ for i = 1:N
 end
 
 relative_target_consensous(robots, target, parameters_simulation);
-voronoi_map(robots);
+voronoi_map(parameters_simulation, robots);
 
 figure();
 hold on

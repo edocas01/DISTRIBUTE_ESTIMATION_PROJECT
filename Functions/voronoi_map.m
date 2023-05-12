@@ -17,15 +17,15 @@ function voronoi_map(param, robots, obstacles)
 		end
 	end
 	
-	% insert in the robot.neigbors_pos (2, neighbours + 1) the position of the neighbors and the target at the end
+	% insert in the robot.neighbors_pos (2, neighbours + 1) the position of the neighbors and the target at the end
 	% move the neighbors according to:
 	% - the uncertainty of j
 	% - the uncertainty of i
 	% - the encumbrance of i
 	% NOTE: the neighbors have to be measured while the target is already estimated
 	Delta = zeros(N,1);
-	for i = 1:N
-		robots{i}.neigbors_pos = []; 
+	for i = 1:N 
+		robots{i}.neighbors_pos = []; 
 		for j = 1:length(robots{i}.neighbors) + 1 % to insert also the target
 			if j <= length(robots{i}.neighbors)
 				% Perform the measure on the neighbor
@@ -50,7 +50,11 @@ function voronoi_map(param, robots, obstacles)
 				cov = robots{i}.target_P;
 			end
 			% move the robot j in the closest point to the agent i according to the uncertainty of j
-			[~,z] = moving_closer_point(robots{i}.x_est, z, cov, 3);
+			if size(cov,1) == 4
+				[~,z] = moving_closer_point(robots{i}.x_est, z, cov(1:2, 1:2), 3);
+			else
+				[~,z] = moving_closer_point(robots{i}.x_est, z, cov, 2);
+			end
 			% move the robot j to consider the max uncertainty of i (max semiaxis of i)
 			[~, eigenvalues] = eig(robots{i}.P*3);
 			max_semiaxis = sqrt(max(diag(eigenvalues)));
@@ -59,9 +63,9 @@ function voronoi_map(param, robots, obstacles)
 			% if the vmax allows to exit from the "sicure cell" then reduce it
 			robots_d = norm(robots{i}.x_est - z);
 			if robots_d/2 < robots{i}.vmax * param.dt + Delta(i)
-				robots{i}.neigbors_pos(:,j) = z + 2 * Delta(i) * (robots{i}.x_est - z) / robots_d;
+				robots{i}.neighbors_pos(:,j) = z + 2 * Delta(i) * (robots{i}.x_est - z) / robots_d;
 			end
-			robots{i}.neigbors_pos(:,j) = z;		
+			robots{i}.neighbors_pos(:,j) = z;		
 		end
 	end
 
