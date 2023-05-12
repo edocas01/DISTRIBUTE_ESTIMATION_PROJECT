@@ -129,3 +129,6 @@ RIDUZIONE TOTALE:
 - riduco rs di delta + 3*max(sigmai)
 - NOTA: la cella va ridotta del max(sigmai) poichè il robot potendo in generale ruotare, può far ruotare
   il proprio elissoide in tutte le direzioni -> prendo la circonferenza circoscritta
+
+
+RIDURRE IL FIELD OF VIEW DEI ROBOT -> zona di comunicazione è circolare ma i robot hanno la telecamera con 150° di visione

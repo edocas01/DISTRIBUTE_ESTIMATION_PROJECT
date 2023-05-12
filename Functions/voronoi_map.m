@@ -1,9 +1,6 @@
 function voronoi_map(param, robots, obstacles)
 	N = length(robots);
-	% If the neighbors are not initialized, initialize them and move them according to:
-	% - the uncertainty of j
-	% - the uncertainty of i
-	% - the encumbrance of i
+	% If the neighbors are not initialized, initialize them:
 	if strcmp(robots{1}.neighbors, 'init')
 		for i = 1:N
 			robots{i}.neighbors = [];
@@ -13,21 +10,60 @@ function voronoi_map(param, robots, obstacles)
 				if j ~= i
 					robots_d =  norm(robots{i}.x - robots{j}.x);
 					if robots_d <= robots{i}.ComRadius
-						robots{i}.neighbors_pos = [robots{i}.neighbors, j];
-
+						robots{i}.neighbors = [robots{i}.neighbors, j];
 					end
 				end
 			end
 		end
 	end
-	% add 
+	
+	% insert in the robot.neigbors_pos (2, neighbours + 1) the position of the neighbors and the target at the end
+	% move the neighbors according to:
+	% - the uncertainty of j
+	% - the uncertainty of i
+	% - the encumbrance of i
+	% NOTE: the neighbors have to be measured while the target is already estimated
+	Delta = zeros(N,1);
+	for i = 1:N
+		robots{i}.neigbors_pos = []; 
+		for j = 1:length(robots{i}.neighbors) + 1 % to insert also the target
+			if j <= length(robots{i}.neighbors)
+				% Perform the measure on the neighbor
+				% neighbor in agent reference frame
+				neighbor_measure = (robots{robots{i}.neighbors(j)}.x - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
+				% neighbor in world frame
+				z = neighbor_measure + robots{i}.x_est;
+				cov = robots{i}.R_dist + robots{i}.P;
+				% if the neighbor can communicate with the agent then they can mean their estimate 
+				robots_d = norm(robots{i}.x - robots{robots{i}.neighbors(j)}.x);
+				if robots_d <= robots{robots{i}.neighbors(j)}.ComRadius
+					% bayesian mean between the agent and the neighbor estimate on neighbor position
+					z2 = robots{robots{i}.neighbors(j)}.x_est;
+					cov2 = robots{robots{i}.neighbors(j)}.P; 
+					z = [z;z2];
+					H = [eye(2); eye(2)];
+					cov = [cov, zeros(2); zeros(2), cov2];
+					z = inv(H'*inv(cov)*H)*H'*inv(cov)*z;
+				end
+			else
+				z = robots{i}.target_est;
+				cov = robots{i}.target_P;
+			end
+			% move the robot j in the closest point to the agent i according to the uncertainty of j
+			[~,z] = moving_closer_point(robots{i}.x_est, z, cov, 3);
+			% move the robot j to consider the max uncertainty of i (max semiaxis of i)
+			[~, eigenvalues] = eig(robots{i}.P*3);
+			max_semiaxis = sqrt(max(diag(eigenvalues)));
+			Delta(i) = robots{i}.volume + max_semiaxis;
 
-	% creare una matrice 3D o un campo del robot dove salviamo le posizioni dei vicini + target
-	% NOTE: il target lo conosciamo già mentre gli altri li misuriamo
-	% avvicinare ogni punto e il target in base all'incertezza
-	% avviciniare i punti con delta e il proprio sigma
-
-
+			% if the vmax allows to exit from the "sicure cell" then reduce it
+			robots_d = norm(robots{i}.x_est - z);
+			if robots_d/2 < robots{i}.vmax * param.dt + Delta(i)
+				robots{i}.neigbors_pos(:,j) = z + 2 * Delta(i) * (robots{i}.x_est - z) / robots_d;
+			end
+			robots{i}.neigbors_pos(:,j) = z;		
+		end
+	end
 
 	for i = 1:N
 		% Initialization of the variables
