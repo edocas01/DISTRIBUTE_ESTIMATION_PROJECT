@@ -16,15 +16,17 @@ parameters_simulation = struct( ...
 	... % Debug flags 	
 	'title_flags', 					false, 			... % to print the central strings
 	... % Robot parameters 	
-	'MIN_Rc', 					3, 			... % minimum radius of the communication range (m)
+	'MIN_Rc', 					5, 			... % minimum radius of the communication range (m)
 	'MAX_Rc', 					15, 				... % maximum radius of the communication range (m)
 	'std_gps', 						1, 				... % standard deviation of the GPS (m)
 	'std_robots_model', 			1, 				... % standard deviation of the robot model (m)
 	'std_relative_sensor', 			0.3,      		... % standard deviation of the relative sensor (m)
 	'MAX_VOLUME',					0.5, 			... % maximum radius of the robot volume (m)
 	'MIN_VOLUME',					0.1, 			... % minimum radius of the robot volume (m)
-	'MAX_LINEAR_VELOCITY', 			1, 				... % maximum linear velocity (m/s)
+	'MAX_LINEAR_VELOCITY', 			10/3.6, 				... % maximum linear velocity (m/s)
+	'MIN_LINEAR_VELOCITY', 			3/3.6, 				... % minimum linear velocity (m/s)
 	'MAX_ANGULAR_VELOCITY', 		pi/2, 			... % maximum angular velocity (rad/s)
+	'MIN_ANGULAR_VELOCITY', 		pi/6, 			... % minimum angular velocity (rad/s)
 	... % Consensous parameters	
 	'MSG_PROTOCOL', 				50				... % protocol used for message passing
 	);

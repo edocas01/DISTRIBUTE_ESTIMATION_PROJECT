@@ -92,7 +92,7 @@ classdef ROBOT < handle
 			obj.P = eye(2);
 			obj.Q = (rand(2,2) - 0.5) * param.std_relative_sensor;
 			obj.Q = obj.Q * obj.Q';
-			obj.vmax = rand()*param.MAX_LINEAR_VELOCITY;
+			obj.vmax = rand() * (param.MAX_LINEAR_VELOCITY - param.MIN_LINEAR_VELOCITY) + param.MIN_LINEAR_VELOCITY;
 		elseif strcmp(obj.type, 'unicycle')
 			obj.x = zeros(3,1); 
 			obj.x(1) = x(1);
@@ -103,7 +103,8 @@ classdef ROBOT < handle
 			obj.P = eye(3);
 			obj.Q = (rand(3,3) - 0.5) * param.std_relative_sensor;
 			obj.Q = obj.Q * obj.Q';
-			obj.vmax = [rand()*param.MAX_LINEAR_VELOCITY; rand()*param.MAX_ANGULAR_VELOCITY];
+			obj.vmax = [rand() * (param.MAX_LINEAR_VELOCITY - param.MIN_LINEAR_VELOCITY) + param.MIN_LINEAR_VELOCITY;...
+					    rand() * (param.MAX_ANGULAR_VELOCITY - param.MIN_ANGULAR_VELOCITY) + param.MIN_ANGULAR_VELOCITY];
 		end
 			
 		obj.ComRadius = rand()*(param.MAX_Rc - param.MIN_Rc) + param.MIN_Rc;

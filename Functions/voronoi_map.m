@@ -53,17 +53,20 @@ function voronoi_map(param, robots, obstacles)
 				cov = robots{i}.target_P;
 			end
 			% move the robot j in the closest point to the agent i according to the uncertainty of j
-			[~,z] = moving_closer_point(robots{i}.x_est, z, cov, 3);
+			z = moving_closer_point(robots{i}.x_est, z, cov, 3);
 			% move the robot j to consider the max uncertainty of i (max semiaxis of i)
 			[~, eigenvalues] = eig(robots{i}.P*3);
-			max_semiaxis = sqrt(max(diag(eigenvalues)));
-			Delta(i) = robots{i}.volume + max_semiaxis;
+			max_semiaxis(i) = sqrt(max(diag(eigenvalues)));
 
-			robots{i}.neighbors_pos(:,j) = z;		
-			% if the vmax allows to exit from the "sicure cell" then reduce it
+			% move the robot j to consider the uncertainty of i
 			robots_d = norm(robots{i}.x_est - z);
-			if robots_d/2 < robots{i}.vmax * param.dt + Delta(i)
-				robots{i}.neighbors_pos(:,j) = z + 2 * Delta(i) * (robots{i}.x_est - z) / robots_d;
+			z = z + 2 * max_semiaxis(i) * (robots{i}.x_est - z) / robots_d;		
+			robots{i}.neighbors_pos(:,j) = z;
+
+			robots_d = norm(robots{i}.x_est - z);
+			% if the vmax allows to exit from the "sicure cell" then reduce it of the volume
+			if robots_d/2 < robots{i}.vmax * param.dt + robots{i}.volume
+				robots{i}.neighbors_pos(:,j) = z + 2 * robots{i}.volume * (robots{i}.x_est - z) / robots_d;
 			end
 		end
 	end
@@ -82,9 +85,12 @@ function voronoi_map(param, robots, obstacles)
 		len_neighbors = length(robots{i}.neighbors_pos(1,:));
 		% Define the admissible radius
 		Rs = robots{i}.ComRadius/2;
+		% reduce the radius of the agent to consider the uncertainty of the agent
+		Rs = Rs - max_semiaxis(i);
+
 		% if the robot can exit from the "sicure cell" then reduce the radius
-		if robots{i}.vmax * param.dt + Delta(i) > Rs
-			Rs = Rs - Delta(i);
+		if robots{i}.vmax * param.dt + robots{i}.volume > Rs
+			Rs = Rs - robots{i}.volume;
 		end
 
 		% Control the number of neighbors and manage the cases
@@ -249,15 +255,12 @@ function [p_circle] = circle_sector(x_center, y_center, A, B)
 end
 
 % move a pointj closer to another pointi with a given covariancej
-function [point_ellipse, new_pj] = moving_closer_point(p_i, p_j, cov_j, prob)
+function new_pj = moving_closer_point(p_i, p_j, cov_j, prob)
 	
-	% find the ellipse around pj with covariance covj and probability prob
     [V, D] = eig(cov_j * prob);
-    t = linspace(0, 2*pi, 30);
-    point_ellipse = [p_j(1); p_j(2)] + (V * sqrt(D)) * [cos(t(:))'; sin(t(:))'];
-
-	% find the closest point on the ellipse to pi
-	p_i = [p_i(1); p_i(2)];
-	[~,idx] = min(sum((point_ellipse - p_i).^2,1));
-	new_pj = point_ellipse(:,idx);
+	max_semiaxis = sqrt(max(diag(D)));
+	
+	dir = p_i - p_j;
+	dir = dir/norm(dir);
+	new_pj = p_j + dir * max_semiaxis;
 end
