@@ -43,29 +43,28 @@ function voronoi_map(param, robots, obstacles)
 					z = [z;z2];
 					H = [eye(2); eye(2)];
 					cov = [cov, zeros(2); zeros(2), cov2];
+					% fused information
 					z = inv(H'*inv(cov)*H)*H'*inv(cov)*z;
+					% fused covariance
+					cov = inv(H'*inv(cov)*H);
 				end
 			else
 				z = robots{i}.target_est;
 				cov = robots{i}.target_P;
 			end
 			% move the robot j in the closest point to the agent i according to the uncertainty of j
-			if size(cov,1) == 4
-				[~,z] = moving_closer_point(robots{i}.x_est, z, cov(1:2, 1:2), 3);
-			else
-				[~,z] = moving_closer_point(robots{i}.x_est, z, cov, 2);
-			end
+			[~,z] = moving_closer_point(robots{i}.x_est, z, cov, 3);
 			% move the robot j to consider the max uncertainty of i (max semiaxis of i)
 			[~, eigenvalues] = eig(robots{i}.P*3);
 			max_semiaxis = sqrt(max(diag(eigenvalues)));
 			Delta(i) = robots{i}.volume + max_semiaxis;
 
+			robots{i}.neighbors_pos(:,j) = z;		
 			% if the vmax allows to exit from the "sicure cell" then reduce it
 			robots_d = norm(robots{i}.x_est - z);
 			if robots_d/2 < robots{i}.vmax * param.dt + Delta(i)
 				robots{i}.neighbors_pos(:,j) = z + 2 * Delta(i) * (robots{i}.x_est - z) / robots_d;
 			end
-			robots{i}.neighbors_pos(:,j) = z;		
 		end
 	end
 
@@ -80,59 +79,44 @@ function voronoi_map(param, robots, obstacles)
 		ia = [];
 		inf_points = [];
 		% Define the number of neighbors
-		len_neighbors = length(robots{i}.neighbors);
+		len_neighbors = length(robots{i}.neighbors_pos(1,:));
 		% Define the admissible radius
 		Rs = robots{i}.ComRadius/2;
-		% TODO:
-		% - consider the volume of the robot
-		% - make the points closer according to the uncertainty
+		% if the robot can exit from the "sicure cell" then reduce the radius
+		if robots{i}.vmax * param.dt + Delta(i) > Rs
+			Rs = Rs - Delta(i);
+		end
 
 		% Control the number of neighbors and manage the cases
 		if len_neighbors == 0 % no other agents -> go with sensing range only
+			% This case should never happen because the target is always a neighbor
+			% (if a robot cannot see the target it uses the last estimate)
 			[pointsx, pointsy] = Circle(robots{i}.x_est(1), robots{i}.x_est(2), Rs);
     		robots{i}.voronoi = polyshape(pointsx, pointsy);
 		elseif len_neighbors == 1 % only one agent -> take the line in the middle of the agents
-			dir = robots{robots{i}.neighbors}.x_est - robots{i}.x_est; % direction of the line from robot to neighbor
+			dir = robots{i}.neighbors_pos(:,1) - robots{i}.x_est; % direction of the line from robot to neighbor
 			dir = dir/norm(dir);                % normalization of the line
 			norm_dir = [-dir(2); dir(1)];       % normal to dir (i.e. line in the middle of the agents)
-			M =  mean([robots{i}.x_est'; robots{robots{i}.neighbors}.x_est'], 1)'; % middle point
-			dist_points = sqrt(Rs^2 - norm(M - robots{i}.x_est)^2); % distance between the middle point and the intersection points
-			A = M + norm_dir*dist_points;      % circle-middle line intersection sx
-			B = M - norm_dir*dist_points;      % circle-middle line intersection dx
-			
-			points = circle_sector(robots{i}.x_est(1), robots{i}.x_est(2), A, B); % points of the circular sector of interest
-			robots{i}.voronoi = polyshape(points(:,1),points(:,2)); 
+
+			M =  mean([robots{i}.x_est, robots{i}.neighbors_pos(:,1)], 2); % middle point
+			% if the radius is smaller than the distance between the middle point and the agent
+			if Rs^2 < norm(M - robots{i}.x_est)^2
+				[pointsx, pointsy] = Circle(robots{i}.x_est(1), robots{i}.x_est(2), Rs);
+				robots{i}.voronoi = polyshape(pointsx, pointsy);
+			else
+				dist_points = sqrt(Rs^2 - norm(M - robots{i}.x_est)^2); % distance between the middle point and the intersection points
+				A = M + norm_dir*dist_points;      % circle-middle line intersection sx
+				B = M - norm_dir*dist_points;      % circle-middle line intersection dx
+				
+				points = circle_sector(robots{i}.x_est(1), robots{i}.x_est(2), A, B); % points of the circular sector of interest
+				robots{i}.voronoi = polyshape(points(:,1),points(:,2)); 
+			end
 		else
 			% Save the positions of the agents and their neighbors in P (NOTE: the first row is the position of the agent itself)
 			P(1,:) = robots{i}.x_est;
 			for j = 1:len_neighbors
-				% Perform the measure on the neighbor
-				% neighbor in agent reference frame
-				neighbor_measure = (robots{robots{i}.neighbors(j)}.x - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
-				% neighbor in world frame
-				z1 = neighbor_measure + robots{i}.x_est;
-				cov1 = robots{i}.R_dist + robots{i}.P;
-				% if the neighbor cannot communicate with the agent then the agent uses only its measurement
-				P(j+1,:) = z1; 
-				% if the neighbor can communicate with the agent then they can mean their estimate 
-				robots_d = norm(robots{i}.x - robots{robots{i}.neighbors(j)}.x);
-				if robots_d <= robots{robots{i}.neighbors(j)}.ComRadius
-					% bayesian mean between the agent and the neighbor estimate on neighbor position
-					z2 = robots{robots{i}.neighbors(j)}.x_est;
-					cov2 = robots{robots{i}.neighbors(j)}.P; 
-					z = [z1;z2];
-					H = [eye(2); eye(2)];
-					C = [cov1, zeros(2); zeros(2), cov2];
-					P(j+1,:) = inv(H'*inv(C)*H)*H'*inv(C)*z;
-				end 
+				P(j+1,:) = robots{i}.neighbors_pos(:,j);
 			end
-			% TODO:
-			% - make the points closer to the agent if they are uncertain
-			% Add the tatget to the points
-			P = [P; robots{i}.target_est'];
-			% TODO:
-			% - consider the obstacles
-			
 			% Compute the voronoi tesselation
 
 			% NOTE:
@@ -182,16 +166,13 @@ function voronoi_map(param, robots, obstacles)
 		
 			% Associate the new points to the agents
 			row_start = length(V(:,1)) - length(inf_points(:, 1)) + 1; % row where the infinite points start in V
-			% Save the positions of the agents and their neighbors in robots_pos 
-			% (NOTE: the first row is the position of the agent itself)
-			robots_pos = P;
 			% Loop over the new points
 			% for each point we check which is the closest agent
 			% if the closest agent is the agent itself, we add the point to C{1}
 			% NOTE: C is compute by each agent and the first row is always the agent itself so we
 			% have to care only about the first row
 			for j = row_start:length(V(:,1))
-				V_dist = sum(abs(V(j,:)-robots_pos).^2,2).^0.5; % vector of distances between the considered point and the agents
+				V_dist = sum(abs(V(j,:)-P).^2,2).^0.5; % vector of distances between the considered point and the agents
 				% V_dist is a vector of n elements where n is the number of agents
 				V_index = find(V_dist == min(V_dist)); % check the closest agent
 				% if the output is a vector of length 2, it means that the point is equidistant from 2 agents
@@ -242,7 +223,7 @@ end
 
 %}
 
-
+% compute the circular sector given the center and the two points
 function [p_circle] = circle_sector(x_center, y_center, A, B)
 	% This function reports the point of a circle
 	
@@ -265,4 +246,18 @@ function [p_circle] = circle_sector(x_center, y_center, A, B)
 	th = alpha_A:step:alpha_B;
 	p_circle(:, 1) = x_center + R*cos(th);
 	p_circle(:, 2) = y_center + R*sin(th);
+end
+
+% move a pointj closer to another pointi with a given covariancej
+function [point_ellipse, new_pj] = moving_closer_point(p_i, p_j, cov_j, prob)
+	
+	% find the ellipse around pj with covariance covj and probability prob
+    [V, D] = eig(cov_j * prob);
+    t = linspace(0, 2*pi, 30);
+    point_ellipse = [p_j(1); p_j(2)] + (V * sqrt(D)) * [cos(t(:))'; sin(t(:))'];
+
+	% find the closest point on the ellipse to pi
+	p_i = [p_i(1); p_i(2)];
+	[~,idx] = min(sum((point_ellipse - p_i).^2,1));
+	new_pj = point_ellipse(:,idx);
 end

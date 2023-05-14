@@ -106,7 +106,7 @@ classdef ROBOT < handle
 			obj.vmax = [rand()*param.MAX_LINEAR_VELOCITY; rand()*param.MAX_ANGULAR_VELOCITY];
 		end
 			
-		obj.ComRadius = rand()*(param.MAX_RADIUS - param.MIN_RADIUS) + param.MIN_RADIUS;
+		obj.ComRadius = rand()*(param.MAX_Rc - param.MIN_Rc) + param.MIN_Rc;
 		obj.id = id;
 
 		% Measurement model on the absolute position GPS
