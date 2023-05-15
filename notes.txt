@@ -1,22 +1,3 @@
-Try unicycle
-
-Distributed localization of the target:
-	- relative measure between robot-target
-	- distance measure between robot-target
-	- distance measure between robot-target (some robots cannot measure the target)
-
-Obstacles management:
-	- single point o "shape"
-
-Control:
-	- compute the voronoi map 
-
-
-
-DOMANDE:
-- incertezza nella trilaterazione -> jacobiana va calcolata rispetto al target o alla poszione delle ancore
-
-
 INCONTRO CON FONTANELLI 20/04/2023
 
 	Localizzazione distribuita con solo misure di distanza è impossibile perchè il prolema non è osservabile.
@@ -124,11 +105,17 @@ DOMANDE DA FARE:
 
 RIDUZIONE TOTALE:
 
-- posiziono il robot j nel punto più vicino in cui potrebbe cadere (3*sigmaj).
+- posiziono il robot j lungo la congiungente tra i due robot ma avvicinato del max(sigmaj)*3
+  NOTA: il robot va mosso lungo la congiungente dei due robot altrimenti si rischia di avere intersezioni
 - creo un punto fittizio avvicinando questo punto di una distanza pari a 2*(max(sigmai)*3 + delta)
 - riduco rs di delta + 3*max(sigmai)
 - NOTA: la cella va ridotta del max(sigmai) poichè il robot potendo in generale ruotare, può far ruotare
   il proprio elissoide in tutte le direzioni -> prendo la circonferenza circoscritta
+- NOTA: la cella va sempre ridotta dell'incertezza perchè entra sempre in gioco. Il delta viene considerato
+		solo in relazione a vmax.
+- NOTA: sembra funzionare anche con un fattore di copertura di 1 (anzichè 3)
 
+Nel report/presentazione far vedere che le zone si intersecano se non consideriamo le incertezze e far vedere
+come dopo le zone sono modificate
 
 RIDURRE IL FIELD OF VIEW DEI ROBOT -> zona di comunicazione è circolare ma i robot hanno la telecamera con 150° di visione
