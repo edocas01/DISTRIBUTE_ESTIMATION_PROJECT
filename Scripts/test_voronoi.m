@@ -5,7 +5,7 @@ clearvars;
 addpath('Classes');
 addpath('Functions');
 coverage = 3;
-coverage_01 = 1;
+coverage_01 = 2;
 config;
 N = 6;
 range = 3;

@@ -47,6 +47,7 @@ function voronoi_map(param, robots, obstacles, coverage)
 					z = inv(H'*inv(cov)*H)*H'*inv(cov)*z;
 					% fused covariance
 					cov = inv(H'*inv(cov)*H);
+                    % cov = inv( inv(cov1) + inv(cov2))
 				end
 			else
 				z = robots{i}.target_est;
