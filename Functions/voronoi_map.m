@@ -1,4 +1,4 @@
-function voronoi_map(param, robots, obstacles)
+function voronoi_map(param, robots, obstacles, coverage)
 	N = length(robots);
 	% If the neighbors are not initialized, initialize them:
 	if strcmp(robots{1}.neighbors, 'init')
@@ -53,9 +53,9 @@ function voronoi_map(param, robots, obstacles)
 				cov = robots{i}.target_P;
 			end
 			% move the robot j in the closest point to the agent i according to the uncertainty of j
-			z = moving_closer_point(robots{i}.x_est, z, cov, 3);
+			z = moving_closer_point(robots{i}.x_est, z, cov, coverage);
 			% move the robot j to consider the max uncertainty of i (max semiaxis of i)
-			[~, eigenvalues] = eig(robots{i}.P*3);
+			[~, eigenvalues] = eig(robots{i}.P*coverage);
 			max_semiaxis(i) = sqrt(max(diag(eigenvalues)));
 
 			% move the robot j to consider the uncertainty of i

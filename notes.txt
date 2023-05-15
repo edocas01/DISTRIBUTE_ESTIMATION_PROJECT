@@ -113,5 +113,9 @@ RIDUZIONE TOTALE:
   il proprio elissoide in tutte le direzioni -> prendo la circonferenza circoscritta
 - NOTA: la cella va sempre ridotta dell'incertezza perchè entra sempre in gioco. Il delta viene considerato
 		solo in relazione a vmax.
+- NOTA: sembra funzionare anche con un fattore di copertura di 1 (anzichè 3)
+
+Nel report/presentazione far vedere che le zone si intersecano se non consideriamo le incertezze e far vedere
+come dopo le zone sono modificate
 
 RIDURRE IL FIELD OF VIEW DEI ROBOT -> zona di comunicazione è circolare ma i robot hanno la telecamera con 150° di visione
