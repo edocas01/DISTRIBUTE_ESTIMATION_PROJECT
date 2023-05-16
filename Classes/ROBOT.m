@@ -208,7 +208,7 @@ classdef ROBOT < handle
 	% - Add the possibility to plot the covariance ellipse
 	% - Add the volume of the robot
 	function h = plot(obj, all_markers, color_matrix, plot_circle)
-		h = plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['Robot ', num2str(obj.id)], 'MarkerSize', 10, 'Color', color_matrix(obj.id,:));
+		h = plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['Robot ', num2str(obj.id)], 'MarkerSize', 10, 'Color', color_matrix(obj.id,:),'LineWidth', 1.5);
 		hold on;
 		if plot_circle
 			[x,y] = Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius);
