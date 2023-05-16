@@ -26,16 +26,27 @@ voronoi_map(parameters_simulation, R, [], coverage);
 
 phi = @(x,y) exp(-((x - T.x(1))^2 + (y - T.x(2))^2)); % kg / m^2
 
+ptsx = zeros(N+1, 1);
+ptsy = zeros(N+1, 1);
+for i = 1:N
+	ptsx = [ptsx; R{i}.x_est(1)];
+	ptsy = [ptsy; R{i}.x_est(2)];
+end
+
+[vx, vy] = voronoi(ptsx, ptsy);
+
 tic
 
 figure(1)
 T.plot();
 hold on; grid on; axis equal;
+plot(vx, vy, 'k', 'HandleVisibility', 'off')
 leg = cell(1,N);
+h = zeros(1,N+1);
 for i = 1:N
 	[barycenter, msh] = compute_centroid(R{i}.voronoi, phi);
 	h(i) = R{i}.plot(all_markers, color_matrix, false);
-	leg{i} = sprintf('Robot %d', i);
+
 	if i == N
 	 	h(i+1) = plot(barycenter(1), barycenter(2), 'kx', 'MarkerSize', 10, 'LineWidth', 2, 'HandleVisibility', 'off');
 		leg{i+1} = 'Centroid';
@@ -45,7 +56,7 @@ for i = 1:N
 	plot(R{i}.voronoi, 'HandleVisibility', 'off')
 	pdemesh(msh);
 end
-legend(h, leg, 'Location', 'bestoutside')
+legend(h, 'Location', 'bestoutside')
 hold off
 
 toc
