@@ -212,7 +212,7 @@ classdef ROBOT < handle
 		hold on;
 		[ptsx, ptsy] = Circle(obj.x_est(1), obj.x_est(2), obj.volume);
 		vol = polyshape(ptsx, ptsy);
-		plot(vol, 'HandleVisibility', 'off', 'FaceAlpha', 0.7, 'FaceColor', 'k');
+		plot(vol, 'HandleVisibility', 'off', 'FaceAlpha', 0.4, 'FaceColor', 'k');
 		if plot_circle
 			[x,y] = Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius);
 			plot(x,y, '--k', 'HandleVisibility', 'off');

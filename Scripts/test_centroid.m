@@ -24,7 +24,9 @@ end
 relative_target_consensous(R, T, parameters_simulation);
 voronoi_map(parameters_simulation, R, [], coverage);
 
-phi = @(x,y) exp(-((x - T.x(1))^2 + (y - T.x(2))^2)); % kg / m^2
+% phi = @(x,y) exp(-((x - T.x(1))^2 + (y - T.x(2))^2)); % kg / m^2
+func = @(x,y,r,x_t,y_t) exp(-r/200*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2);
+phi = @(x,y) func(x,y,5,T.x(1),T.x(2));
 
 ptsx = zeros(N+1, 1);
 ptsy = zeros(N+1, 1);
