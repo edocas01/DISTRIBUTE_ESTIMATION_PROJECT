@@ -1,53 +1,53 @@
 % clc; clear; close all;
+clc;
+close all;
+clearvars;
+% rng default;
+addpath('Classes');
+addpath('Functions');
 
-v1 = [0;0];
-v2 = [10;0];
-v3 = [10,3];
-v4 = [0,3];
+coverage = 3;
+config;
+N = 10;
+range = 5;
+
+dyn_type = repmat("linear",N,1);
+T = TARGET([0;0]);
+R = select_shape(N, dyn_type, 'circle', T.x, range, 0, parameters_simulation);
+
+for i = 1:N
+	for j = 1:10
+    	EKF(R{i}, 0)
+	end
+end
+
+relative_target_consensous(R, T, parameters_simulation);
+voronoi_map(parameters_simulation, R, [], coverage);
+
+phi = @(x,y) exp(-((x - T.x(1))^2 + (y - T.x(2))^2)); % kg / m^2
+
 tic
-pp = polyshape([v1(1),v2(1),v3(1),v4(1)],[v1(2),v2(2),v3(2),v4(2)]);
-pp = robots{1}.voronoi;
-phi = @(x,y) x.^2 + y.^2; % kg / m^2
 
-centroid = compute_centroid(pp, phi);
-% % From documentation:
-% tr = triangulation(pp);
-% model = createpde;
-% tnodes = tr.Points';
-% telements = tr.ConnectivityList';
-% geometryFromMesh(model,tnodes,telements);
-% mesh = generateMesh(model, "Hmax", 0.5, "GeometricOrder","linear");
-% [~, ai] = area(mesh);
-% % ai are the infinitesimal areas
-% mass = 0;
-% barycenter = zeros(2,1);
-% for i = 1:length(ai)
-% 	nodes = mesh.Nodes(:,mesh.Elements(:,i));
-% 	ci = mean(nodes,2);
-% 	phi_i = phi(ci(1),ci(2));
-% 	mass = mass + ai(i) * phi_i;
-% 	barycenter = barycenter + ai(i) * phi_i * ci;
-% end
-% barycenter = barycenter / mass;
-
-
-% generateMesh creates a fine discretization of the given polyshape.
-% GeometricOrder has to be set to linear
-% Hmax -> is the maximum discretization step
-% Hmin -> is the minimum discretization step
-% centroid = 0;
+figure(1)
+T.plot();
+hold on; grid on; axis equal;
+leg = cell(1,N);
+for i = 1:N
+	[barycenter, msh] = compute_centroid(R{i}.voronoi, phi);
+	h(i) = R{i}.plot(all_markers, color_matrix, false);
+	leg{i} = sprintf('Robot %d', i);
+	if i == N
+	 	h(i+1) = plot(barycenter(1), barycenter(2), 'kx', 'MarkerSize', 10, 'LineWidth', 2, 'HandleVisibility', 'off');
+		leg{i+1} = 'Centroid';
+	else
+		plot(barycenter(1), barycenter(2), 'kx', 'MarkerSize', 10, 'LineWidth', 2, 'HandleVisibility', 'off')
+	end
+	plot(R{i}.voronoi, 'HandleVisibility', 'off')
+	pdemesh(msh);
+end
+legend(h, leg, 'Location', 'bestoutside')
+hold off
 
 toc
 
 
-% xmin = min(pp.Vertices(:,1));
-% xmax = max(pp.Vertices(:,1));
-% ymin = min(pp.Vertices(:,2));
-% ymax = max(pp.Vertices(:,2));
-
-% inside = @(x,y) double(inpolygon(x, y, pp.Vertices(:,1), pp.Vertices(:,2)));
-% func = @(x,y) phi(x,y) .* inside(x,y);
-% mass_01 = integral2(func, xmin, xmax, ymin, ymax);
-
-% xc = integral2(@(x,y) func(x,y) .* x, xmin, xmax, ymin, ymax) / mass_01;
-% yc = integral2(@(x,y) func(x,y) .* y, xmin, xmax, ymin, ymax) / mass_01;
