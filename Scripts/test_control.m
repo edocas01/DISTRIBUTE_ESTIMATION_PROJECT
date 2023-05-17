@@ -65,20 +65,37 @@ hold off
 
 
 
-%%
+%% Animation
 tic
 [circx, circy] = Circle(T.x(1), T.x(2), R_form);
+x_est_hist = cell(N,1);
+barycenter_hist = cell(N,1);
 
 Tmax = 10;
+kp = 1 / parameters_simulation.dt;
+
 for t = 1:parameters_simulation.dt:Tmax
 	figure(2); clf
+	xlim([-30 30])
+	ylim([-30 30])
 	hold on; grid on; axis equal;
     plot(circx, circy, '--', 'HandleVisibility','off')
 	h = zeros(1,N+1);
 	for i = 1:N
+		title(sprintf("Time: %.2f s", t))
 		[barycenter, msh] = compute_centroid(R{i}.voronoi, phi);
-		u = R{i}.vmax * parameters_simulation.dt * (barycenter - R{i}.x_est) / norm(barycenter - R{i}.x_est);
+
+		% ---- In some steps some robots still go beyond the centroid ----
+		if  kp * norm(barycenter - R{i}.x_est) < R{i}.vmax
+			u = kp * (barycenter - R{i}.x_est) * parameters_simulation.dt;
+		else
+			u = R{i}.vmax * parameters_simulation.dt * (barycenter - R{i}.x_est) / norm(barycenter - R{i}.x_est);
+		end
 		EKF(R{i}, u);
+		for j = 1:10
+			EKF(R{i}, 0);
+		end
+		voronoi_map(parameters_simulation, R, [], coverage);
 		
 		h(i) = R{i}.plot(all_markers, color_matrix, false);
 		plot(R{i}.voronoi, 'HandleVisibility', 'off')
@@ -88,11 +105,10 @@ for t = 1:parameters_simulation.dt:Tmax
 			plot(barycenter(1), barycenter(2), 'kx', 'MarkerSize', 10, 'LineWidth', 2, 'HandleVisibility', 'off')
 		end
 	end
-	voronoi_map(parameters_simulation, R, [], coverage);
 	T.plot();
-	pause(0.01)
+	legend(h, 'Location', 'bestoutside')
+	pause(0.001)
 end
-legend(h, 'Location', 'bestoutside')
 hold off
 
 
