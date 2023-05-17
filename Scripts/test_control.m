@@ -11,7 +11,7 @@ T = TARGET([0;0]);
 fprintf("Target initial position: (%.2f m, %.2f m)\n", T.x(1), T.x(2));
 
 coverage = 3;
-N = 8;
+N = 4;
 range = 20;
 
 dyn_type = repmat("linear",N,1);
@@ -72,7 +72,7 @@ x_est_hist = cell(N,1);
 barycenter_hist = cell(N,1);
 
 Tmax = 10;
-kp = 1 / parameters_simulation.dt;
+kp = 1 / parameters_simulation.dt - 3;
 
 for t = 1:parameters_simulation.dt:Tmax
 	figure(2); clf

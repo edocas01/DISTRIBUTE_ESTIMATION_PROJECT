@@ -53,8 +53,7 @@ informazione sulla sua posizione se lui è in grado di darmela. Limitare anche l
 Kp is at maximum equal to 1/dt:
 - u = kp*(pi - ci) 
 - dx = u * dt = kp*(pi - ci)*dt <= pi - ci => kp <= 1/dt
-
-
+Il centroide viene ricalcolato ad ogni step. L'area raggiungerà un limite in cui non può più andare oltre nella direzione in cui si muove il robot mentre il robot continuando ad andare nella stessa direzione diminuirà l'area dietro di sè spostando il baricentro geometrico sempre più avanti. Dato che la funzione peso raggiunge il massimo sempre nella stessa posizione, il baricentro oscillerà e così anche il robot. L'oscillazione non è dovuta al controllo proporzionale dato che usiamo kp <= 1 / dt. L'oscillazione si può limitare settando kp minore di 1 / dt in modo tale che l'area non cambi eccessivamente tra uno step e il successivo una volta raggiunto il limite di espansione nella direzione del moto.
 ---------- INCONTRO CON FONTANELLI 04/05/2023 ----------
 
 il robot ha una velocità massima e di conseguenza so lo spostamento massimo del robot che puo avvenire
