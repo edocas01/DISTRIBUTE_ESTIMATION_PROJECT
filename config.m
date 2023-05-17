@@ -1,7 +1,7 @@
 % Font configuration
-set(0,'defaulttextinterpreter','latex')
-set(groot, 'defaultAxesTickLabelInterpreter','latex');
-set(groot, 'defaultLegendInterpreter','latex');
+set(0,'defaulttextinterpreter','none')
+set(groot, 'defaultAxesTickLabelInterpreter','none');
+set(groot, 'defaultLegendInterpreter','none');
 % 
 % set(0,'DefaultFigureWindowStyle','docked');
 % set(0,'defaultAxesFontSize',  16)
