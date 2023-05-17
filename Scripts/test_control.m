@@ -11,8 +11,8 @@ T = TARGET([0;0]);
 fprintf("Target initial position: (%.2f m, %.2f m)\n", T.x(1), T.x(2));
 
 coverage = 3;
-N = 4;
-range = 20;
+N = 10;
+range = 15;
 
 dyn_type = repmat("linear",N,1);
 R = select_shape(N, dyn_type, 'circle', T.x, range, 0, parameters_simulation);
@@ -36,7 +36,7 @@ relative_target_consensous(R, T, parameters_simulation);
 voronoi_map(parameters_simulation, R, [], coverage);
 
 func = @(x,y,r,x_t,y_t) exp(-r/200*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2);
-R_form = 15;
+R_form = 10;
 phi = @(x,y) func(x, y, R_form, T.x(1), T.x(2));
 
 [circx, circy] = Circle(T.x(1), T.x(2), R_form);
@@ -72,7 +72,7 @@ x_est_hist = cell(N,1);
 barycenter_hist = cell(N,1);
 
 Tmax = 10;
-kp = 1 / parameters_simulation.dt - 3;
+kp = 1 / parameters_simulation.dt;
 
 for t = 1:parameters_simulation.dt:Tmax
 	figure(2); clf
@@ -82,20 +82,20 @@ for t = 1:parameters_simulation.dt:Tmax
     plot(circx, circy, '--', 'HandleVisibility','off')
 	h = zeros(1,N+1);
 	for i = 1:N
+        relative_target_consensous(R, T, parameters_simulation);
 		title(sprintf("Time: %.2f s", t))
+        voronoi_map(parameters_simulation, R, [], coverage);
+        
 		[barycenter, msh] = compute_centroid(R{i}.voronoi, phi);
 
-		% ---- In some steps some robots still go beyond the centroid ----
 		if  kp * norm(barycenter - R{i}.x_est) < R{i}.vmax
 			u = kp * (barycenter - R{i}.x_est) * parameters_simulation.dt;
 		else
 			u = R{i}.vmax * parameters_simulation.dt * (barycenter - R{i}.x_est) / norm(barycenter - R{i}.x_est);
 		end
+		
 		EKF(R{i}, u);
-		for j = 1:10
-			EKF(R{i}, 0);
-		end
-		voronoi_map(parameters_simulation, R, [], coverage);
+		
 		
 		h(i) = R{i}.plot(all_markers, color_matrix, false);
 		plot(R{i}.voronoi, 'HandleVisibility', 'off')
