@@ -61,6 +61,10 @@ classdef ROBOT < handle
 
 		neighbors; 			% list of the neighbors of the robot
 		neighbors_pos; 		% list of the neighbors positions (also target)
+
+		all_robots_pos;		% list of all the robots positions (also itself)
+		all_cov_pos;		% covariance of robot measurements of other robots
+
 		voronoi; 			% polyshape of the voronoi region of the robot
 		volume; 			% volume occupied by the robot
 		vmax; 				% maximum velocity of the robot
@@ -132,6 +136,7 @@ classdef ROBOT < handle
 		% To compute voronoi
 		obj.neighbors = ["init"];
 		obj.neighbors_pos = [];
+
 		obj.voronoi = [];
 		obj.volume = rand() * (param.MAX_VOLUME - param.MIN_VOLUME) + param.MIN_VOLUME;
     end
@@ -207,7 +212,7 @@ classdef ROBOT < handle
 	% TODO:
 	% - Add the possibility to plot the covariance ellipse
 	% - Add the volume of the robot
-	function h = plot(obj, all_markers, color_matrix, plot_circle)
+	function h = plot_est(obj, all_markers, color_matrix, plot_circle)
 		h = plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['Robot ', num2str(obj.id)], 'MarkerSize', 10, 'Color', color_matrix(obj.id,:),'LineWidth', 1.5);
 		hold on;
 		[ptsx, ptsy] = Circle(obj.x_est(1), obj.x_est(2), obj.volume);
@@ -219,6 +224,18 @@ classdef ROBOT < handle
 		end
 	end
 
+	function h = plot_real(obj, all_markers, color_matrix, plot_circle)
+		h = plot(obj.x(1), obj.x(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['Robot ', num2str(obj.id)], 'MarkerSize', 10, 'Color', color_matrix(obj.id,:),'LineWidth', 1.5);
+		hold on;
+		[ptsx, ptsy] = Circle(obj.x(1), obj.x(2), obj.volume);
+		vol = polyshape(ptsx, ptsy);
+		plot(vol, 'HandleVisibility', 'off', 'FaceAlpha', 0.4, 'FaceColor', 'k');
+		if plot_circle
+			[x,y] = Circle(obj.x(1), obj.x(2), obj.ComRadius);
+			plot(x,y, '--k', 'HandleVisibility', 'off');
+		end
+	end
+	
 	function Initialize_Position(obj)
 		obj.x = obj.x_in;
 	end
