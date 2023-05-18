@@ -30,7 +30,7 @@ function voronoi_map_consensous(param, robots, obstacles, coverage)
 				robots{i}.neighbors_pos(:,j) = z + 2 * robots{i}.volume * (robots{i}.x_est - z) / robots_d;
 			end
 		end
-		% remove its own position from the neighbors
+		% remove its own position from the neighbors because it is considered later
 		robots{i}.neighbors_pos(:,i) = [];
 	end
 
