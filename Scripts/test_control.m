@@ -96,8 +96,6 @@ for t = 1:parameters_simulation.dt:Tmax
 			u = R{i}.vmax * parameters_simulation.dt * (barycenter - R{i}.x_est) / norm(barycenter - R{i}.x_est);
 		end
 		
-		EKF(R{i}, u);
-		
 		
 		h(i) = R{i}.plot_est(all_markers, color_matrix, true);
 		plot(R{i}.voronoi, 'HandleVisibility', 'off')
@@ -106,6 +104,7 @@ for t = 1:parameters_simulation.dt:Tmax
 		else
 			plot(barycenter(1), barycenter(2), 'kx', 'MarkerSize', 10, 'LineWidth', 2, 'HandleVisibility', 'off')
 		end
+		EKF(R{i}, u);
 	end
 	T.plot();
 	legend(h, 'Location', 'bestoutside')
