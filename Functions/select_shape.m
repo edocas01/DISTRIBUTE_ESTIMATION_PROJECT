@@ -20,24 +20,24 @@ function R = select_shape(N_robots, dyn_type, shape, center_point, distance, ran
 				diagonal = distance * sqrt(2);
 				if randdistance
 					fr = distance / 8;
-					A = center_point + [ diagonal ,  diagonal] + fr * (-1 + 2 * rand(1, 2)); 
-					B = center_point + [-diagonal ,  diagonal] + fr * (-1 + 2 * rand(1, 2));
-					C = center_point + [-diagonal , -diagonal] + fr * (-1 + 2 * rand(1, 2));
-					D = center_point + [ diagonal , -diagonal] + fr * (-1 + 2 * rand(1, 2));
+					A = center_point + [ diagonal ;  diagonal] + fr * (-1 + 2 * rand(2, 1)); 
+					B = center_point + [-diagonal ;  diagonal] + fr * (-1 + 2 * rand(2, 1));
+					C = center_point + [-diagonal ; -diagonal] + fr * (-1 + 2 * rand(2, 1));
+					D = center_point + [ diagonal ; -diagonal] + fr * (-1 + 2 * rand(2, 1));
 				else
-					A = center_point + [ diagonal ,  diagonal]; 
-					B = center_point + [-diagonal ,  diagonal];
-					C = center_point + [-diagonal , -diagonal];
-					D = center_point + [ diagonal , -diagonal];
+					A = center_point + [ diagonal ;  diagonal]; 
+					B = center_point + [-diagonal ;  diagonal];
+					C = center_point + [-diagonal ; -diagonal];
+					D = center_point + [ diagonal ; -diagonal];
 				end
 				% square vertex            % B----K----F----J----A
-				vertex = [A; B; C; D];     % |                   |
+				vertex = [A B C D];        % |                   |
 				% Mid points               % L				     I
 				E = (A + D) / 2;           % |                   |       
 				F = (A + B) / 2;           % G                   E   
 				G = (B + C) / 2;           % |                   |    
 				H = (C + D) / 2;           % M					 |    
-				midpoints = [E; F; G; H];  % |                   |         
+				midpoints = [E F G H];  % |                   |         
 				% Mid mid points           % C----N----H----O----D    
 				I = (E + A) / 2;                    
 				J = (F + A) / 2;                
@@ -46,13 +46,13 @@ function R = select_shape(N_robots, dyn_type, shape, center_point, distance, ran
 				M = (C + G) / 2;
 				N = (C + H) / 2;
 				O = (D + H) / 2;
-				midmidpoints = [I; J; K; L; M; N; O];
+				midmidpoints = [I J K L M N O];
 				if i <= 4
-					R{i} = ROBOT(vertex(i, :), i, dyn_type(i), param);
+					R{i} = ROBOT(vertex(:, i), i, dyn_type(i), param);
 				elseif i <= 8
-					R{i} = ROBOT(midpoints(i - 4, :), i, dyn_type(i), param);
+					R{i} = ROBOT(midpoints(:,i - 4), i, dyn_type(i), param);
 				elseif i <= 15
-					R{i} = ROBOT(midmidpoints(i - 8, :), i, dyn_type(i), param);
+					R{i} = ROBOT(midmidpoints(:,i - 8), i, dyn_type(i), param);
 				end
 				% R{i} = ROBOT([x, y], i, dyn_type(i), param);
 			end

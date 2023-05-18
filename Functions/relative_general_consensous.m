@@ -1,5 +1,5 @@
 % This function is used to calculate the relative target consensus
-function relative_target_consensous(robots, target, param)
+function [z, cov] = relative_general_consensous(robots, target, param)
 	% Robots is a cell array of robots
 	n = length(robots);
 	% Number of consensous protocols messages
@@ -9,21 +9,36 @@ function relative_target_consensous(robots, target, param)
 	% topology matrix
 	A = zeros(n, n);
 	
+	z = zeros(2*(n+1),1,n);
+	for i = 1:n
+		cov(:,:,i) = eye(2*(n+1));
+	end
 	for i = 1:n
 		robots{i}.neighbors = [];
 		count = 0;
+		index = 1;
 		for j = 1:n
 			% if robots j is in the communication radius of robot i
 			% then then i can communicate with j
-            if j == i 
-                continue
-            end
-			robots_d =  norm(robots{i}.x - robots{j}.x);
-			if robots_d <= robots{i}.ComRadius
-				A(i, j) = 1;
-				count = count + 1;
-				robots{i}.neighbors = [robots{i}.neighbors, j];
+            if j ~= i
+				robots_d =  norm(robots{i}.x - robots{j}.x);
+				if robots_d <= robots{i}.ComRadius
+					A(i, j) = 1;
+					count = count + 1;
+					robots{i}.neighbors = [robots{i}.neighbors, j];
+
+					% robotj in roboti reference frame
+					robot_measure = robots{i}.H * (robots{j}.x - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
+					% robotj in world frame
+					z(index:index+1,1,i) = robot_measure + robots{i}.H * robots{i}.x_est;
+					cov(index:index+1,index:index+1,i) = robots{i}.R_dist + robots{i}.H * robots{i}.P * robots{i}.H';
+					
+				end
+			else
+				z(index:index+1,1,i) = robots{i}.GPS_measurement();
+				cov(index:index+1,index:index+1,i) = robots{i}.R_gps;
 			end
+			index = index + 2;
 		end
 		if count == 0
 			warning("Robot " + i + " cannot send messages to any other robot");
@@ -35,13 +50,13 @@ function relative_target_consensous(robots, target, param)
 			% target in robot reference frame
 			target_measure = robots{i}.H * (target.x - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
 			% target world frame
-			z = target_measure + robots{i}.H * robots{i}.x_est;
+			zz = target_measure + robots{i}.H * robots{i}.x_est;
 			% covariance matrix on the target estimate
 			P_target_sensor = robots{i}.R_dist + robots{i}.H * robots{i}.P * robots{i}.H';
 		else
 			% the robot cannot measure the target so it uses the last estimate of the target
 			% and the covariance matrix of the target estimate is set to a high value
-			z = robots{i}.target_est;
+			zz = robots{i}.target_est;
 			robots{i}.target_P = robots{i}.target_P * 10;
 			if norm(robots{i}.target_P) >= norm(eye(2)*1000)
 				P_target_sensor = eye(2)*1000;
@@ -49,11 +64,15 @@ function relative_target_consensous(robots, target, param)
 				P_target_sensor = robots{i}.target_P;
 			end
 		end
-		
+
+		z(2*(n+1)-1:2*(n+1),1,i) = zz;
+		cov(2*(n+1)-1:2*(n+1),2*(n+1)-1:2*(n+1),i) = P_target_sensor;
+		H = eye(2*(n+1));
+
 		% initialize the matrices for the maximum degree weighting
-		F{i} = robots{i}.H' * inv(P_target_sensor) * robots{i}.H;
-		a{i} = robots{i}.H' * inv(P_target_sensor) * z;
-		
+		F{i} = H * inv(cov(:,:,i)) * H';
+		a{i} = H * inv(cov(:,:,i)) * z(:,1,i);
+
 		robots{i}.target_est_hist_messages(:, 1) = inv(F{i}) * a{i};
 		robots{i}.target_P_hist_messages{1} = inv(F{i});
 	end
@@ -78,8 +97,8 @@ function relative_target_consensous(robots, target, param)
 	end
 	% set in the robots the target position and the covariance matrix
 	for i = 1:n
-		robots{i}.target_est = inv(F{i})*a{i};
-		robots{i}.target_P = inv(F{i});
+		z(:,1,i) = inv(F{i})*a{i};
+		cov(:,:,i) = inv(F{i});
 	end
 
 end

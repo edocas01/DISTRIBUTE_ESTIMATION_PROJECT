@@ -18,6 +18,9 @@ Formation Control of Multi-agent systems_](https://arxiv.org/pdf/2110.06332.pdf)
 - [_Proportional-Integral Formation Control for Multi-Agent Systems with
 Time-Varying Attitudes under Relative Measurements_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8899676)
 
+## Distributed Kalmann Filter
+- [_Distributed Kalman Filters for agents consensus_](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7434174)
+
 ## Voroni tassellation
 - [_Multi-Robot Formation Control Based on CVT Algorithm and Health Optimization Management_](https://www.mdpi.com/2076-3417/12/2/755)
 

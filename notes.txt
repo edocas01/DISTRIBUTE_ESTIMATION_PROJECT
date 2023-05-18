@@ -53,9 +53,8 @@ informazione sulla sua posizione se lui è in grado di darmela. Limitare anche l
 Kp is at maximum equal to 1/dt:
 - u = kp*(pi - ci) 
 - dx = u * dt = kp*(pi - ci)*dt <= pi - ci => kp <= 1/dt
-
-
-INCONTRO CON FONTANELLI 04/05/2023
+Il centroide viene ricalcolato ad ogni step. L'area raggiungerà un limite in cui non può più andare oltre nella direzione in cui si muove il robot mentre il robot continuando ad andare nella stessa direzione diminuirà l'area dietro di sè spostando il baricentro geometrico sempre più avanti. Dato che la funzione peso raggiunge il massimo sempre nella stessa posizione, il baricentro oscillerà e così anche il robot. L'oscillazione non è dovuta al controllo proporzionale dato che usiamo kp <= 1 / dt. L'oscillazione si può limitare settando kp minore di 1 / dt in modo tale che l'area non cambi eccessivamente tra uno step e il successivo una volta raggiunto il limite di espansione nella direzione del moto.
+---------- INCONTRO CON FONTANELLI 04/05/2023 ----------
 
 il robot ha una velocità massima e di conseguenza so lo spostamento massimo del robot che puo avvenire
 in un time step. Quindi o riduco la cella oppure aumento l'ingombro del robot
@@ -119,3 +118,7 @@ Nel report/presentazione far vedere che le zone si intersecano se non consideria
 come dopo le zone sono modificate
 
 RIDURRE IL FIELD OF VIEW DEI ROBOT -> zona di comunicazione è circolare ma i robot hanno la telecamera con 150° di visione
+
+---------- INCONTRO CON FONTANELLI 11/05/2023 ----------
+Il distributed kalmann filter si può fare anche se le misure sono correlate, la matrice di covarianza non verrà diagonale.
+La riduzione della cella come avevamo pensato va bene.

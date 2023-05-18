@@ -23,7 +23,6 @@ function voronoi_map(param, robots, obstacles, coverage)
 	% - the uncertainty of i
 	% - the encumbrance of i
 	% NOTE: the neighbors have to be measured while the target is already estimated
-	Delta = zeros(N,1);
 	for i = 1:N 
 		robots{i}.neighbors_pos = []; 
 		for j = 1:length(robots{i}.neighbors) + 1 % to insert also the target
@@ -47,6 +46,7 @@ function voronoi_map(param, robots, obstacles, coverage)
 					z = inv(H'*inv(cov)*H)*H'*inv(cov)*z;
 					% fused covariance
 					cov = inv(H'*inv(cov)*H);
+                    % cov = inv( inv(cov1) + inv(cov2))
 				end
 			else
 				z = robots{i}.target_est;
