@@ -6,35 +6,33 @@ function voronoi_map_consensous(param, robots, obstacles, coverage)
 	% - the encumbrance of i
 	% NOTE: the neighbors have to be measured while the target is already estimated
 	for i = 1:N
-		robots{i}.neighbors_pos = [];   
+		robots{i}.neighbors_pos = [];
+		% compute the max semiaxis of the uncertainty of i
+		[~, eigenvalues] = eig(robots{i}.P*coverage);
+		max_semiaxis = sqrt(max(diag(eigenvalues)));
+
 		for j = 1:length(robots{i}.all_robots_pos)/2
-			% continue if the robot is itself
-			if i == j
-				continue
+			% continue if the robot is itself or if the robot has no information on the others inside all_robots_pos
+			if i == j || isnan(robots{i}.all_robots_pos(2*j-1)) || isnan(robots{i}.all_robots_pos(2*j))
+				continue;
 			end
 			% move the robot j in the closest point to the agent i according to the uncertainty of j
 			z = moving_closer_point(robots{i}.x_est, robots{i}.all_robots_pos(2*j-1:2*j),...
-				robots{i}.all_cov_pos(2*j-1:2*j,2*j-1:2*j), coverage);
-			% move the robot j to consider the max uncertainty of i (max semiaxis of i)
-			[~, eigenvalues] = eig(robots{i}.P*coverage);
-			max_semiaxis(i) = sqrt(max(diag(eigenvalues)));
-
+			robots{i}.all_cov_pos(2*j-1:2*j,2*j-1:2*j), coverage);
+			
 			% move the robot j to consider the uncertainty of i
 			robots_d = norm(robots{i}.x_est - z);
-			z = z + 2 * max_semiaxis(i) * (robots{i}.x_est - z) / robots_d;		
-			robots{i}.neighbors_pos(:,j) = z;
+			% move the robot j to consider the max uncertainty of i (max semiaxis of i)
+			z = z + 2 * max_semiaxis * (robots{i}.x_est - z) / robots_d;		
+			robots{i}.neighbors_pos = [robots{i}.neighbors_pos; z];
 
 			robots_d = norm(robots{i}.x_est - z);
 			% if the vmax allows to exit from the "sicure cell" then reduce it of the volume
 			if robots_d/2 < robots{i}.vmax * param.dt + robots{i}.volume
-				robots{i}.neighbors_pos(:,j) = z + 2 * robots{i}.volume * (robots{i}.x_est - z) / robots_d;
+				robots{i}.neighbors_pos(:,end) = z + 2 * robots{i}.volume * (robots{i}.x_est - z) / robots_d;
 			end
 		end
-		% remove its own position from the neighbors because it is considered later
-		robots{i}.neighbors_pos(:,i) = [];
-	end
 
-	for i = 1:N
 		% Initialization of the variables
 		P = [];
 		vx = [];
@@ -45,11 +43,11 @@ function voronoi_map_consensous(param, robots, obstacles, coverage)
 		ia = [];
 		inf_points = [];
 		% Define the number of neighbors
-		len_neighbors = length(robots{i}.neighbors_pos(1,:));
+		len_neighbors = size(robots{i}.neighbors_pos,2);
 		% Define the admissible radius
 		Rs = robots{i}.ComRadius/2;
 		% reduce the radius of the agent to consider the uncertainty of the agent
-		Rs = Rs - max_semiaxis(i);
+		Rs = Rs - max_semiaxis;
 
 		% if the robot can exit from the "sicure cell" then reduce the radius
 		if robots{i}.vmax * param.dt + robots{i}.volume > Rs
