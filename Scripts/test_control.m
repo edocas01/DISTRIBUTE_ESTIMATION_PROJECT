@@ -11,7 +11,7 @@ T = TARGET([0;0]);
 fprintf("Target initial position: (%.2f m, %.2f m)\n", T.x(1), T.x(2));
 
 coverage = 3;
-N = 10;
+N = 5;
 range = 15;
 
 dyn_type = repmat("linear",N,1);
@@ -85,9 +85,11 @@ for t = 1:parameters_simulation.dt:Tmax
         relative_target_consensous(R, T, parameters_simulation);
 		title(sprintf("Time: %.2f s", t))
         voronoi_map(parameters_simulation, R, [], coverage);
-        
-		[barycenter, msh] = compute_centroid(R{i}.voronoi, phi);
-
+        phi = @(x,y) func(x, y, R_form, R{i}.target_est(1), R{i}.target_est(1));
+		[barycenter, msh] = compute_centroid(R{i}.voronoi, phi); 
+        % phi CAMBIA PER OGNI ROBOT -> targetest (i robot che comunicano hanno la stessa
+        % stima)
+ 
 		if  kp * norm(barycenter - R{i}.x_est) < R{i}.vmax
 			u = kp * (barycenter - R{i}.x_est) * parameters_simulation.dt;
 		else

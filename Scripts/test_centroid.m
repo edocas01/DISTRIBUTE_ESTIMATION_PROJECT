@@ -47,7 +47,7 @@ end
 [vx, vy] = voronoi(ptsx, ptsy);
 
 tic
-[circx, circy] = circle(T.x(1), T.x(2), R_form);
+[circx, circy] = Circle(T.x(1), T.x(2), R_form);
 
 figure(2)
 T.plot();
