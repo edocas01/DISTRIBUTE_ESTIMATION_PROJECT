@@ -21,7 +21,7 @@ figure(1); clf
 T.plot();
 hold on; grid on; axis equal;
 for i = 1:N
-	R{i}.plot(all_markers, color_matrix, false);
+	R{i}.plot_real(all_markers, color_matrix, false);
 end
 hold off
 
@@ -48,7 +48,7 @@ h = zeros(1,N+1);
 plot(circx, circy, '--', 'HandleVisibility','off')
 for i = 1:N
 	[barycenter, msh] = compute_centroid(R{i}.voronoi, phi);
-	h(i) = R{i}.plot(all_markers, color_matrix, false);
+	h(i) = R{i}.plot_real(all_markers, color_matrix, false);
 	
 	if i == N
 	 	h(i+1) = plot(barycenter(1), barycenter(2), 'kx', 'MarkerSize', 10, 'LineWidth', 2, 'HandleVisibility', 'off','DisplayName','Centroid');
@@ -99,7 +99,7 @@ for t = 1:parameters_simulation.dt:Tmax
 		EKF(R{i}, u);
 		
 		
-		h(i) = R{i}.plot(all_markers, color_matrix, false);
+		h(i) = R{i}.plot_real(all_markers, color_matrix, false);
 		plot(R{i}.voronoi, 'HandleVisibility', 'off')
 		if i == N
 			h(i+1) = plot(barycenter(1), barycenter(2), 'kx', 'MarkerSize', 10, 'LineWidth', 2, 'HandleVisibility', 'off','DisplayName','Centroid');
