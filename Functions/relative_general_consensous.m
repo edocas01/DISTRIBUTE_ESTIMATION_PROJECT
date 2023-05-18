@@ -40,8 +40,8 @@ function relative_general_consensous(robots, target, param)
 				end
 			else
 				% the robot insert its own position in the matrix
-				robots{i}.all_robots_pos(2*j-1:2*j, 1) = robots{i}.GPS_measurement();
-				robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = robots{i}.R_gps;
+				robots{i}.all_robots_pos(2*j-1:2*j, 1) = robots{i}.x_est;
+				robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = robots{i}.P;
 			end
 		end
 		if count == 0
