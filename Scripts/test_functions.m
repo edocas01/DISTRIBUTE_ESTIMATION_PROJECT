@@ -5,8 +5,8 @@ addpath('Classes');
 addpath('Functions');
 
 config;
-N = 8;
-range = 15;
+N = parameters_simulation.N;
+range = 5;
 
 dyn_type = repmat("linear",N,1);
 T = TARGET([0;0]);
@@ -16,7 +16,7 @@ figure(1)
 T.plot();
 hold on; grid on; axis equal;
 for i = 1:N
-	R{i}.plot(all_markers, color_matrix, false);
+	R{i}.plot_real(all_markers, color_matrix, true);
 end
 hold off
 for i = 1:N
@@ -24,6 +24,10 @@ for i = 1:N
     	EKF(R{i}, 0)
 	end
 end
+legend show
+relative_general_consensous(R, T, parameters_simulation);
 
-
-[z, cov] = relative_general_consensous(R, T, parameters_simulation);
+for i = 1:N
+    check(:,i) = R{i}.all_robots_pos(:);
+end
+check

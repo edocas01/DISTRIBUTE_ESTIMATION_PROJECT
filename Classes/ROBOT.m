@@ -61,6 +61,9 @@ classdef ROBOT < handle
 
 		neighbors; 			% list of the neighbors of the robot
 		neighbors_pos; 		% list of the neighbors positions (also target)
+		all_robots_pos; 		% list of the neighbors positions (also target)
+		all_cov_pos; 	% covariance of the neighbors positions (also target)
+
 		voronoi; 			% polyshape of the voronoi region of the robot
 		volume; 			% volume occupied by the robot
 		vmax; 				% maximum velocity of the robot
@@ -120,7 +123,9 @@ classdef ROBOT < handle
 		obj.R_dist = obj.R_dist * obj.R_dist';
 		obj.target_est = zeros(2,1);
 		obj.target_P = eye(2);
-
+		obj.all_robots_pos = zeros(2*(param.N+1), 1);
+		obj.all_cov_pos = eye(2*(param.N+1));
+		
 		% To track the estimation after the consensus algorithm is completed
 		obj.target_est_hist = [];
 		obj.target_P_hist = {};
@@ -131,7 +136,6 @@ classdef ROBOT < handle
 
 		% To compute voronoi
 		obj.neighbors = ["init"];
-		obj.neighbors_pos = [];
 		obj.voronoi = [];
 		obj.volume = rand() * (param.MAX_VOLUME - param.MIN_VOLUME) + param.MIN_VOLUME;
     end
@@ -206,8 +210,7 @@ classdef ROBOT < handle
 	% Plot the position of the robot with its communication radius
 	% TODO:
 	% - Add the possibility to plot the covariance ellipse
-	% - Add the volume of the robot
-	function h = plot(obj, all_markers, color_matrix, plot_circle)
+	function h = plot_est(obj, all_markers, color_matrix, plot_circle)
 		h = plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['Robot ', num2str(obj.id)], 'MarkerSize', 10, 'Color', color_matrix(obj.id,:),'LineWidth', 1.5);
 		hold on;
 		[ptsx, ptsy] = Circle(obj.x_est(1), obj.x_est(2), obj.volume);
@@ -215,6 +218,18 @@ classdef ROBOT < handle
 		plot(vol, 'HandleVisibility', 'off', 'FaceAlpha', 0.4, 'FaceColor', 'k');
 		if plot_circle
 			[x,y] = Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius);
+			plot(x,y, '--k', 'HandleVisibility', 'off');
+		end
+	end
+
+	function h = plot_real(obj, all_markers, color_matrix, plot_circle)
+		h = plot(obj.x(1), obj.x(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['Robot ', num2str(obj.id)], 'MarkerSize', 10, 'Color', color_matrix(obj.id,:),'LineWidth', 1.5);
+		hold on;
+		[ptsx, ptsy] = Circle(obj.x(1), obj.x(2), obj.volume);
+		vol = polyshape(ptsx, ptsy);
+		plot(vol, 'HandleVisibility', 'off', 'FaceAlpha', 0.4, 'FaceColor', 'k');
+		if plot_circle
+			[x,y] = Circle(obj.x(1), obj.x(2), obj.ComRadius);
 			plot(x,y, '--k', 'HandleVisibility', 'off');
 		end
 	end
