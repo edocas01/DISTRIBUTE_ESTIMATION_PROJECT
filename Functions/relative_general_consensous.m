@@ -40,8 +40,8 @@ function relative_general_consensous(robots, target, param)
 				end
 			else
 				% the robot insert its own position in the matrix
-				robots{i}.all_robots_pos(2*j-1:2*j, 1) = robots{i}.GPS_measurement();
-				robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = robots{i}.R_gps;
+				robots{i}.all_robots_pos(2*j-1:2*j, 1) = robots{i}.x_est;
+				robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = robots{i}.P;
 			end
 		end
 		if count == 0
@@ -74,8 +74,6 @@ function relative_general_consensous(robots, target, param)
 		F{i} = H' * inv(robots{i}.all_cov_pos) * H;
 		a{i} = H' * inv(robots{i}.all_cov_pos) * robots{i}.all_robots_pos;
 
-		robots{i}.target_est_hist_messages(:, 1) = inv(F{i}) * a{i};
-		robots{i}.target_P_hist_messages{1} = inv(F{i});
 	end
 	
 	D = A * ones(n,1);
@@ -92,8 +90,6 @@ function relative_general_consensous(robots, target, param)
 					a{i} = a{i} + 1 / (1+max(D)) * (aStore{j} - aStore{i});
 				end
 			end
-			robots{i}.target_est_hist_messages(:, k+1) = inv(F{i}) * a{i};
-			robots{i}.target_P_hist_messages{k+1} = inv(F{i});
 		 end
 	end
 	% set in the robots the target position and the covariance matrix
