@@ -18,7 +18,7 @@ hold on; grid on; axis equal;
 for i = 1:N
 	R{i}.plot_real(all_markers, color_matrix, true);
 end
-hold off
+
 for i = 1:N
 	for j = 1:10
     	EKF(R{i}, 0)
@@ -31,3 +31,9 @@ for i = 1:N
     check(:,i) = R{i}.all_robots_pos(:);
 end
 check
+
+voronoi_map_consensous(parameters_simulation, R, [], 3);
+
+for i = 1:N	
+	plot(R{i}.voronoi,'HandleVisibility','off');
+end

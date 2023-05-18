@@ -7,7 +7,7 @@ function voronoi_map_consensous(param, robots, obstacles, coverage)
 	% NOTE: the neighbors have to be measured while the target is already estimated
 	for i = 1:N
 		robots{i}.neighbors_pos = [];   
-		for j = 1:length(robots{i}.all_robots_pos)
+		for j = 1:length(robots{i}.all_robots_pos)/2
 			% continue if the robot is itself
 			if i == j
 				continue
@@ -31,7 +31,7 @@ function voronoi_map_consensous(param, robots, obstacles, coverage)
 			end
 		end
 		% remove its own position from the neighbors
-		robots{i}.neighbors_pos(:,i) = []
+		robots{i}.neighbors_pos(:,i) = [];
 	end
 
 	for i = 1:N

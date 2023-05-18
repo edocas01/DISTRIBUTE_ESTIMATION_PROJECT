@@ -127,10 +127,6 @@ classdef ROBOT < handle
 		obj.target_est_hist = [];
 		obj.target_P_hist = {};
 
-		% To track the estimation during the iterations of the consensus algorithm
-        obj.target_est_hist_messages = [];
-		obj.target_P_hist_messages = {};
-
 		% To compute voronoi
 		obj.neighbors = ["init"];
 		obj.voronoi = [];
