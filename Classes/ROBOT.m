@@ -55,15 +55,11 @@ classdef ROBOT < handle
 
 		target_est_hist;    % history of the target estimation
 		target_P_hist;		% history of the target covariance matrix
-		
-		target_est_hist_messages;	% history of the target estimation
-		target_P_hist_messages;		% history of the target covariance matrix
 
 		neighbors; 			% list of the neighbors of the robot
-		neighbors_pos; 		% list of the neighbors positions (also target)
-
-		all_robots_pos;		% list of all the robots positions (also itself)
-		all_cov_pos;		% covariance of robot measurements of other robots
+		neighbors_pos; 		% list of the neighbors positions (also target) used in voronoi
+		all_robots_pos; 	% list of the neighbors positions (also target)
+		all_cov_pos; 	% covariance of the neighbors positions (also target)
 
 		voronoi; 			% polyshape of the voronoi region of the robot
 		volume; 			% volume occupied by the robot
@@ -124,19 +120,15 @@ classdef ROBOT < handle
 		obj.R_dist = obj.R_dist * obj.R_dist';
 		obj.target_est = zeros(2,1);
 		obj.target_P = eye(2);
-
+		obj.all_robots_pos = ones(2*(param.N+1), 1)*1e6;
+		obj.all_cov_pos = eye(2*(param.N+1));
+		
 		% To track the estimation after the consensus algorithm is completed
 		obj.target_est_hist = [];
 		obj.target_P_hist = {};
 
-		% To track the estimation during the iterations of the consensus algorithm
-        obj.target_est_hist_messages = [];
-		obj.target_P_hist_messages = {};
-
 		% To compute voronoi
 		obj.neighbors = ["init"];
-		obj.neighbors_pos = [];
-
 		obj.voronoi = [];
 		obj.volume = rand() * (param.MAX_VOLUME - param.MIN_VOLUME) + param.MIN_VOLUME;
     end
@@ -211,7 +203,6 @@ classdef ROBOT < handle
 	% Plot the position of the robot with its communication radius
 	% TODO:
 	% - Add the possibility to plot the covariance ellipse
-	% - Add the volume of the robot
 	function h = plot_est(obj, all_markers, color_matrix, plot_circle)
 		h = plot(obj.x_est(1), obj.x_est(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['Robot ', num2str(obj.id)], 'MarkerSize', 10, 'Color', color_matrix(obj.id,:),'LineWidth', 1.5);
 		hold on;
@@ -235,7 +226,6 @@ classdef ROBOT < handle
 			plot(x,y, '--k', 'HandleVisibility', 'off');
 		end
 	end
-	
 	function Initialize_Position(obj)
 		obj.x = obj.x_in;
 	end

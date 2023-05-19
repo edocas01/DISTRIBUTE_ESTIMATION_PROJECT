@@ -4,15 +4,15 @@ clearvars;
 % rng default;
 addpath('Classes');
 addpath('Functions');
-
+addpath('..');
 config;
 % [T, trajectory, u_trajectory, obstacles] = initialize_env(parameters_simulation);
 T = TARGET([0;0]);
 fprintf("Target initial position: (%.2f m, %.2f m)\n", T.x(1), T.x(2));
 
 coverage = 3;
-N = 5;
-range = 15;
+N = parameters_simulation.N;
+range = 40;
 
 dyn_type = repmat("linear",N,1);
 R = select_shape(N, dyn_type, 'circle', T.x, range, 0, parameters_simulation);
@@ -21,7 +21,7 @@ figure(1); clf
 T.plot();
 hold on; grid on; axis equal;
 for i = 1:N
-	R{i}.plot(all_markers, color_matrix, false);
+	R{i}.plot_real(all_markers, color_matrix, false);
 end
 hold off
 
@@ -32,8 +32,8 @@ for i = 1:N
 	end
 end
 
-relative_target_consensous(R, T, parameters_simulation);
-voronoi_map(parameters_simulation, R, [], coverage);
+relative_general_consensous(R, T, parameters_simulation);
+voronoi_map_consensous(parameters_simulation, R, [], coverage);
 
 func = @(x,y,r,x_t,y_t) exp(-r/200*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2);
 R_form = 10;
@@ -48,7 +48,7 @@ h = zeros(1,N+1);
 plot(circx, circy, '--', 'HandleVisibility','off')
 for i = 1:N
 	[barycenter, msh] = compute_centroid(R{i}.voronoi, phi);
-	h(i) = R{i}.plot(all_markers, color_matrix, false);
+	h(i) = R{i}.plot_real(all_markers, color_matrix, false);
 	
 	if i == N
 	 	h(i+1) = plot(barycenter(1), barycenter(2), 'kx', 'MarkerSize', 10, 'LineWidth', 2, 'HandleVisibility', 'off','DisplayName','Centroid');
@@ -82,9 +82,9 @@ for t = 1:parameters_simulation.dt:Tmax
     plot(circx, circy, '--', 'HandleVisibility','off')
 	h = zeros(1,N+1);
 	for i = 1:N
-        relative_target_consensous(R, T, parameters_simulation);
+        relative_general_consensous(R, T, parameters_simulation);
 		title(sprintf("Time: %.2f s", t))
-        voronoi_map(parameters_simulation, R, [], coverage);
+        voronoi_map_consensous(parameters_simulation, R, [], coverage);
         phi = @(x,y) func(x, y, R_form, R{i}.target_est(1), R{i}.target_est(1));
 		[barycenter, msh] = compute_centroid(R{i}.voronoi, phi); 
         % phi CAMBIA PER OGNI ROBOT -> targetest (i robot che comunicano hanno la stessa
@@ -96,20 +96,18 @@ for t = 1:parameters_simulation.dt:Tmax
 			u = R{i}.vmax * parameters_simulation.dt * (barycenter - R{i}.x_est) / norm(barycenter - R{i}.x_est);
 		end
 		
-		EKF(R{i}, u);
 		
-		
-		h(i) = R{i}.plot(all_markers, color_matrix, false);
+		h(i) = R{i}.plot_est(all_markers, color_matrix, true);
 		plot(R{i}.voronoi, 'HandleVisibility', 'off')
 		if i == N
 			h(i+1) = plot(barycenter(1), barycenter(2), 'kx', 'MarkerSize', 10, 'LineWidth', 2, 'HandleVisibility', 'off','DisplayName','Centroid');
 		else
 			plot(barycenter(1), barycenter(2), 'kx', 'MarkerSize', 10, 'LineWidth', 2, 'HandleVisibility', 'off')
 		end
+		EKF(R{i}, u);
 	end
 	T.plot();
 	legend(h, 'Location', 'bestoutside')
-	pause(0.001)
 end
 hold off
 
