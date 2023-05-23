@@ -14,13 +14,13 @@ N = parameters_simulation.N;
 range = 10;
 
 dyn_type = repmat("linear",N,1);
-R = select_shape(N, dyn_type, 'circle', T.x, range, 0, parameters_simulation);
+R = select_shape(N, dyn_type, 'circle', [0;0], range, 0, parameters_simulation);
 
   figure(1); clf
 T.plot();
 hold on; grid on; axis equal;
 for i = 1:N
-	R{i}.plot_real(all_markers, color_matrix, false);
+	R{i}.plot_real(all_markers, color_matrix, true);
 end
 hold off
 
@@ -28,10 +28,9 @@ hold off
 %% Animation
 tic
 
-
-for i = 1:length(R)
-    for j = 1:10
-        EKF(R{i},0);
+for i = 1:10
+    for j = 1:length(R)
+        EKF(R{j},0);
     end
     relative_general_consensous(R, T, parameters_simulation);
 end
@@ -57,7 +56,7 @@ for t = 1:length(u_traj(1,:))
 		[u(:,i), barycenter] = compute_control(R{i},parameters_simulation); 
        
 
-		h(i) = R{i}.plot_est(all_markers, color_matrix, true);
+		h(i) = R{i}.plot_real(all_markers, color_matrix, true);
 		plot(R{i}.voronoi, 'HandleVisibility', 'off')
 		if i == N
 			h(i+1) = plot(barycenter(1), barycenter(2), 'kx', 'MarkerSize', 10, 'LineWidth', 2, 'HandleVisibility', 'off','DisplayName','Centroid');
@@ -67,12 +66,12 @@ for t = 1:length(u_traj(1,:))
 		
    	
     
-    EKF(R{i}, u(:,i));
+        EKF(R{i}, u(:,i));
     end
     T.plot();
 	legend(h, 'Location', 'bestoutside')
-
     T.dynamics(u_traj(:,t));
+    pause(0.01)
 end
 % hold off
 
