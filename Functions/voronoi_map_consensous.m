@@ -13,7 +13,7 @@ function voronoi_map_consensous(param, robots, obstacles, coverage)
 
 		for j = 1:length(robots{i}.all_robots_pos)/2
 			% continue if the robot is itself or if the robot has no information on the others inside all_robots_pos
-			if i == j || robots{i}.all_robots_pos(2*j-1) > 1e4 || robots{i}.all_robots_pos(2*j) > 1e4
+			if i == j || norm(robots{i}.x_est - robots{i}.all_robots_pos(2*j-1:2*j)) > robots{i}.ComRadius*2
 				continue;
 			end
 			% move the robot j in the closest point to the agent i according to the uncertainty of j
@@ -106,7 +106,7 @@ function voronoi_map_consensous(param, robots, obstacles, coverage)
 			v = unique(v, 'rows'); 
 			
 			% compare V and v to add the infinite points to V
-			[~, ia] = setdiff(round(v, 6), round(V,6), 'rows'); % a rounding is needed -> there are some small numerical issues
+			[~, ia] = setdiff(round(v,8), round(V,8), 'rows'); % a rounding is needed -> there are some small numerical issues
 			inf_points = v(ia,:); % ia are the indices of the infinite points in v (points that are in v but not in V)
 		
 			% NOTE: the infinite points need to be elongated in order to perform the intersection with the sensing range

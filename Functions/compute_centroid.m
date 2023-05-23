@@ -1,7 +1,7 @@
 % given a density function phi, compute the barycenter of the cell
-function [barycenter, msh] = compute_centroid(ps, phi)
+function [barycenter, msh] = compute_centroid(robot, phi, radius)
 	% from matlab documentation: https://it.mathworks.com/help/pde/ug/2-d-geometry-from-polyshape.html
-	tr = triangulation(ps);
+	tr = triangulation(robot.voronoi);
 	model = createpde;
 	tnodes = tr.Points';
 	telements = tr.ConnectivityList';
@@ -14,10 +14,24 @@ function [barycenter, msh] = compute_centroid(ps, phi)
 	for i = 1:length(ai) 
 		nodes = msh.Nodes(:,msh.Elements(:,i)); % nodes of the i-th element
 		ci = mean(nodes,2); % centroid of the i-th element
-		phi_i = phi(ci(1),ci(2)); % value of phi at the centroid
+	
+		% if ci is further than the robot with respect to the desired circle (radius), its weight is less important
+
+		% compute the intermedium point
+		dir = robot.x_est - robot.all_robots_pos(end-1:end);
+		dir = dir/norm(dir);
+		intermedium = robot.all_robots_pos(end-1:end) + dir*radius; 
+		if norm(ci - intermedium) > norm(robot.x_est - intermedium)
+			phi_i = phi(ci(1),ci(2))*0.1; % value of phi at the centroid (decremented)
+		else
+			phi_i = phi(ci(1),ci(2)); % value of phi at the centroid
+		end
+
+        if phi_i < eps
+            warning("Phi is too small")
+        end
 		mass = mass + ai(i) * phi_i; % mass of the cell
 		barycenter = barycenter + ai(i) * phi_i * ci;
 	end
 	barycenter = barycenter / mass; % normalize the barycenter
-
 end
