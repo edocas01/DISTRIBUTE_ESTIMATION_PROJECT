@@ -17,14 +17,14 @@ function voronoi_map(param, robots, obstacles, coverage)
 		end
 	end
 	
-	% insert in the robot.neighbors_pos (2, neighbours + 1) the position of the neighbors and the target at the end
+	% insert in the modified_positions (2, neighbours + 1) the position of the neighbors and the target at the end
 	% move the neighbors according to:
 	% - the uncertainty of j
 	% - the uncertainty of i
 	% - the encumbrance of i
 	% NOTE: the neighbors have to be measured while the target is already estimated
 	for i = 1:N 
-		robots{i}.neighbors_pos = []; 
+		modified_positions = []; 
 		for j = 1:length(robots{i}.neighbors) + 1 % to insert also the target
 			if j <= length(robots{i}.neighbors)
 				% Perform the measure on the neighbor
@@ -61,12 +61,12 @@ function voronoi_map(param, robots, obstacles, coverage)
 			% move the robot j to consider the uncertainty of i
 			robots_d = norm(robots{i}.x_est - z);
 			z = z + 2 * max_semiaxis(i) * (robots{i}.x_est - z) / robots_d;		
-			robots{i}.neighbors_pos(:,j) = z;
+			modified_positions(:,j) = z;
 
 			robots_d = norm(robots{i}.x_est - z);
 			% if the vmax allows to exit from the "sicure cell" then reduce it of the volume
 			if robots_d/2 < robots{i}.vmax * param.dt + robots{i}.volume
-				robots{i}.neighbors_pos(:,j) = z + 2 * robots{i}.volume * (robots{i}.x_est - z) / robots_d;
+				modified_positions(:,j) = z + 2 * robots{i}.volume * (robots{i}.x_est - z) / robots_d;
 			end
 		end
 	end
@@ -82,7 +82,7 @@ function voronoi_map(param, robots, obstacles, coverage)
 		ia = [];
 		inf_points = [];
 		% Define the number of neighbors
-		len_neighbors = length(robots{i}.neighbors_pos(1,:));
+		len_neighbors = length(modified_positions(1,:));
 		% Define the admissible radius
 		Rs = robots{i}.ComRadius/2;
 		% reduce the radius of the agent to consider the uncertainty of the agent
@@ -100,11 +100,11 @@ function voronoi_map(param, robots, obstacles, coverage)
 			[pointsx, pointsy] = Circle(robots{i}.x_est(1), robots{i}.x_est(2), Rs);
     		robots{i}.voronoi = polyshape(pointsx, pointsy);
 		elseif len_neighbors == 1 % only one agent -> take the line in the middle of the agents
-			dir = robots{i}.neighbors_pos(:,1) - robots{i}.x_est; % direction of the line from robot to neighbor
+			dir = modified_positions(:,1) - robots{i}.x_est; % direction of the line from robot to neighbor
 			dir = dir/norm(dir);                % normalization of the line
 			norm_dir = [-dir(2); dir(1)];       % normal to dir (i.e. line in the middle of the agents)
 
-			M =  mean([robots{i}.x_est, robots{i}.neighbors_pos(:,1)], 2); % middle point
+			M =  mean([robots{i}.x_est, modified_positions(:,1)], 2); % middle point
 			% if the radius is smaller than the distance between the middle point and the agent
 			if Rs^2 < norm(M - robots{i}.x_est)^2
 				[pointsx, pointsy] = Circle(robots{i}.x_est(1), robots{i}.x_est(2), Rs);
@@ -121,7 +121,7 @@ function voronoi_map(param, robots, obstacles, coverage)
 			% Save the positions of the agents and their neighbors in P (NOTE: the first row is the position of the agent itself)
 			P(1,:) = robots{i}.x_est;
 			for j = 1:len_neighbors
-				P(j+1,:) = robots{i}.neighbors_pos(:,j);
+				P(j+1,:) = modified_positions(:,j);
 			end
 			% Compute the voronoi tesselation
 

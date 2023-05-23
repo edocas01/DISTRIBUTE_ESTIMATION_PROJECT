@@ -2,9 +2,6 @@ clc;
 close all;
 clearvars;
 % rng default;
-addpath('Classes');
-addpath('Functions');
-addpath('..');
 config;
 % [T, trajectory, u_trajectory, obstacles] = initialize_env(parameters_simulation);
 T = TARGET([0;0]);
@@ -35,8 +32,8 @@ end
 relative_general_consensous(R, T, parameters_simulation);
 voronoi_map_consensous(parameters_simulation, R, [], coverage);
 
-func = @(x,y,r,x_t,y_t) exp(-r/200*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2);
-R_form = 10;
+func = @(x,y,r,x_t,y_t) exp(-r/400*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2);
+R_form = 2;
 phi = @(x,y) func(x, y, R_form, T.x(1), T.x(2));
 
 [circx, circy] = Circle(T.x(1), T.x(2), R_form);
@@ -85,7 +82,7 @@ for t = 1:parameters_simulation.dt:Tmax
         relative_general_consensous(R, T, parameters_simulation);
 		title(sprintf("Time: %.2f s", t))
         voronoi_map_consensous(parameters_simulation, R, [], coverage);
-        phi = @(x,y) func(x, y, R_form, R{i}.target_est(1), R{i}.target_est(1));
+        phi = @(x,y) func(x, y, R_form, R{i}.target_est(1), R{i}.target_est(2));
 		[barycenter, msh] = compute_centroid(R{i}.voronoi, phi); 
         % phi CAMBIA PER OGNI ROBOT -> targetest (i robot che comunicano hanno la stessa
         % stima)

@@ -57,9 +57,8 @@ classdef ROBOT < handle
 		target_P_hist;		% history of the target covariance matrix
 
 		neighbors; 			% list of the neighbors of the robot
-		neighbors_pos; 		% list of the neighbors positions (also target) used in voronoi
 		all_robots_pos; 	% list of the neighbors positions (also target)
-		all_cov_pos; 	% covariance of the neighbors positions (also target)
+		all_cov_pos; 		% covariance of the neighbors positions (also target)
 
 		voronoi; 			% polyshape of the voronoi region of the robot
 		volume; 			% volume occupied by the robot
