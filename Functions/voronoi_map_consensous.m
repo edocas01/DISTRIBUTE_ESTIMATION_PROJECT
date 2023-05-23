@@ -1,77 +1,38 @@
-function voronoi_map(param, robots, obstacles, coverage)
+function voronoi_map_consensous(param, robots, obstacles, coverage)
 	N = length(robots);
-	% If the neighbors are not initialized, initialize them:
-	if strcmp(robots{1}.neighbors, 'init')
-		for i = 1:N
-			robots{i}.neighbors = [];
-			for j = 1:N
-				% if robots j is in the communication radius of robot i
-				% then then i can communicate with j
-				if j ~= i
-					robots_d =  norm(robots{i}.x - robots{j}.x);
-					if robots_d <= robots{i}.ComRadius
-						robots{i}.neighbors = [robots{i}.neighbors, j];
-					end
-				end
-			end
-		end
-	end
-	
-	% insert in the modified_positions (2, neighbours + 1) the position of the neighbors and the target at the end
 	% move the neighbors according to:
 	% - the uncertainty of j
 	% - the uncertainty of i
 	% - the encumbrance of i
 	% NOTE: the neighbors have to be measured while the target is already estimated
-	for i = 1:N 
-		modified_positions = []; 
-		for j = 1:length(robots{i}.neighbors) + 1 % to insert also the target
-			if j <= length(robots{i}.neighbors)
-				% Perform the measure on the neighbor
-				% neighbor in agent reference frame
-				neighbor_measure = (robots{robots{i}.neighbors(j)}.x - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
-				% neighbor in world frame
-				z = neighbor_measure + robots{i}.x_est;
-				cov = robots{i}.R_dist + robots{i}.P;
-				% if the neighbor can communicate with the agent then they can mean their estimate 
-				robots_d = norm(robots{i}.x - robots{robots{i}.neighbors(j)}.x);
-				if robots_d <= robots{robots{i}.neighbors(j)}.ComRadius
-					% bayesian mean between the agent and the neighbor estimate on neighbor position
-					z2 = robots{robots{i}.neighbors(j)}.x_est;
-					cov2 = robots{robots{i}.neighbors(j)}.P; 
-					z = [z;z2];
-					H = [eye(2); eye(2)];
-					cov = [cov, zeros(2); zeros(2), cov2];
-					% fused information
-					z = inv(H'*inv(cov)*H)*H'*inv(cov)*z;
-					% fused covariance
-					cov = inv(H'*inv(cov)*H);
-                    % cov = inv( inv(cov1) + inv(cov2))
-				end
-			else
-				z = robots{i}.target_est;
-				cov = robots{i}.target_P;
+	for i = 1:N
+		modified_positions = [];
+		% compute the max semiaxis of the uncertainty of i
+		[~, eigenvalues] = eig(robots{i}.P*coverage);
+		max_semiaxis = sqrt(max(diag(eigenvalues)));
+
+		for j = 1:length(robots{i}.all_robots_pos)/2
+			% continue if the robot is itself or if the robot has no information on the others inside all_robots_pos
+			if i == j || robots{i}.all_robots_pos(2*j-1) > 1e4 || robots{i}.all_robots_pos(2*j) > 1e4
+				continue;
 			end
 			% move the robot j in the closest point to the agent i according to the uncertainty of j
-			z = moving_closer_point(robots{i}.x_est, z, cov, coverage);
+			z = moving_closer_point(robots{i}.x_est, robots{i}.all_robots_pos(2*j-1:2*j),...
+			robots{i}.all_cov_pos(2*j-1:2*j,2*j-1:2*j), coverage);
+			
 			% move the robot j to consider the max uncertainty of i (max semiaxis of i)
-			[~, eigenvalues] = eig(robots{i}.P*coverage);
-			max_semiaxis(i) = sqrt(max(diag(eigenvalues)));
-
-			% move the robot j to consider the uncertainty of i
 			robots_d = norm(robots{i}.x_est - z);
-			z = z + 2 * max_semiaxis(i) * (robots{i}.x_est - z) / robots_d;		
-			modified_positions(:,j) = z;
-
+			z = z + 2 * max_semiaxis * (robots{i}.x_est - z) / robots_d;		
+			
 			robots_d = norm(robots{i}.x_est - z);
 			% if the vmax allows to exit from the "sicure cell" then reduce it of the volume
 			if robots_d/2 < robots{i}.vmax * param.dt + robots{i}.volume
-				modified_positions(:,j) = z + 2 * robots{i}.volume * (robots{i}.x_est - z) / robots_d;
+				z = z + 2 * robots{i}.volume * (robots{i}.x_est - z) / robots_d;
 			end
+			% create the vector for the voronoi tesselation
+			modified_positions = [modified_positions, z];
 		end
-	end
 
-	for i = 1:N
 		% Initialization of the variables
 		P = [];
 		vx = [];
@@ -82,11 +43,11 @@ function voronoi_map(param, robots, obstacles, coverage)
 		ia = [];
 		inf_points = [];
 		% Define the number of neighbors
-		len_neighbors = length(modified_positions(1,:));
+		len_neighbors = size(modified_positions,2);
 		% Define the admissible radius
 		Rs = robots{i}.ComRadius/2;
 		% reduce the radius of the agent to consider the uncertainty of the agent
-		Rs = Rs - max_semiaxis(i);
+		Rs = Rs - max_semiaxis;
 
 		% if the robot can exit from the "sicure cell" then reduce the radius
 		if robots{i}.vmax * param.dt + robots{i}.volume > Rs

@@ -32,10 +32,10 @@ function relative_general_consensous(robots, target, param)
 					% the roboti cannot measure the robotj so it uses the last estimate of the robot
 					% and the covariance matrix of the robot estimate is set to a high value
 					robots{i}.all_robots_pos(2*j-1:2*j, 1) = robots{i}.all_robots_pos(2*j-1:2*j, 1);
-					if norm(robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) * 10) >= norm(eye(2)*1000)
+					if norm(robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) * 5) >= norm(eye(2)*1000)
 						robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = eye(2)*1000;
 					else
-						robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) * 10;
+						robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) * 5;
 					end
 				end
 			else
@@ -74,8 +74,6 @@ function relative_general_consensous(robots, target, param)
 		F{i} = H' * inv(robots{i}.all_cov_pos) * H;
 		a{i} = H' * inv(robots{i}.all_cov_pos) * robots{i}.all_robots_pos;
 
-		robots{i}.target_est_hist_messages(:, 1) = inv(F{i}) * a{i};
-		robots{i}.target_P_hist_messages{1} = inv(F{i});
 	end
 	
 	D = A * ones(n,1);
@@ -92,8 +90,6 @@ function relative_general_consensous(robots, target, param)
 					a{i} = a{i} + 1 / (1+max(D)) * (aStore{j} - aStore{i});
 				end
 			end
-			robots{i}.target_est_hist_messages(:, k+1) = inv(F{i}) * a{i};
-			robots{i}.target_P_hist_messages{k+1} = inv(F{i});
 		 end
 	end
 	% set in the robots the target position and the covariance matrix

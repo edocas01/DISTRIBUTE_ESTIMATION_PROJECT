@@ -21,7 +21,7 @@
 %         where:
 %         H(k+1) is the jacobian of hk+1(x,epsilon) w.r.t the state e and evaluated in the x_est(k+1) and epsilon = 0
 
-function EKF(robot, u)
+function EKF(robot, u) % u is already the delta_x and delta_y
 	J_X = robot.jacobian_state();
 	J_Q = robot.jacobian_noise();
 	J_H = robot.jacobian_measurement();

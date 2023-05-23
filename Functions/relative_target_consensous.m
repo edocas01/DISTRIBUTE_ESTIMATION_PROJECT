@@ -53,9 +53,7 @@ function relative_target_consensous(robots, target, param)
 		% initialize the matrices for the maximum degree weighting
 		F{i} = robots{i}.H' * inv(P_target_sensor) * robots{i}.H;
 		a{i} = robots{i}.H' * inv(P_target_sensor) * z;
-		
-		robots{i}.target_est_hist_messages(:, 1) = inv(F{i}) * a{i};
-		robots{i}.target_P_hist_messages{1} = inv(F{i});
+
 	end
 	
 	D = A * ones(n,1);
@@ -72,8 +70,6 @@ function relative_target_consensous(robots, target, param)
 					a{i} = a{i} + 1 / (1+max(D)) * (aStore{j} - aStore{i});
 				end
 			end
-			robots{i}.target_est_hist_messages(:, k+1) = inv(F{i}) * a{i};
-			robots{i}.target_P_hist_messages{k+1} = inv(F{i});
 		 end
 	end
 	% set in the robots the target position and the covariance matrix
