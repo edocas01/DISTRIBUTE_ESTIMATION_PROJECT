@@ -120,7 +120,7 @@ classdef ROBOT < handle
 		obj.target_est = zeros(2,1);
 		obj.target_P = eye(2);
 		obj.all_robots_pos = ones(2*(param.N+1), 1)*1e6;
-		obj.all_cov_pos = eye(2*(param.N+1))*1000;
+		obj.all_cov_pos = eye(2*(param.N+1))*100;
 		
 		% To track the estimation after the consensus algorithm is completed
 		obj.target_est_hist = [];

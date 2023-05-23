@@ -13,7 +13,7 @@ parameters_simulation = struct( ...
 	'dt', 							0.1,    		... % time step
 	'size_map', 					50,  			... % size of the map
 	'N_MAX', 						15,  			... % maximum number of agents
-    'N',                             5,             ... % number of agents
+    'N',                             8,             ... % number of agents
 	... % Debug flags 	
 	'title_flags', 					false, 			... % to print the central strings
 	... % Robot parameters 	
@@ -28,6 +28,8 @@ parameters_simulation = struct( ...
 	'MIN_LINEAR_VELOCITY', 			20/3.6, 			... % minimum linear velocity (m/s)
 	'MAX_ANGULAR_VELOCITY', 		pi/2, 			... % maximum angular velocity (rad/s)
 	'MIN_ANGULAR_VELOCITY', 		pi/6, 			... % minimum angular velocity (rad/s)
+	... % Target parameters
+	'vmax_target', 					15/3.6,		 	... % velocity of target (m/s)
 	... % Consensous parameters	
 	'MSG_PROTOCOL', 				50,				... % protocol used for message passing
 	... % Control parameters

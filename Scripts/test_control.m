@@ -4,9 +4,11 @@ clearvars;
 % rng default;
 config;
 % [T, trajectory, u_trajectory, obstacles] = initialize_env(parameters_simulation);
-T = TARGET([0;0]);
-fprintf("Target initial position: (%.2f m, %.2f m)\n", T.x(1), T.x(2));
 
+
+
+[T,~,u_traj,~] = initialize_env(parameters_simulation);
+fprintf("Target initial position: (%.2f m, %.2f m)\n", T.x(1), T.x(2));
 coverage = 3;
 N = parameters_simulation.N;
 range = 10;
@@ -23,10 +25,9 @@ end
 hold off
 
 
-
 %% Animation
 tic
-[circx, circy] = Circle(T.x(1), T.x(2), parameters_simulation.DISTANCE_TARGET);
+
 
 for i = 1:length(R)
     for j = 1:10
@@ -37,13 +38,13 @@ end
 
 % IF A ROBOT HAS NO INFORMATIONS IT MOVES RANDOMLY
 
-Tmax = 10;
 kp = 1 / parameters_simulation.dt;
-for t = 1:parameters_simulation.dt:Tmax/2
+for t = 1:length(u_traj(1,:))
 	figure(2); clf
-	xlim([-15 15])
-	ylim([-15 15])
+	xlim([-20 20])
+	ylim([-20 20])
 	hold on; grid on; axis equal;
+    [circx, circy] = Circle(T.x(1), T.x(2), parameters_simulation.DISTANCE_TARGET);
     plot(circx, circy, '--', 'HandleVisibility','off')
 	h = zeros(1,N+1);
 
@@ -70,6 +71,8 @@ for t = 1:parameters_simulation.dt:Tmax/2
     end
     T.plot();
 	legend(h, 'Location', 'bestoutside')
+
+    T.dynamics(u_traj(:,t));
 end
 % hold off
 
