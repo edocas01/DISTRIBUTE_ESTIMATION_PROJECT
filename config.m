@@ -13,23 +13,27 @@ parameters_simulation = struct( ...
 	'dt', 							0.1,    		... % time step
 	'size_map', 					50,  			... % size of the map
 	'N_MAX', 						15,  			... % maximum number of agents
-    'N',                             5,             ... % number of agents
+    'N',                             8,             ... % number of agents
 	... % Debug flags 	
 	'title_flags', 					false, 			... % to print the central strings
 	... % Robot parameters 	
-	'MIN_Rc', 					5 * 50, 			... % minimum radius of the communication range (m)
-	'MAX_Rc', 					15, 				... % maximum radius of the communication range (m)
+	'MIN_Rc', 						10, 					... % minimum radius of the communication range (m)
+	'MAX_Rc', 						15, 				... % maximum radius of the communication range (m)
 	'std_gps', 						1, 				... % standard deviation of the GPS (m)
 	'std_robots_model', 			1, 				... % standard deviation of the robot model (m)
 	'std_relative_sensor', 			0.3,      		... % standard deviation of the relative sensor (m)
 	'MAX_VOLUME',					0.5, 			... % maximum radius of the robot volume (m)
 	'MIN_VOLUME',					0.1, 			... % minimum radius of the robot volume (m)
-	'MAX_LINEAR_VELOCITY', 			1000/3.6, 		... % maximum linear velocity (m/s)
-	'MIN_LINEAR_VELOCITY', 			100/3.6, 			... % minimum linear velocity (m/s)
+	'MAX_LINEAR_VELOCITY', 			50/3.6, 		... % maximum linear velocity (m/s)
+	'MIN_LINEAR_VELOCITY', 			20/3.6, 			... % minimum linear velocity (m/s)
 	'MAX_ANGULAR_VELOCITY', 		pi/2, 			... % maximum angular velocity (rad/s)
 	'MIN_ANGULAR_VELOCITY', 		pi/6, 			... % minimum angular velocity (rad/s)
+	... % Target parameters
+	'vmax_target', 					15/3.6,		 	... % velocity of target (m/s)
 	... % Consensous parameters	
-	'MSG_PROTOCOL', 				50				... % protocol used for message passing
+	'MSG_PROTOCOL', 				50,				... % protocol used for message passing
+	... % Control parameters
+	'DISTANCE_TARGET',				2 				... % distance from the target (m)
 	);
 
 % Define the colors in a matrix 15 by 3 (RGB) without red

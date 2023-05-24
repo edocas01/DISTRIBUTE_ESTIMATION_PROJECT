@@ -57,9 +57,8 @@ classdef ROBOT < handle
 		target_P_hist;		% history of the target covariance matrix
 
 		neighbors; 			% list of the neighbors of the robot
-		neighbors_pos; 		% list of the neighbors positions (also target) used in voronoi
 		all_robots_pos; 	% list of the neighbors positions (also target)
-		all_cov_pos; 	% covariance of the neighbors positions (also target)
+		all_cov_pos; 		% covariance of the neighbors positions (also target)
 
 		voronoi; 			% polyshape of the voronoi region of the robot
 		volume; 			% volume occupied by the robot
@@ -121,7 +120,7 @@ classdef ROBOT < handle
 		obj.target_est = zeros(2,1);
 		obj.target_P = eye(2);
 		obj.all_robots_pos = ones(2*(param.N+1), 1)*1e6;
-		obj.all_cov_pos = eye(2*(param.N+1));
+		obj.all_cov_pos = eye(2*(param.N+1))*100;
 		
 		% To track the estimation after the consensus algorithm is completed
 		obj.target_est_hist = [];

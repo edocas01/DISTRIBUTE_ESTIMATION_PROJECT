@@ -54,7 +54,7 @@ function [target, trajectory, u_trajectory, obstacles] = initialize_env(param)
 		% compute distance from the point to the next point
 		dist = norm(x_fin - x_in);
 		% compute the number of steps as the distance divided by the time step
-		N_steps = round(dist / param.dt);
+		N_steps = round(dist / (param.dt*param.vmax_target));
 		% compute the velocity
 		for j = 1:N_steps
 			% the iput is equal to the velocity for a certain number of steps

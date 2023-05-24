@@ -6,31 +6,31 @@ function voronoi_map_consensous(param, robots, obstacles, coverage)
 	% - the encumbrance of i
 	% NOTE: the neighbors have to be measured while the target is already estimated
 	for i = 1:N
-		robots{i}.neighbors_pos = [];
+		modified_positions = [];
 		% compute the max semiaxis of the uncertainty of i
 		[~, eigenvalues] = eig(robots{i}.P*coverage);
 		max_semiaxis = sqrt(max(diag(eigenvalues)));
 
 		for j = 1:length(robots{i}.all_robots_pos)/2
 			% continue if the robot is itself or if the robot has no information on the others inside all_robots_pos
-			if i == j || robots{i}.all_robots_pos(2*j-1) > 1e4 || robots{i}.all_robots_pos(2*j) > 1e4
+			if i == j || norm(robots{i}.x_est - robots{i}.all_robots_pos(2*j-1:2*j)) > robots{i}.ComRadius*2
 				continue;
 			end
 			% move the robot j in the closest point to the agent i according to the uncertainty of j
 			z = moving_closer_point(robots{i}.x_est, robots{i}.all_robots_pos(2*j-1:2*j),...
 			robots{i}.all_cov_pos(2*j-1:2*j,2*j-1:2*j), coverage);
 			
-			% move the robot j to consider the uncertainty of i
-			robots_d = norm(robots{i}.x_est - z);
 			% move the robot j to consider the max uncertainty of i (max semiaxis of i)
+			robots_d = norm(robots{i}.x_est - z);
 			z = z + 2 * max_semiaxis * (robots{i}.x_est - z) / robots_d;		
-			robots{i}.neighbors_pos = [robots{i}.neighbors_pos, z];
-
+			
 			robots_d = norm(robots{i}.x_est - z);
 			% if the vmax allows to exit from the "sicure cell" then reduce it of the volume
 			if robots_d/2 < robots{i}.vmax * param.dt + robots{i}.volume
-				robots{i}.neighbors_pos(:,end) = z + 2 * robots{i}.volume * (robots{i}.x_est - z) / robots_d;
+				z = z + 2 * robots{i}.volume * (robots{i}.x_est - z) / robots_d;
 			end
+			% create the vector for the voronoi tesselation
+			modified_positions = [modified_positions, z];
 		end
 
 		% Initialization of the variables
@@ -43,7 +43,7 @@ function voronoi_map_consensous(param, robots, obstacles, coverage)
 		ia = [];
 		inf_points = [];
 		% Define the number of neighbors
-		len_neighbors = size(robots{i}.neighbors_pos,2);
+		len_neighbors = size(modified_positions,2);
 		% Define the admissible radius
 		Rs = robots{i}.ComRadius/2;
 		% reduce the radius of the agent to consider the uncertainty of the agent
@@ -61,11 +61,11 @@ function voronoi_map_consensous(param, robots, obstacles, coverage)
 			[pointsx, pointsy] = Circle(robots{i}.x_est(1), robots{i}.x_est(2), Rs);
     		robots{i}.voronoi = polyshape(pointsx, pointsy);
 		elseif len_neighbors == 1 % only one agent -> take the line in the middle of the agents
-			dir = robots{i}.neighbors_pos(:,1) - robots{i}.x_est; % direction of the line from robot to neighbor
+			dir = modified_positions(:,1) - robots{i}.x_est; % direction of the line from robot to neighbor
 			dir = dir/norm(dir);                % normalization of the line
 			norm_dir = [-dir(2); dir(1)];       % normal to dir (i.e. line in the middle of the agents)
 
-			M =  mean([robots{i}.x_est, robots{i}.neighbors_pos(:,1)], 2); % middle point
+			M =  mean([robots{i}.x_est, modified_positions(:,1)], 2); % middle point
 			% if the radius is smaller than the distance between the middle point and the agent
 			if Rs^2 < norm(M - robots{i}.x_est)^2
 				[pointsx, pointsy] = Circle(robots{i}.x_est(1), robots{i}.x_est(2), Rs);
@@ -82,7 +82,7 @@ function voronoi_map_consensous(param, robots, obstacles, coverage)
 			% Save the positions of the agents and their neighbors in P (NOTE: the first row is the position of the agent itself)
 			P(1,:) = robots{i}.x_est;
 			for j = 1:len_neighbors
-				P(j+1,:) = robots{i}.neighbors_pos(:,j);
+				P(j+1,:) = modified_positions(:,j);
 			end
 			% Compute the voronoi tesselation
 
@@ -106,7 +106,7 @@ function voronoi_map_consensous(param, robots, obstacles, coverage)
 			v = unique(v, 'rows'); 
 			
 			% compare V and v to add the infinite points to V
-			[~, ia] = setdiff(round(v, 6), round(V,6), 'rows'); % a rounding is needed -> there are some small numerical issues
+			[~, ia] = setdiff(round(v,8), round(V,8), 'rows'); % a rounding is needed -> there are some small numerical issues
 			inf_points = v(ia,:); % ia are the indices of the infinite points in v (points that are in v but not in V)
 		
 			% NOTE: the infinite points need to be elongated in order to perform the intersection with the sensing range
