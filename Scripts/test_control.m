@@ -1,7 +1,7 @@
 clc;
 close all;
 clearvars;
-% rng default;
+rng default;
 config;
 % [T, trajectory, u_trajectory, obstacles] = initialize_env(parameters_simulation);
 
@@ -28,7 +28,7 @@ hold off
 %% Animation
 tic
 
-for i = 1:10
+for i = 1:100
     for j = 1:length(R)
         EKF(R{j},0);
     end
