@@ -24,7 +24,7 @@ for i = 1:N
 end
 hold off
 
-
+pause(1)
 %% Animation
 tic
 

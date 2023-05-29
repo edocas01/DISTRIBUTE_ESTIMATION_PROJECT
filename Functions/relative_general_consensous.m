@@ -32,8 +32,8 @@ function relative_general_consensous(robots, target, param)
 					% the roboti cannot measure the robotj so it uses the last estimate of the robot
 					% and the covariance matrix of the robot estimate is set to a high value
 					robots{i}.all_robots_pos(2*j-1:2*j) = robots{i}.all_robots_pos(2*j-1:2*j);
-					if norm(robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) * 5) >= norm(eye(2)*1000)
-						robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = eye(2)*1000;
+					if norm(robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) * 5) >= norm(eye(2)*1e6)
+						robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = eye(2)*1e6;
 					else
 						robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) * 5;
 					end
@@ -61,8 +61,8 @@ function relative_general_consensous(robots, target, param)
 			% the robot cannot measure the target so it uses the last estimate of the target
 			% and the covariance matrix of the target estimate is set to a high value
 			robots{i}.all_robots_pos(end-1:end, 1) = robots{i}.all_robots_pos(end-1:end, 1);
-			if norm(robots{i}.all_cov_pos(end-1:end,end-1:end) * 10) >= norm(eye(2)*1000)
-				robots{i}.all_cov_pos(end-1:end,end-1:end) = eye(2)*1000;
+			if norm(robots{i}.all_cov_pos(end-1:end,end-1:end) * 10) >= norm(eye(2)*1e6)
+				robots{i}.all_cov_pos(end-1:end,end-1:end) = eye(2)*1e6;
 			else
 				robots{i}.all_cov_pos(end-1:end,end-1:end) = robots{i}.all_cov_pos(end-1:end,end-1:end) * 10;
 			end
