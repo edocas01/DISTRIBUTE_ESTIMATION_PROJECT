@@ -15,7 +15,7 @@ function [u, barycenter] = compute_control(robot,param)
 		neighbor(robot.id:robot.id+1) = [];
 		neighbor(neighbor > 1e4) = [];
 		if length(neighbor) > 0 % robot must have at least one good neighbour 
-			k = randsample(1:2:length(neighbor)-1);
+			k = randsample(1:2:length(neighbor)-1,1);
 			center = neighbor(k:k+1);
 		else % Moves randomly
 			xmin = min(robot.voronoi.Vertices(:,1));
