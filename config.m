@@ -33,7 +33,8 @@ parameters_simulation = struct( ...
 	... % Consensous parameters	
 	'MSG_PROTOCOL', 				50,				... % protocol used for message passing
 	... % Control parameters
-	'DISTANCE_TARGET',				2 				... % distance from the target (m)
+	'DISTANCE_TARGET',				5, 				... % distance from the target (m)
+	'TOLERANCE_DISTANCE', 			0.2 			... % tolerance distance on the circle (m)
 	);
 
 % Define the colors in a matrix 15 by 3 (RGB) without red

@@ -69,8 +69,10 @@ for t = 1:length(u_traj(1,:))
         EKF(R{i}, u(:,i));
     end
     T.plot();
-	legend(h, 'Location', 'bestoutside')
-    T.dynamics(u_traj(:,t));
+	legend show
+	% legend(h, 'Location', 'bestoutside')
+    % T.dynamics(u_traj(:,t));
+    T.dynamics([0;0]);
     pause(0.01)
 end
 % hold off

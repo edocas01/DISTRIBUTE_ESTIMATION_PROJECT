@@ -75,7 +75,7 @@ classdef ROBOT < handle
                                                                           
  
 
-%}
+%} 
 
 	methods 
 	% Iniatialization of the robot
