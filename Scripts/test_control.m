@@ -71,7 +71,7 @@ for t = 1:length(u_traj(1,:))
     T.plot();
 	legend show
 	% legend(h, 'Location', 'bestoutside')
-    % T.dynamics(u_traj(:,t));
+%     T.dynamics(u_traj(:,t));
     T.dynamics([0;0]);
     pause(0.01)
 end
