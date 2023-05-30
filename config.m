@@ -24,17 +24,17 @@ parameters_simulation = struct( ...
 	'std_relative_sensor', 			0.3,      		... % standard deviation of the relative sensor (m)
 	'MAX_VOLUME',					0.5, 			... % maximum radius of the robot volume (m)
 	'MIN_VOLUME',					0.1, 			... % minimum radius of the robot volume (m)
-	'MAX_LINEAR_VELOCITY', 			50/3.6, 		... % maximum linear velocity (m/s)
-	'MIN_LINEAR_VELOCITY', 			20/3.6, 			... % minimum linear velocity (m/s)
+	'MAX_LINEAR_VELOCITY', 			500/3.6, 		... % maximum linear velocity (m/s)
+	'MIN_LINEAR_VELOCITY', 			200/3.6, 			... % minimum linear velocity (m/s)
 	'MAX_ANGULAR_VELOCITY', 		pi/2, 			... % maximum angular velocity (rad/s)
 	'MIN_ANGULAR_VELOCITY', 		pi/6, 			... % minimum angular velocity (rad/s)
 	... % Target parameters
-	'vmax_target', 					15/3.6,		 	... % velocity of target (m/s)
+	'vmax_target', 					10/3.6,		 	... % velocity of target (m/s)
 	... % Consensous parameters	
 	'MSG_PROTOCOL', 				50,				... % protocol used for message passing
 	... % Control parameters
 	'DISTANCE_TARGET',				5, 				... % distance from the target (m)
-	'TOLERANCE_DISTANCE', 			0.2 			... % tolerance distance on the circle (m)
+	'TOLERANCE_DISTANCE', 			0.1 			... % tolerance distance on the circle (m)
 	);
 
 % Define the colors in a matrix 15 by 3 (RGB) without red

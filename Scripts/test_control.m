@@ -44,7 +44,7 @@ for t = 1:length(u_traj(1,:))
 	ylim([-20 20])
 	hold on; grid on; axis equal;
     [circx, circy] = Circle(T.x(1), T.x(2), parameters_simulation.DISTANCE_TARGET);
-    plot(circx, circy, '--', 'HandleVisibility','off')
+    plot(circx, circy, '--', 'HandleVisibility','off','LineWidth',1.4)
 	h = zeros(1,N+1);
 
     relative_general_consensous(R, T, parameters_simulation);
@@ -56,7 +56,7 @@ for t = 1:length(u_traj(1,:))
 		[u(:,i), barycenter] = compute_control(R{i},parameters_simulation); 
        
 
-		h(i) = R{i}.plot_real(all_markers, color_matrix, true);
+		h(i) = R{i}.plot_real(all_markers, color_matrix, false);
 		plot(R{i}.voronoi, 'HandleVisibility', 'off')
 		if i == N
 			h(i+1) = plot(barycenter(1), barycenter(2), 'kx', 'MarkerSize', 10, 'LineWidth', 2, 'HandleVisibility', 'off','DisplayName','Centroid');
