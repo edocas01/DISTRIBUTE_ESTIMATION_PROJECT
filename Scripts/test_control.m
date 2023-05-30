@@ -58,7 +58,13 @@ for t = 1:length(u_traj(1,:))
 
 		h(i) = R{i}.plot_real(all_markers, color_matrix, false);
 		plot(R{i}.voronoi, 'HandleVisibility', 'off')
-		if i == N
+        if i > 1
+            pippo = intersect(R{i}.voronoi,R{i-1}.voronoi);
+            if pippo.NumRegions > 0
+                error("Aoooo")
+            end
+        end
+        if i == N
 			h(i+1) = plot(barycenter(1), barycenter(2), 'kx', 'MarkerSize', 10, 'LineWidth', 2, 'HandleVisibility', 'off','DisplayName','Centroid');
 		else
 			plot(barycenter(1), barycenter(2), 'kx', 'MarkerSize', 10, 'LineWidth', 2, 'HandleVisibility', 'off')
@@ -71,8 +77,8 @@ for t = 1:length(u_traj(1,:))
     T.plot();
 	legend show
 	% legend(h, 'Location', 'bestoutside')
-%     T.dynamics(u_traj(:,t));
-    T.dynamics([0;0]);
+    T.dynamics(u_traj(:,t));
+%     T.dynamics([0;0]);
     pause(0.01)
 end
 % hold off

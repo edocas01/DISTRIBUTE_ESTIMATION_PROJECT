@@ -36,7 +36,7 @@ function [barycenter, msh] = compute_centroid(robot, phi, objective, param)
 			dir = dir/norm(dir);
 			intermedium = objective + dir*radius; 
 			if norm(ci - intermedium) > norm(robot.x_est - intermedium)
-				phi_i = phi(ci(1),ci(2))*0.1; % value of phi at the centroid (decremented)
+				phi_i = phi(ci(1),ci(2))*0.01; % value of phi at the centroid (decremented)
 			else
 				phi_i = phi(ci(1),ci(2)); % value of phi at the centroid
 			end
