@@ -1,4 +1,4 @@
-classdef TARGET < handle
+classdef TARGET < matlab.mixin.Copyable
 
 %{
 

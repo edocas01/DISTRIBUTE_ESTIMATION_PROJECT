@@ -1,4 +1,4 @@
-classdef ROBOT < handle
+classdef ROBOT < matlab.mixin.Copyable
 
 %{
 

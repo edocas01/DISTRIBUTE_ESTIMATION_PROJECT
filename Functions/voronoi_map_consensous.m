@@ -1,4 +1,4 @@
-function voronoi_map_consensous(param, robots, obstacles, coverage)
+function voronoi_map_consensous(param, robots, obstacles)
 	N = length(robots);
 	% move the neighbors according to:
 	% - the uncertainty of j
@@ -8,7 +8,7 @@ function voronoi_map_consensous(param, robots, obstacles, coverage)
 	for i = 1:N
 		modified_positions = [];
 		% compute the max semiaxis of the uncertainty of i
-		[~, eigenvalues] = eig(robots{i}.P*coverage);
+		[~, eigenvalues] = eig(robots{i}.P*param.coverage);
 		max_semiaxis = sqrt(max(diag(eigenvalues)));
 
 		for j = 1:length(robots{i}.all_robots_pos)/2
@@ -18,7 +18,7 @@ function voronoi_map_consensous(param, robots, obstacles, coverage)
 			end
 			% move the robot j in the closest point to the agent i according to the uncertainty of j
 			z = moving_closer_point(robots{i}.x_est, robots{i}.all_robots_pos(2*j-1:2*j),...
-			robots{i}.all_cov_pos(2*j-1:2*j,2*j-1:2*j), coverage);
+			robots{i}.all_cov_pos(2*j-1:2*j,2*j-1:2*j), param.coverage);
 			
 			% move the robot j to consider the max uncertainty of i (max semiaxis of i)
 			robots_d = norm(robots{i}.x_est - z);

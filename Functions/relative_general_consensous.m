@@ -44,7 +44,7 @@ function relative_general_consensous(robots, target, param)
 				robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = robots{i}.P;
 			end
 		end
-		if count == 0
+		if count == 0 && param.DEBUG == true
 			warning("Robot " + i + " cannot send messages to any other robot");
 		end
 

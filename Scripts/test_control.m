@@ -25,6 +25,11 @@ end
 hold off
 
 pause(1)
+
+%% Calculations 
+tic
+
+toc
 %% Animation
 tic
 
@@ -38,10 +43,10 @@ end
 % IF A ROBOT HAS NO INFORMATIONS IT MOVES RANDOMLY
 
 kp = 1 / parameters_simulation.dt;
+figure(2);
 for t = 1:length(u_traj(1,:))
-	figure(2); clf
-	xlim([-20 20])
-	ylim([-20 20])
+	clf
+	axis padded
 	hold on; grid on; axis equal;
     [circx, circy] = Circle(T.x(1), T.x(2), parameters_simulation.DISTANCE_TARGET);
     plot(circx, circy, '--', 'HandleVisibility','off','LineWidth',1.4)

@@ -14,11 +14,12 @@ parameters_simulation = struct( ...
 	'size_map', 					50,  			... % size of the map
 	'N_MAX', 						15,  			... % maximum number of agents
     'N',                             8,             ... % number of agents
+	'DEBUG', 						false,           ... % Debug flags
 	... % Debug flags 	
 	'title_flags', 					false, 			... % to print the central strings
 	... % Robot parameters 	
-	'MIN_Rc', 						5, 					... % minimum radius of the communication range (m)
-	'MAX_Rc', 						15, 				... % maximum radius of the communication range (m)
+	'MIN_Rc', 						5, 				... % minimum radius of the communication range (m)
+	'MAX_Rc', 						15, 			... % maximum radius of the communication range (m)
 	'std_gps', 						1, 				... % standard deviation of the GPS (m)
 	'std_robots_model', 			1, 				... % standard deviation of the robot model (m)
 	'std_relative_sensor', 			0.3,      		... % standard deviation of the relative sensor (m)
@@ -32,6 +33,8 @@ parameters_simulation = struct( ...
 	'vmax_target', 					10/3.6,		 	... % velocity of target (m/s)
 	... % Consensous parameters	
 	'MSG_PROTOCOL', 				50,				... % protocol used for message passing
+	... % Voronoi parameters
+	'coverage', 					3, 				... % coverage for the uncertainties 
 	... % Control parameters
 	'DISTANCE_TARGET',				5, 				... % distance from the target (m)
 	'TOLERANCE_DISTANCE', 			0.2 			... % tolerance distance on the circle (m)
