@@ -9,14 +9,13 @@ config;
 
 [T,~,u_traj,~] = initialize_env(parameters_simulation);
 fprintf("Target initial position: (%.2f m, %.2f m)\n", T.x(1), T.x(2));
-coverage = 3;
 N = parameters_simulation.N;
 range = 10;
 
 dyn_type = repmat("linear",N,1);
 R = select_shape(N, dyn_type, 'circle', [0;0], range, 0, parameters_simulation);
 
-  figure(1); clf
+figure(1); clf
 T.plot();
 hold on; grid on; axis equal;
 for i = 1:N
@@ -54,7 +53,7 @@ for t = 1:length(u_traj(1,:))
 
     relative_general_consensous(R, T, parameters_simulation);
 	title(sprintf("Time: %.2f s", t))
-    voronoi_map_consensous(parameters_simulation, R, [], coverage);
+    voronoi_map_consensous(parameters_simulation, R, []);
 
 	for i = 1:N
         
@@ -66,7 +65,7 @@ for t = 1:length(u_traj(1,:))
         if i > 1
             pippo = intersect(R{i}.voronoi,R{i-1}.voronoi);
             if pippo.NumRegions > 0
-                error("Aoooo")
+                warning("Aoooo")
             end
         end
         if i == N

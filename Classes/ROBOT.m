@@ -207,7 +207,8 @@ classdef ROBOT < matlab.mixin.Copyable
 		hold on;
 		[ptsx, ptsy] = Circle(obj.x_est(1), obj.x_est(2), obj.volume);
 		vol = polyshape(ptsx, ptsy);
-		plot(vol, 'HandleVisibility', 'off', 'FaceAlpha', 0.4, 'FaceColor', 'k');
+		% plot(vol, 'HandleVisibility', 'off', 'FaceAlpha', 0.4, 'FaceColor', 'k');
+		plot(vol, 'DisplayName', ['Vol. robot ', num2str(obj.id)], 'FaceAlpha', 0.2, 'FaceColor', color_matrix(obj.id,:));
 		if plot_circle
 			[x,y] = Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius);
 			plot(x,y, '--k', 'HandleVisibility', 'off');

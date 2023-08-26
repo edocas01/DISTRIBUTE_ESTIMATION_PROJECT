@@ -57,7 +57,7 @@ classdef TARGET < matlab.mixin.Copyable
 
 %}
         function plot(obj)
-		    plot(obj.x(1), obj.x(2),'or','DisplayName','target','MarkerSize',10,'LineWidth',2);
+		    plot(obj.x(1), obj.x(2),'or','DisplayName','Target','MarkerSize',10,'LineWidth',2);
 		    hold on;
 	    end
 		
