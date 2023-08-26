@@ -4,7 +4,7 @@ clc;
 clear;
 close all;
 clearvars;
-
+rng default;
 addpath('Scripts');
 addpath('Functions');
 addpath('Classes');
@@ -16,15 +16,15 @@ R = cell(N,1);
 range = 3;
 
 % define target
-T = TARGET([0; 0]);
+T = TARGET([0; 1]);
 
 % define robots
-for i = 1:N
-	R{i} = ROBOT([randi([-range, range]); randi([-range, range])], i, 'linear' ,parameters_simulation);
-end
+R{1} = ROBOT([-2;-1.5], 1, 'linear' ,parameters_simulation);
+R{2} = ROBOT([1.5;-1], 2, 'linear' ,parameters_simulation);
+
 
 % exchange information
-for i = 1:10
+for i = 1:15
 	for j = 1:length(R)
 		EKF(R{j},0);
 	end
@@ -47,7 +47,7 @@ R{1}.plot_est(all_markers, color_matrix, false);
 plot(x,y, '--', 'Color', color_matrix(R{1}.id,:), 'DisplayName', 'Com. radius 1', 'LineWidth', 1);
 
 plot(R{2}.x_est(1), R{2}.x_est(2), 'ok', 'DisplayName', 'Other robot','MarkerSize', 10,'LineWidth', 0.8);
-[x,y] = Circle(R{2}.x_est(1), R{2}.x_est(2), R{1}.ComRadius);
+[x,y] = Circle(R{2}.x_est(1), R{2}.x_est(2), R{2}.ComRadius);
 plot(x,y, '--k', 'DisplayName', 'Other com. radius', 'LineWidth', 1.5);
 
 % plot the covariance ellipses of robot 1
@@ -67,31 +67,64 @@ end
 
 
 legend;
-hold off
-% xlim([-range range]); ylim([-range range]);
-% pause(1)
-% %% Calculations	
-% tic
-% results = run_simulation(R, T, u_traj, parameters_simulation);
-% toc
+xlim([-range, range]);
+ylim([-range, range]);
+xlabel('x [m]');
+ylabel('y [m]');
+title('Point of view of robot 1');
 
-% %% Animation
-% tic
-% figure(2);
 
-% for t = 1:length(results)
-%     clf
-% 	hold on; grid on; 
-% 	xlim([-40 40]); ylim([-40 40]);
-% 	datas = results{t};
-% 	datas.T.plot()
-% 	plot(datas.circle_target(1,:), datas.circle_target(2,:), 'b--', 'LineWidth', 1.5);
-% 	for i = 1:N
-% 		datas.R{i}.plot_real(all_markers, color_matrix, false);
-% 		plot(datas.R{i}.voronoi);
-% 		plot(datas.barycenter(1,i), datas.barycenter(2,i), 'kx', 'LineWidth', 1);
-%     end
-%     drawnow
-% end
 
-% toc
+%{
+
+ 
+  __     _____  ____   ___  _   _  ___ ___ 
+  \ \   / / _ \|  _ \ / _ \| \ | |/ _ \_ _|
+   \ \ / / | | | |_) | | | |  \| | | | | | 
+    \ V /| |_| |  _ <| |_| | |\  | |_| | | 
+     \_/  \___/|_| \_\\___/|_| \_|\___/___|
+                                           
+ 
+
+%}
+
+
+% plot the voronoi tessellation
+figure(2);
+clf
+hold on;
+grid on;
+axis equal;
+
+T.plot();
+
+% plot the robots
+voronoi_map_consensous(parameters_simulation, R, []);
+R{1}.plot_est(all_markers, color_matrix, false);
+plot(R{1}.voronoi, 'FaceAlpha', 0.2, 'FaceColor', [1,0,0.8], 'DisplayName', 'Voronoi 1');
+[x,y] = Circle(R{1}.x_est(1), R{1}.x_est(2), R{1}.ComRadius/2);
+plot(x,y, '--b', 'DisplayName', 'Half com. radius 1', 'LineWidth', 1);
+
+R{2}.plot_est(all_markers, color_matrix, false);
+plot(R{2}.voronoi, 'FaceAlpha', 0.2, 'FaceColor', [0.9290 1 0.1250], 'DisplayName', 'Voronoi 2');
+
+[x,y] = Circle(R{2}.x_est(1), R{2}.x_est(2), R{2}.ComRadius/2);
+plot(x,y, '--','Color',[0.4660 0.6740 0.1880], 'DisplayName', 'Half com. radius 2', 'LineWidth', 1.5);
+
+% compute voronoi without the volume and uncertainty
+R{1}.volume = 0;
+R{2}.volume = 0;
+R{1}.all_cov_pos = zeros(2*N+2);
+R{2}.all_cov_pos = zeros(2*N+2);
+R{1}.P = zeros(2);
+R{2}.P = zeros(2);
+voronoi_map_consensous(parameters_simulation, R, [1,2]);
+
+plot(R{1}.voronoi, 'FaceAlpha', 0.2, 'FaceColor', [0.5,0,0.0],  'DisplayName','Voronoi 1 without uncertainty/volume');
+plot(R{2}.voronoi, 'FaceAlpha', 0.2, 'FaceColor', [0.7290 0.6940 0.],  'DisplayName','Voronoi 2 without uncertainty/volume');
+
+title('Voronoi tessellation')
+xlabel('x [m]');
+ylabel('y [m]');
+
+legend('Location','eastoutside')
