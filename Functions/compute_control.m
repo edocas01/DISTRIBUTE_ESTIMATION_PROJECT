@@ -41,11 +41,14 @@ end
 % - if a robot start seeing the trget it moves towards the target
 % - if a robot reaches the maximium covariance on the target it moves randomly
 function [center, phi] = decide_target_barycenter(robot,param)
+    % Set false the radius for the reaching of the target    
+    robot.set_distance_radius = false;
 	% if a robot is not seeing the target
 	if (robot.all_robots_pos(end-1) > 1e4 && robot.all_robots_pos(end) > 1e4)
-		% select a random neighbor
+		% select a random neighbour
 		neighbor = robot.all_robots_pos;
-		neighbor(robot.id:robot.id+1) = [];
+        % delete myself from the neighbour
+		neighbor(2*robot.id-1:2*robot.id) = [];
 		neighbor(neighbor > 1e4) = [];
 		if length(neighbor) > 0 % robot must have at least one good neighbour 
 			k = randsample(1:2:length(neighbor)-1,1);
@@ -80,13 +83,14 @@ function [center, phi] = decide_target_barycenter(robot,param)
 			center = [x;y];
 		else % The target estimate is updated and the uncertainty is low
 			center = robot.all_robots_pos(end-1:end);
+            robot.set_distance_radius = true;
 		end
 	end
 	% control on the circle around the target
 	radius = param.DISTANCE_TARGET;
 	func = @(x,y,r,x_t,y_t) exp(-r/10*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2); % KEEP the "4"
 	phi = @(x,y) func(x, y, radius, center(1), center(2));
-	center = [NaN;NaN]; % to avoid the control on the circle in compute centroid
+
 end
 
 % If the robot is on the circle it has to move in order to keep the equidistance from the other robots

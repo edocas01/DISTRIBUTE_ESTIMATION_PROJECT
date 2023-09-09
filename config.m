@@ -13,7 +13,7 @@ parameters_simulation = struct( ...
 	'dt', 							0.1,    		... % time step
 	'size_map', 					50,  			... % size of the map
 	'N_MAX', 						15,  			... % maximum number of agents
-    'N',                             8,             ... % number of agents
+    'N',                             4,             ... % number of agents
 	'DEBUG', 						true,           ... % Debug flags
 	... % Debug flags 	
 	'title_flags', 					false, 			... % to print the central strings
@@ -26,7 +26,7 @@ parameters_simulation = struct( ...
 	'MAX_VOLUME',					0.2, 			... % maximum radius of the robot volume (m)
 	'MIN_VOLUME',					0.4, 			... % minimum radius of the robot volume (m)
 	'MAX_LINEAR_VELOCITY', 			50/3.6, 		... % maximum linear velocity (m/s)
-	'MIN_LINEAR_VELOCITY', 			20/3.6, 			... % minimum linear velocity (m/s)
+	'MIN_LINEAR_VELOCITY', 			20/3.6, 		... % minimum linear velocity (m/s)
 	'MAX_ANGULAR_VELOCITY', 		pi/2, 			... % maximum angular velocity (rad/s)
 	'MIN_ANGULAR_VELOCITY', 		pi/6, 			... % minimum angular velocity (rad/s)
 	... % Target parameters
@@ -36,7 +36,7 @@ parameters_simulation = struct( ...
 	... % Voronoi parameters
 	'coverage', 					3, 				... % coverage for the uncertainties 
 	... % Control parameters
-	'DISTANCE_TARGET',				5, 				... % distance from the target (m)
+	'DISTANCE_TARGET',				2, 				... % distance from the target (m)
 	'TOLERANCE_DISTANCE', 			0.2 			... % tolerance distance on the circle (m)
 	);
 

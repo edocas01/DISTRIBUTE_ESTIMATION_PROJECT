@@ -1,5 +1,5 @@
 % given a density function phi, compute the barycenter of the cell
-% if the robot is outside the circle, it has to reach the target (objective i nan)
+% if the robot is outside the circle, it has to reach the target (objective is nan)
 % if the robot is already in the circle, it has to move in the circumference
 function [barycenter, msh] = compute_centroid(robot, phi, objective, param)
 	% from matlab documentation: https://it.mathworks.com/help/pde/ug/2-d-geometry-from-polyshape.html
@@ -20,18 +20,18 @@ function [barycenter, msh] = compute_centroid(robot, phi, objective, param)
 	else
 		% if ci is further than the robot with respect to the desired circle (radius), its weight is less important
 		% compute the intermedium point, the same if has to reach a defined point or a circle
-		if isnan(objective(1))
-			radius = param.DISTANCE_TARGET;
-			objective = robot.all_robots_pos(end-1:end);
-		else
-			radius = 0;
-			objective = [objective(1); objective(2)];
-		end
-
+		radius = 0;
+        if (robot.set_distance_radius == true)
+            radius = param.DISTANCE_TARGET;
+        end
+        
 		for i = 1:length(ai) 
 			nodes = msh.Nodes(:,msh.Elements(:,i)); % nodes of the i-th element
 			ci = mean(nodes,2); % centroid of the i-th element
 
+            % We move the "target" on the circle distance_target only if a
+            % robot can see it and it is not on the circle. In this way the
+            % robot can get close to the circle (we weight the cell non uniformely)
 			dir = robot.x_est - objective;
 			dir = dir/norm(dir);
 			intermedium = objective + dir*radius; 

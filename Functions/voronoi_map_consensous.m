@@ -30,7 +30,7 @@ function voronoi_map_consensous(param, robots, obstacles)
 			end
 
 			% if the point is behind the robot itself, move it in front of the robot of an epsilon
-			if dot((robots{i}.all_robots_pos(2*j-1:2*j) - robots{i}.x_est),(z - robots{i}.x_est))< 0
+			if dot((robots{i}.all_robots_pos(2*j-1:2*j) - robots{i}.x_est),(z - robots{i}.x_est)) < 0
 				if param.DEBUG
 					warning("Point behind the robot");
 				end

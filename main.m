@@ -10,7 +10,8 @@ rng default;
 addpath('Scripts');
 addpath('Functions');
 addpath('Classes');
-
+addpath('Results');
+name = input("Save the results\n", "s");
 % ------------------------ %
 %  DEFINE DEFAULT SETTINGS %
 %  ----------------------- %
@@ -38,6 +39,10 @@ pause(1)
 %% Calculations	
 tic
 results = run_simulation(R, T, u_traj, parameters_simulation);
+if (~isempty(name))
+    name = ['Results/',name,'.mat'];
+    save(name, "results");
+end
 toc
 
 %% Animation

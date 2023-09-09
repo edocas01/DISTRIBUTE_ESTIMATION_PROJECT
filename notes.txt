@@ -126,7 +126,7 @@ La riduzione della cella come avevamo pensato va bene.
 -------------------------------------------------------------------------------------------- dopo pausa estate
 
 - sistemare i bug, sistemare voronoi
-	implementare sicurezza su spostamento voronoi
-
+	implementare sicurezza su spostamento voronoi -> FATTO
+- sistemare equidistanza tra robot
 - ostacoli (statici e dinamici)
 - dinamica non lineare
