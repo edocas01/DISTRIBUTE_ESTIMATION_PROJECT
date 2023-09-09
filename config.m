@@ -14,7 +14,7 @@ parameters_simulation = struct( ...
 	'size_map', 					50,  			... % size of the map
 	'N_MAX', 						15,  			... % maximum number of agents
     'N',                             8,             ... % number of agents
-	'DEBUG', 						false,           ... % Debug flags
+	'DEBUG', 						true,           ... % Debug flags
 	... % Debug flags 	
 	'title_flags', 					false, 			... % to print the central strings
 	... % Robot parameters 	
@@ -23,8 +23,8 @@ parameters_simulation = struct( ...
 	'std_gps', 						1, 				... % standard deviation of the GPS (m)
 	'std_robots_model', 			1, 				... % standard deviation of the robot model (m)
 	'std_relative_sensor', 			0.3,      		... % standard deviation of the relative sensor (m)
-	'MAX_VOLUME',					0.5, 			... % maximum radius of the robot volume (m)
-	'MIN_VOLUME',					0.1, 			... % minimum radius of the robot volume (m)
+	'MAX_VOLUME',					0.0, 			... % maximum radius of the robot volume (m)
+	'MIN_VOLUME',					0.0, 			... % minimum radius of the robot volume (m)
 	'MAX_LINEAR_VELOCITY', 			50/3.6, 		... % maximum linear velocity (m/s)
 	'MIN_LINEAR_VELOCITY', 			20/3.6, 			... % minimum linear velocity (m/s)
 	'MAX_ANGULAR_VELOCITY', 		pi/2, 			... % maximum angular velocity (rad/s)

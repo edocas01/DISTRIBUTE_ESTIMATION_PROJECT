@@ -122,3 +122,11 @@ RIDURRE IL FIELD OF VIEW DEI ROBOT -> zona di comunicazione è circolare ma i ro
 ---------- INCONTRO CON FONTANELLI 11/05/2023 ----------
 Il distributed kalmann filter si può fare anche se le misure sono correlate, la matrice di covarianza non verrà diagonale.
 La riduzione della cella come avevamo pensato va bene.
+
+-------------------------------------------------------------------------------------------- dopo pausa estate
+
+- sistemare i bug, sistemare voronoi
+	implementare sicurezza su spostamento voronoi
+
+- ostacoli (statici e dinamici)
+- dinamica non lineare

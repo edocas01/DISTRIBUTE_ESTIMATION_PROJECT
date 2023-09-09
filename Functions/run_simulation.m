@@ -19,7 +19,7 @@ function results = run_simulation(R, T, u_traj, parameters_simulation)
         relative_general_consensous(R, T, parameters_simulation);
         voronoi_map_consensous(parameters_simulation, R, []);
         
-        % Saving the results sss
+        % Saving the results
         data.T = copy(T);
         for i = 1:length(R)
             R{i} = copy(R{i});
@@ -32,9 +32,10 @@ function results = run_simulation(R, T, u_traj, parameters_simulation)
             [u(:,i), barycenter(:,i)] = compute_control(R{i},parameters_simulation); 
             
             
-            if i > 1
-                inters = intersect(R{i}.voronoi,R{i-1}.voronoi);
-                if inters.NumRegions > 0 && parameters_simulation.DEBUG
+            
+            for j = 1:parameters_simulation.N
+                inters = intersect(R{i}.voronoi,R{j}.voronoi);
+                if inters.NumRegions > 0 && parameters_simulation.DEBUG && i~=j
                     warning("Intersection of cells")
                 end
             end

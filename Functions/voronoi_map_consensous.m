@@ -19,11 +19,10 @@ function voronoi_map_consensous(param, robots, obstacles)
 			% move the robot j in the closest point to the agent i according to the uncertainty of j
 			z = moving_closer_point(robots{i}.x_est, robots{i}.all_robots_pos(2*j-1:2*j),...
 			robots{i}.all_cov_pos(2*j-1:2*j,2*j-1:2*j), param.coverage);
-			
 			% move the robot j to consider the max uncertainty of i (max semiaxis of i)
 			robots_d = norm(robots{i}.x_est - z);
-			z = z + 2 * max_semiaxis * (robots{i}.x_est - z) / robots_d;		
-			
+			z = z + 2 * max_semiaxis * (robots{i}.x_est - z) / robots_d;	
+
 			robots_d = norm(robots{i}.x_est - z);
 			% if the vmax allows to exit from the "sicure cell" then reduce it of the volume
 			if robots_d/2 < robots{i}.vmax * param.dt + robots{i}.volume

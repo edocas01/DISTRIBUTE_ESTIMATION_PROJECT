@@ -41,9 +41,9 @@ function [barycenter, msh] = compute_centroid(robot, phi, objective, param)
 				phi_i = phi(ci(1),ci(2)); % value of phi at the centroid
 			end
 
-			if phi_i < eps && param.DEBUG
-				warning("Phi is too small")
-			end
+			% if phi_i < eps && param.DEBUG
+			% 	warning("Phi is too small")
+			% end
 			mass = mass + ai(i) * phi_i; % mass of the cell
 			barycenter = barycenter + ai(i) * phi_i * ci;
 		end	
