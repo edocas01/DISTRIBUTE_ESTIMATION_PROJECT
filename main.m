@@ -11,7 +11,7 @@ addpath('Scripts');
 addpath('Functions');
 addpath('Classes');
 addpath('Results');
-name = input("Save the results\n", "s");
+name = input("Save the results: ", "s");
 % ------------------------ %
 %  DEFINE DEFAULT SETTINGS %
 %  ----------------------- %
@@ -46,6 +46,6 @@ end
 toc
 
 %% Animation
-tic
+tic  
 show_simulation(results)
 toc

@@ -37,7 +37,7 @@ parameters_simulation = struct( ...
 	'coverage', 					3, 				... % coverage for the uncertainties 
 	... % Control parameters
 	'DISTANCE_TARGET',				2, 				... % distance from the target (m)
-	'TOLERANCE_DISTANCE', 			0.2 			... % tolerance distance on the circle (m)
+	'TOLERANCE_DISTANCE', 			0.3 			... % tolerance distance on the circle (m)
 	);
 
 % Define the colors in a matrix 15 by 3 (RGB) without red

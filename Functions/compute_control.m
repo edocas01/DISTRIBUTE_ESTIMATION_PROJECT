@@ -107,7 +107,7 @@ function [center, phi] = decide_circle_barycenter(robot,param)
 	distances = sum(abs(target' - neighbors_on_circle).^2,2).^0.5;
 	neighbors_on_circle(distances < radius - tolerance | distances > radius + tolerance,:) = [];
 
-	% if there are no sufficient neighbors on the circle, the robot stay still (at least 3)
+	% if there are no sufficient neighbors on the circle, the robot stay still (at least 2)
 	if size(neighbors_on_circle,1) < 2
 		center = robot.x_est;
 		phi = 0;
@@ -129,8 +129,9 @@ function [center, phi] = decide_circle_barycenter(robot,param)
 			angle_neighbors = [angles(idx(my_order-1),:); angles(idx(my_order+1),:)];
 		end
 		
-		% compute the radius of the circle		
-		radius_circle = norm(robot.x_est - target);
+		% compute the radius of the circle
+        distances = sum(abs(target' - neighbors_on_circle).^2,2).^0.5;
+		radius_circle = mean(distances);
 		% compute the curvilinear distance between the two neighbors
 		curvilinear_distance(1) = radius_circle*abs(angles(my_idx) - angle_neighbors(1));
 		curvilinear_distance(2) = radius_circle*abs(angles(my_idx) - angle_neighbors(2));
@@ -141,7 +142,7 @@ function [center, phi] = decide_circle_barycenter(robot,param)
 			new_angle = angles(my_idx) + (curvilinear_distance(2) - curvilinear_distance(1))/radius_circle;
 		else
 			% the robot has to move clockwise
-			new_angle = angles(my_idx) - (curvilinear_distance(1) - curvilinear_distance(2))/radius_circle;
+			new_angle = angles(my_idx) + (curvilinear_distance(1) - curvilinear_distance(2))/radius_circle;
 		end
 
 		center = target + radius_circle*[cos(new_angle); sin(new_angle)];
