@@ -17,7 +17,7 @@ function show_simulation(results)
 		end
 
 		for i = 1:length(datas.O)
-			datas.O{i}.plot();
+            plot(datas.O(:,1),datas.O(:,2),'sk','HandleVisibility', 'off','MarkerSize', 10,'LineWidth', 1.8);
 		end
     	drawnow
 	end

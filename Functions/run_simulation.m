@@ -25,11 +25,12 @@ function results = run_simulation(R, T, O, u_traj, parameters_simulation)
         end
         data.R = R;
         
+        position_obstacles = [];
         for i = 1:length(O)
-            data.O = O;
+            position_obstacles(i,:) = [O{i}.x(1),O{i}.x(2)];
         end
+        data.O = position_obstacles;
 
-        
 		data.circle_target = [circx;circy];
 		
         for i = 1:parameters_simulation.N

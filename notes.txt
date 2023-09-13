@@ -134,6 +134,7 @@ La riduzione della cella come avevamo pensato va bene.
 - ostacoli (statici e dinamici):
 	- simulare misurazioni di ostacoli, introdurli in voronoi -> FATTO
 - TODO:
-	- problema del "copy"
+	- problema del "copy" -> HO SISTEMATO IN ALTRO MODO
+	- quando un robot si incaglia, potremmo fargli seguire la traiettoria del target
 	- ostacoli come pareti
 - dinamica non lineare
