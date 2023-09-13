@@ -1,8 +1,8 @@
 % This function compute the inputs for the robots according to the controls
-function [u, barycenter] = compute_control(robot,param)
+function [u, barycenter] = compute_control(R,T,robot,param)
 
 	% decide the control for the robot
-	[objective, phi] = is_on_circle(robot, param);
+	[objective, phi] = is_on_circle(R,T,robot, param);
 	[barycenter, msh] = compute_centroid(robot, phi, objective, param);
 
 	if norm(barycenter - robot.x_est) == 0
@@ -94,7 +94,8 @@ function [center, phi] = decide_target_barycenter(robot,param)
 end
 
 % If the robot is on the circle it has to move in order to keep the equidistance from the other robots
-function [center, phi] = decide_circle_barycenter(robot,param)
+function [center, phi] = decide_circle_barycenter(R,T, robot, param)
+	config;
 	radius = param.DISTANCE_TARGET;
 	tolerance = param.TOLERANCE_DISTANCE;
 	target = robot.all_robots_pos(end-1:end);
@@ -133,8 +134,11 @@ function [center, phi] = decide_circle_barycenter(robot,param)
         distances = sum(abs(target' - neighbors_on_circle).^2,2).^0.5;
 		radius_circle = mean(distances);
 		% compute the curvilinear distance between the two neighbors
-		curvilinear_distance(1) = radius_circle*abs(angles(my_idx) - angle_neighbors(1));
-		curvilinear_distance(2) = radius_circle*abs(angles(my_idx) - angle_neighbors(2));
+		% the curvilinear distance has to be the smallest arc that joints the 2 robots
+		% so if the difference of angles is larger than 180° we take the complementar angle
+		
+		curvilinear_distance(1) = radius_circle*abs(min(angles(my_idx) - angle_neighbors(1), 2*pi - angles(my_idx) - angle_neighbors(1)));
+		curvilinear_distance(2) = radius_circle*abs(min(angles(my_idx) - angle_neighbors(2), 2*pi - angles(my_idx) - angle_neighbors(2)));
 
 		% apply the control law
 		if curvilinear_distance(1) < curvilinear_distance(2)
@@ -152,13 +156,13 @@ function [center, phi] = decide_circle_barycenter(robot,param)
 end
 
 % Decide if the robot is on the circle or it has still to reach it
-function [center, phi] = is_on_circle(robot, param)
+function [center, phi] = is_on_circle(R,T,robot, param)
 	radius = param.DISTANCE_TARGET;
 	tolerance = param.TOLERANCE_DISTANCE;
 	target = robot.all_robots_pos(end-1:end);
 
 	if norm(robot.x_est - target) >= radius - tolerance && norm(robot.x_est - target) <= radius + tolerance
-		[center, phi] = decide_circle_barycenter(robot,param);
+		[center, phi] = decide_circle_barycenter(R,T,robot,param);
 	else
 		[center, phi] = decide_target_barycenter(robot,param);
 	end
