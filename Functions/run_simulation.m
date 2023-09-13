@@ -23,13 +23,13 @@ function results = run_simulation(R, T, O, u_traj, parameters_simulation)
         for i = 1:length(R)
             R{i} = copy(R{i});
         end
-
-        for i = 1:length(O)
-            O{i} = copy(O{i});
-        end
-        
-        data.O = O;
         data.R = R;
+        
+        for i = 1:length(O)
+            data.O = O;
+        end
+
+        
 		data.circle_target = [circx;circy];
 		
         for i = 1:parameters_simulation.N

@@ -12,8 +12,8 @@ function [target, trajectory, u_trajectory, obstacles, robots] = initialize_env(
 	sgtitle("Select points to create obstacles")
 	hold on;
 	grid on;
-	axis(param.size_map * [-1 1 -1 1]);
 	axis equal;
+	axis(param.size_map * [-1 1 -1 1]);
 	idx = 1;
 
 	% Set the obstacles
@@ -79,7 +79,7 @@ function [target, trajectory, u_trajectory, obstacles, robots] = initialize_env(
 		robots{idx} = ROBOT([xi;yi], idx, 'linear', param);
 		robots{idx}.plot_real(all_markers, color_matrix, true);
 		idx = idx + 1;
-		if idx == param.N_MAX +1
+		if idx == param.N +1
 			break;
 		end
 	end

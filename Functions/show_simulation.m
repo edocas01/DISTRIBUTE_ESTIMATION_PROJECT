@@ -15,6 +15,10 @@ function show_simulation(results)
 			plot(datas.R{i}.voronoi);
 			plot(datas.barycenter(1,i), datas.barycenter(2,i),'kx', 'LineWidth', 1);
 		end
+
+		for i = 1:length(datas.O)
+			datas.O{i}.plot();
+		end
     	drawnow
 	end
 end

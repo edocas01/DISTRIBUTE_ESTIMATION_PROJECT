@@ -132,5 +132,8 @@ La riduzione della cella come avevamo pensato va bene.
 	- vedere come un robot vede gli altri
 	- salvare una possibile traiettoria del target
 - ostacoli (statici e dinamici):
-	- simulare misurazioni di ostacoli, introdurli in voronoi
+	- simulare misurazioni di ostacoli, introdurli in voronoi -> FATTO
+- TODO:
+	- problema del "copy"
+	- ostacoli come pareti
 - dinamica non lineare
