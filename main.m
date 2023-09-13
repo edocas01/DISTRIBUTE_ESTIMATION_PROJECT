@@ -35,6 +35,7 @@ for i = 1:N
 	R{i}.plot_real(all_markers, color_matrix, true);
 end
 hold off
+legend('Location','eastoutside')
 pause(1)
 %% Calculations	
 tic

@@ -127,6 +127,8 @@ La riduzione della cella come avevamo pensato va bene.
 
 - sistemare i bug, sistemare voronoi
 	implementare sicurezza su spostamento voronoi -> FATTO
-- sistemare equidistanza tra robot
+- sistemare equidistanza tra robot:
+	- vedere come un robot vede gli altri
+	- salvare una possibile traiettoria del target
 - ostacoli (statici e dinamici)
 - dinamica non lineare
