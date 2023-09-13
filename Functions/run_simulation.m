@@ -1,5 +1,5 @@
 % This function runs the simulation of the robots
-function results = run_simulation(R, T, u_traj, parameters_simulation)
+function results = run_simulation(R, T, O, u_traj, parameters_simulation)
 	Tmax = length(u_traj(1,:));
 	results = cell(1,Tmax);
     
@@ -16,13 +16,19 @@ function results = run_simulation(R, T, u_traj, parameters_simulation)
         
 
         relative_general_consensous(R, T, parameters_simulation);
-        voronoi_map_consensous(parameters_simulation, R, []);
+        voronoi_map_consensous(parameters_simulation, R, O);
         
         % Saving the results
         data.T = copy(T);
         for i = 1:length(R)
             R{i} = copy(R{i});
         end
+
+        for i = 1:length(O)
+            O{i} = copy(O{i});
+        end
+        
+        data.O = O;
         data.R = R;
 		data.circle_target = [circx;circy];
 		

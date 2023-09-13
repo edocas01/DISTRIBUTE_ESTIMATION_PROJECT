@@ -113,7 +113,8 @@ RIDUZIONE TOTALE:
 - NOTA: la cella va sempre ridotta dell'incertezza perchè entra sempre in gioco. Il delta viene considerato
 		solo in relazione a vmax.
 - NOTA: sembra funzionare anche con un fattore di copertura di 1 (anzichè 3)
-
+- NOTA: è sempre necessario avviciniare del doppio del volume/incertezza perché così la cella si riduce esattamente
+		della quantità desiderata. Altrimenti sposterei solo di una parte del mio volume/incertezza.
 Nel report/presentazione far vedere che le zone si intersecano se non consideriamo le incertezze e far vedere
 come dopo le zone sono modificate
 
@@ -127,8 +128,9 @@ La riduzione della cella come avevamo pensato va bene.
 
 - sistemare i bug, sistemare voronoi
 	implementare sicurezza su spostamento voronoi -> FATTO
-- sistemare equidistanza tra robot:
+- sistemare equidistanza tra robot: -> FATTO
 	- vedere come un robot vede gli altri
 	- salvare una possibile traiettoria del target
-- ostacoli (statici e dinamici)
+- ostacoli (statici e dinamici):
+	- simulare misurazioni di ostacoli, introdurli in voronoi
 - dinamica non lineare

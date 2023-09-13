@@ -54,7 +54,7 @@ classdef OBSTACLE < handle
 
 %}
         function plot(obj)
-		    plot(obj.x(1), obj.x(2),'sk','DisplayName','target','MarkerSize',10,'LineWidth',2);
+		    plot(obj.x(1), obj.x(2),'sk','HandleVisibility', 'off','MarkerSize', 10,'LineWidth', 2);
 		    hold on;
 	    end
 			

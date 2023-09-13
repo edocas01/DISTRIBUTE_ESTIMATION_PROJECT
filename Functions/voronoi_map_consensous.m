@@ -39,8 +39,31 @@ function voronoi_map_consensous(param, robots, obstacles)
 
 			% create the vector for the voronoi tesselation
 			modified_positions = [modified_positions, z];
+			
 		end
+		
+		for k = 1:length(obstacles)
+			obstalcle = obstacles{k}.x;
+			obstacle_d = norm(robot{i}.x - obstacle);
+				if obstacle_d <= robots{i}.ComRadius
+					% obstacle in robot reference frame
+					obstacle_measure = robots{i}.H * (obstacle - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
+					% obstacle in world frame
+					obstacle_measure = obstacle_measure + robots{i}.H * robots{i}.x_est;
+					obstacle_covariance = robots{i}.R_dist + robots{i}.H * robots{i}.P * robots{i}.H';
 
+					% move the obstacle in the closest point to the agent i according to the uncertainty on the obstacle 
+					z = moving_closer_point(robots{i}.x_est, obstacle_measure, obstacle_covariance, param.coverage);
+					% move the obstacle according to the max uncertainty of i (max semiaxis of i)
+					robots_d = norm(robots{i}.x_est - z);
+					z = z + 2 * max_semiaxis * (robots{i}.x_est - z) / robots_d;
+					
+
+					% create the vector for the voronoi tesselation
+					modified_positions = [modified_positions, z];
+				end
+		end
+		
 		% Initialization of the variables
 		P = [];
 		vx = [];

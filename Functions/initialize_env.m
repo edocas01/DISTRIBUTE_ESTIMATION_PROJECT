@@ -1,8 +1,10 @@
 % This function is used to generate the obstacles and the target with its trajectory
-function [target, trajectory, u_trajectory, obstacles] = initialize_env(param)
+function [target, trajectory, u_trajectory, obstacles, robots] = initialize_env(param)
+    config;
 	trajectory = [];
     u_trajectory = [];
 	obstacles = {};
+	robots = {};
 	x = [];
 	y = [];
 
@@ -11,6 +13,7 @@ function [target, trajectory, u_trajectory, obstacles] = initialize_env(param)
 	hold on;
 	grid on;
 	axis(param.size_map * [-1 1 -1 1]);
+	axis equal;
 	idx = 1;
 
 	% Set the obstacles
@@ -41,11 +44,10 @@ function [target, trajectory, u_trajectory, obstacles] = initialize_env(param)
 		plot(x, y, '--ro');
 	end
 	
-	close(fig_1);
 	print_title("Acquired trajectory", param.title_flags);
 	trajectory = [x;y];
 	n = length(x);
-
+	
 	% inputs for the target
 	for i = 1:n-1
 		% define the initial and final points
@@ -61,8 +63,27 @@ function [target, trajectory, u_trajectory, obstacles] = initialize_env(param)
 			u_trajectory = [u_trajectory, (x_fin - x_in)/N_steps];
         end
     end
-
+	
 	% generate the target
 	target = TARGET([x(1),y(1)]);
-
+	
+	idx = 1;
+	% Set the robots
+	sgtitle("Select points to create robots")
+	
+	while true
+		[xi, yi ,button] = ginput(1);
+		if ~isequal(button,1) % if enter is pressed
+			break;
+		end
+		robots{idx} = ROBOT([xi;yi], idx, 'linear', param);
+		robots{idx}.plot_real(all_markers, color_matrix, true);
+		idx = idx + 1;
+		if idx == param.N_MAX +1
+			break;
+		end
+	end
+	print_title("Acquired robots positions", param.title_flags);
+	
+	close(fig_1);
 end
