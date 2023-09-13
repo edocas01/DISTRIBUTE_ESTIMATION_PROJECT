@@ -9,7 +9,7 @@ function [u, barycenter] = compute_control(R,T,robot,param)
 		u = [0;0];
 	else
 		kp = 1/param.dt;
-		%% compute the control
+		% compute the control
 		if  kp * norm(barycenter - robot.x_est) < robot.vmax
 			u = kp * (barycenter - robot.x_est) * param.dt;
 		else
@@ -145,13 +145,15 @@ function [center, phi] = decide_circle_barycenter(R,T, robot, param)
 			angle_distance(2) = angle_neighbors(2) - angles(my_idx) + 2*pi;
 		end
 
-		% apply the control law
-		if angle_distance(1) < angle_distance(2)
+		% apply the control law imposing a new angle accordingly to the difference
+		% between the two angle_distances
+
+		if angle_distance(1) <= angle_distance(2)
 			% the robot has to move anticlockwise
-			new_angle = angles(my_idx) + (angle_distance(2) - angle_distance(1));
+			new_angle = angles(my_idx) + (angle_distance(2) - angle_distance(1))/2;
 		else
 			% the robot has to move clockwise
-			new_angle = angles(my_idx) + (angle_distance(1) - angle_distance(2));
+			new_angle = angles(my_idx) - (angle_distance(1) - angle_distance(2))/2;
 		end
 
 		% compute the center (it has to the circumference)
