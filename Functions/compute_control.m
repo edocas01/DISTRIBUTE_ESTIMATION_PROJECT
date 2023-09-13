@@ -1,8 +1,8 @@
 % This function compute the inputs for the robots according to the controls
-function [u, barycenter] = compute_control(R,T,robot,param)
+function [u, barycenter] = compute_control(robot,param)
 
 	% decide the control for the robot
-	[objective, phi] = is_on_circle(R,T,robot, param);
+	[objective, phi] = is_on_circle(robot, param);
 	[barycenter, msh] = compute_centroid(robot, phi, objective, param);
 
 	if norm(barycenter - robot.x_est) == 0
@@ -94,7 +94,7 @@ function [center, phi] = decide_target_barycenter(robot,param)
 end
 
 % If the robot is on the circle it has to move in order to keep the equidistance from the other robots
-function [center, phi] = decide_circle_barycenter(R,T, robot, param)
+function [center, phi] = decide_circle_barycenter(robot, param)
 	config;
 	radius = param.DISTANCE_TARGET;
 	tolerance = param.TOLERANCE_DISTANCE;
@@ -164,13 +164,13 @@ function [center, phi] = decide_circle_barycenter(R,T, robot, param)
 end
 
 % Decide if the robot is on the circle or it has still to reach it
-function [center, phi] = is_on_circle(R,T,robot, param)
+function [center, phi] = is_on_circle(robot, param)
 	radius = param.DISTANCE_TARGET;
 	tolerance = param.TOLERANCE_DISTANCE;
 	target = robot.all_robots_pos(end-1:end);
 
 	if norm(robot.x_est - target) >= radius - tolerance && norm(robot.x_est - target) <= radius + tolerance
-		[center, phi] = decide_circle_barycenter(R,T,robot,param);
+		[center, phi] = decide_circle_barycenter(robot,param);
 	else
 		[center, phi] = decide_target_barycenter(robot,param);
 	end

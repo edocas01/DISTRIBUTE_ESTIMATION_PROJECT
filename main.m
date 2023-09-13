@@ -23,7 +23,7 @@ parameters_simulation;
 
 fprintf("Target initial position: (%.2f m, %.2f m)\n", T.x(1), T.x(2));
 N = parameters_simulation.N;
-range = 5;
+range = 10;
 
 dyn_type = repmat("linear",N,1);
 R = select_shape(N, dyn_type, 'circle', [0;0], range, 0, parameters_simulation);
