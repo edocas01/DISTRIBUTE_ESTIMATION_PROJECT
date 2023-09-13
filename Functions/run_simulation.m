@@ -11,6 +11,8 @@ function results = run_simulation(R, T, u_traj, parameters_simulation)
         relative_general_consensous(R, T, parameters_simulation);
     end
     % Simulation
+    figure()
+    config;
     for t = 1:Tmax
         [circx, circy] = Circle(T.x(1), T.x(2), parameters_simulation.DISTANCE_TARGET);
         
@@ -42,6 +44,24 @@ function results = run_simulation(R, T, u_traj, parameters_simulation)
         
         data.barycenter = barycenter;
 		results{t} = data;
+
+        %% PLOT
+
+        clf
+		hold on; grid on; 
+        axis equal
+		xlim([-40 40]); ylim([-40 40]);
+		datas = data;
+		datas.T.plot()
+		plot(datas.circle_target(1,:), datas.circle_target(2,:),'b--', 'LineWidth', 1.5);
+		for i = 1:parameters_simulation.N
+			datas.R{i}.plot_real(all_markers, color_matrix, false);
+			plot(datas.R{i}.voronoi);
+			plot(datas.barycenter(1,i), datas.barycenter(2,i),'kx', 'LineWidth', 1);
+		end
+    	drawnow
+
+        %% PLOT
 
         % Move the target
         T.dynamics(u_traj(:,t));

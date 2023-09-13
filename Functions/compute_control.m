@@ -130,26 +130,32 @@ function [center, phi] = decide_circle_barycenter(R,T, robot, param)
 			angle_neighbors = [angles(idx(my_order-1),:); angles(idx(my_order+1),:)];
 		end
 		
-		% compute the radius of the circle
-        distances = sum(abs(target' - neighbors_on_circle).^2,2).^0.5;
-		radius_circle = mean(distances);
-		% compute the curvilinear distance between the two neighbors
-		% the curvilinear distance has to be the smallest arc that joints the 2 robots
-		% so if the difference of angles is larger than 180° we take the complementar angle
-		
-		curvilinear_distance(1) = radius_circle*abs(min(angles(my_idx) - angle_neighbors(1), 2*pi - angles(my_idx) - angle_neighbors(1)));
-		curvilinear_distance(2) = radius_circle*abs(min(angles(my_idx) - angle_neighbors(2), 2*pi - angles(my_idx) - angle_neighbors(2)));
-
-		% apply the control law
-		if curvilinear_distance(1) < curvilinear_distance(2)
-			% the robot has to move anticlockwise
-			new_angle = angles(my_idx) + (curvilinear_distance(2) - curvilinear_distance(1))/radius_circle;
+		% compute the angular distance between the two neighbors
+		% notice that the angle has to be taken in the correct order:
+		% from the previos to the next robot
+		if (angles(my_idx) > angle_neighbors(1))
+			angle_distance(1) = angles(my_idx) - angle_neighbors(1);
 		else
-			% the robot has to move clockwise
-			new_angle = angles(my_idx) + (curvilinear_distance(1) - curvilinear_distance(2))/radius_circle;
+			angle_distance(1) = angles(my_idx) - angle_neighbors(1) + 2*pi;
 		end
 
-		center = target + radius_circle*[cos(new_angle); sin(new_angle)];
+		if (angle_neighbors(2) > angles(my_idx))
+			angle_distance(2) = angle_neighbors(2) - angles(my_idx);
+		else
+			angle_distance(2) = angle_neighbors(2) - angles(my_idx) + 2*pi;
+		end
+
+		% apply the control law
+		if angle_distance(1) < angle_distance(2)
+			% the robot has to move anticlockwise
+			new_angle = angles(my_idx) + (angle_distance(2) - angle_distance(1));
+		else
+			% the robot has to move clockwise
+			new_angle = angles(my_idx) + (angle_distance(1) - angle_distance(2));
+		end
+
+		% compute the center (it has to the circumference)
+		center = target + radius*[cos(new_angle); sin(new_angle)];
 		Func = @(x,y,x_t,y_t) exp(-((x-x_t)^2 + (y-y_t)^2)); % KEEP the "4"
 		phi = @(x,y) Func(x, y, center(1), center(2));
 	end

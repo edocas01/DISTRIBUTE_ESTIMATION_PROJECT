@@ -14,7 +14,7 @@ parameters_simulation = struct( ...
 	'size_map', 					50,  			... % size of the map
 	'N_MAX', 						15,  			... % maximum number of agents
     'N',                             5,             ... % number of agents
-	'DEBUG', 						true,           ... % Debug flags
+	'DEBUG', 						false,          ... % Debug flags
 	... % Debug flags 	
 	'title_flags', 					false, 			... % to print the central strings
 	... % Robot parameters 	
@@ -39,7 +39,7 @@ parameters_simulation = struct( ...
 	'DISTANCE_TARGET',				5, 				... % distance from the target (m)
 	'TOLERANCE_DISTANCE', 			0 			... % tolerance distance on the circle (m)
 	);
-	parameters_simulation.TOLERANCE_DISTANCE = parameters_simulation.DISTANCE_TARGET*0.25;
+	parameters_simulation.TOLERANCE_DISTANCE = parameters_simulation.DISTANCE_TARGET*0.5;
 
 % Define the colors in a matrix 15 by 3 (RGB) without red
 color_matrix = [ ...
