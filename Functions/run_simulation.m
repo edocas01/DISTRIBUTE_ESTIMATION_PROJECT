@@ -11,7 +11,6 @@ function results = run_simulation(R, T, u_traj, parameters_simulation)
         relative_general_consensous(R, T, parameters_simulation);
     end
     % Simulation
-    u_uno = [];
     for t = 1:Tmax
         [circx, circy] = Circle(T.x(1), T.x(2), parameters_simulation.DISTANCE_TARGET);
         
@@ -30,10 +29,7 @@ function results = run_simulation(R, T, u_traj, parameters_simulation)
         for i = 1:parameters_simulation.N
             
             [u(:,i), barycenter(:,i)] = compute_control(R{i},parameters_simulation);
-            if i == 1
-                u_uno(:,t) = u(:,i);
-            end
-            
+
             for j = 1:parameters_simulation.N
                 inters = intersect(R{i}.voronoi,R{j}.voronoi);
                 if inters.NumRegions > 0 && parameters_simulation.DEBUG && i~=j
