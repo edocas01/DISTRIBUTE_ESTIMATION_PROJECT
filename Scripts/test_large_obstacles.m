@@ -59,7 +59,7 @@ if ~isempty(intersection) % there is intersection
 		% if there are vertices of the obstacle inside the cell
 		if inpolygon(LO.x(i,1), LO.x(i,2), poly_voronoi.Vertices(:,1), poly_voronoi.Vertices(:,2))
 			% if I can see this point from the origin I use this point (the line connecting me and the point is inside the obstacle or not)
-			if ~isempty(intersect(LO.poly, [0,0; LO.x(i,:)]))
+			if isempty(intersect(LO.poly, [0,0; LO.x(i,:)]))
 				visible_points = [visible_points; LO.x(i,:)];
 			end
 		end
@@ -72,3 +72,27 @@ if ~isempty(intersection) % there is intersection
 
 	end
 end
+
+% 
+% pgon=polyshape(     [2.8259    1.8997
+%     1.3496    4.4206
+%     3.3552    3.4178
+%     4.3719    4.6992
+%     4.8872    2.1226
+%     3.2298    2.7214
+%     3.3134    1.1337
+%     1.1685    1.1616] );  %hypothetical polygon
+% R=1.5; [x0,y0]=deal(3,3); %Circle radius and center
+% t=linspace(0,360,1000).'; t(end)=[]; %circle angular samples
+% circle=polyshape([cosd(t), sind(t)]*R+[x0,y0]); 
+% plot([pgon,circle]); axis equal
+% %find intersections
+% V=pgon.Vertices;
+% N=size(V,1);
+% V=V([1:N,1],:);
+% hold on
+% for i=1:N
+%     xy=linexlines2D(circle,V(i,:),V(i+1,:));
+%     plot(xy(1,:),xy(2,:),'or','MarkerFaceColor','r');
+% end
+% hold off

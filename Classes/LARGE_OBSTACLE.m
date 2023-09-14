@@ -52,8 +52,8 @@ classdef LARGE_OBSTACLE < handle
  
 
 %}
-        function plot(obj)
-		    plot(obj.poly,'FaceColor','black','FaceAlpha',0.5)
+      function plot(obj)
+		    plot(obj.poly,'FaceColor','black','FaceAlpha',0.5,'HandleVisibility', 'off')
 	    end
 			
 	end % methods
