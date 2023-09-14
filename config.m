@@ -13,7 +13,6 @@ parameters_simulation = struct( ...
 	'dt', 							0.1,    		... % time step
 	'size_map', 					50,  			... % size of the map
 	'N_MAX', 						15,  			... % maximum number of agents
-    'N',                             5,             ... % number of agents
 	'DEBUG', 						false,          ... % Debug flags
 	... % Debug flags 	
 	'title_flags', 					false, 			... % to print the central strings

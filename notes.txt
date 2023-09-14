@@ -134,7 +134,8 @@ La riduzione della cella come avevamo pensato va bene.
 - ostacoli (statici e dinamici):
 	- simulare misurazioni di ostacoli, introdurli in voronoi -> FATTO
 - TODO:
-	- problema del "copy" -> HO SISTEMATO IN ALTRO MODO
 	- quando un robot si incaglia, potremmo fargli seguire la traiettoria del target
-	- ostacoli come pareti
+	- ostacoli come pareti:
+		a differenza degli ostacoli puntuali (che possono anche muoversi ed in quel caso ci sta fare voronoi per essere più conservativi) le pareti
+		possono essere trattate semplicemente considerando che un robot nel caso vi si avvicini, riduca la sua cella quel tanto che basta da non toccarla.
 - dinamica non lineare

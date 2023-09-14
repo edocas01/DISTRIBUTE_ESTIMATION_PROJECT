@@ -10,7 +10,7 @@ function show_simulation(results)
 		datas = results{t};
 		datas.T.plot()
 		plot(datas.circle_target(1,:), datas.circle_target(2,:),'b--', 'LineWidth', 1.5);
-		for i = 1:parameters_simulation.N
+		for i = 1:length(datas.R)
 			datas.R{i}.plot_real(all_markers, color_matrix, false);
 			plot(datas.R{i}.voronoi);
 			plot(datas.barycenter(1,i), datas.barycenter(2,i),'kx', 'LineWidth', 1);

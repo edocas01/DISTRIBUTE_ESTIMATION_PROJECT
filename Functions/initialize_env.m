@@ -68,6 +68,8 @@ function [target, trajectory, u_trajectory, obstacles, robots] = initialize_env(
 	target = TARGET([x(1),y(1)]);
 	
 	idx = 1;
+	x = [];
+	y = [];
 	% Set the robots
 	sgtitle("Select points to create robots")
 	
@@ -76,13 +78,21 @@ function [target, trajectory, u_trajectory, obstacles, robots] = initialize_env(
 		if ~isequal(button,1) % if enter is pressed
 			break;
 		end
-		robots{idx} = ROBOT([xi;yi], idx, 'linear', param);
-		robots{idx}.plot_real(all_markers, color_matrix, true);
+		x = [x xi];
+		y = [y yi];
+		plot(x, y, '+b');
 		idx = idx + 1;
-		if idx == param.N +1
+		if idx == param.N_MAX + 1
 			break;
 		end
 	end
+
+	param.N = idx - 1;
+	for i = 1:param.N
+		robots{i} = ROBOT([x(i);y(i)], i, 'linear', param);
+		robots{i}.plot_real(all_markers, color_matrix, true);
+	end
+
 	print_title("Acquired robots positions", param.title_flags);
 	
 	close(fig_1);

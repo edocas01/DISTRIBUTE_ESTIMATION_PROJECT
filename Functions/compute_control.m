@@ -95,7 +95,6 @@ end
 
 % If the robot is on the circle it has to move in order to keep the equidistance from the other robots
 function [center, phi] = decide_circle_barycenter(robot, param)
-	config;
 	radius = param.DISTANCE_TARGET;
 	tolerance = param.TOLERANCE_DISTANCE;
 	target = robot.all_robots_pos(end-1:end);
