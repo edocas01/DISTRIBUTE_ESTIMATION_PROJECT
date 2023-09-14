@@ -4,6 +4,7 @@ function [target, trajectory, u_trajectory, obstacles, robots] = initialize_env(
 	trajectory = [];
     u_trajectory = [];
 	obstacles = {};
+	large_obstacles = {};
 	robots = {};
 	x = [];
 	y = [];
@@ -14,9 +15,10 @@ function [target, trajectory, u_trajectory, obstacles, robots] = initialize_env(
 	grid on;
 	axis equal;
 	axis(param.size_map * [-1 1 -1 1]);
-	idx = 1;
-
+	
 	% Set the obstacles
+	sgtitle("Select points to create punctual obstacles")
+	idx = 1;
 	while true
 		[xi, yi ,button] = ginput(1);
 		x = [x xi];
@@ -28,7 +30,24 @@ function [target, trajectory, u_trajectory, obstacles, robots] = initialize_env(
 		plot(x, y, 'sk');
 		idx = idx + 1;
 	end
-	print_title("Acquired obstacles",param.title_flags);
+	print_title("Acquired punctual obstacles",param.title_flags);
+
+	
+	% Set the obstacles
+	sgtitle("Select points to create punctual obstacles")
+	idx = 1;
+	while true
+		[xi, yi ,button] = ginput(1);
+		x = [x xi];
+		y = [y yi];
+		if ~isequal(button,1) % if enter is pressed
+			break;
+		end
+		obstacles{idx} = OBSTACLE(xi,yi);
+		plot(x, y, 'sk');
+		idx = idx + 1;
+	end
+	print_title("Acquired punctual obstacles",param.title_flags);
 	
 	sgtitle("Select points to create trajectory")
 	% Set the target trajectory
