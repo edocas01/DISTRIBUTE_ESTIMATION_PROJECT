@@ -18,7 +18,7 @@ name = input("Save the results: ", "s");
 config;
 clc;
 
-[T,~,u_traj,O,R] = initialize_env(parameters_simulation);
+[T,~,u_traj,O,L_O,R] = initialize_env(parameters_simulation);
 fprintf("Target initial position: (%.2f m, %.2f m)\n", T.x(1), T.x(2));
 parameters_simulation.N = length(R);
 N = length(R);
@@ -37,6 +37,10 @@ end
 
 for i = 1:length(O)
     O{i}.plot();
+end
+
+for i = 1:length(L_O)
+    L_O{i}.plot();
 end
 
 hold off

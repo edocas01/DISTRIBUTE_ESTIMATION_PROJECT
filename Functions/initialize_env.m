@@ -1,5 +1,5 @@
 % This function is used to generate the obstacles and the target with its trajectory
-function [target, trajectory, u_trajectory, obstacles, robots] = initialize_env(param)
+function [target, trajectory, u_trajectory, obstacles, large_obstacles, robots] = initialize_env(param)
     config;
 	trajectory = [];
     u_trajectory = [];
@@ -10,32 +10,62 @@ function [target, trajectory, u_trajectory, obstacles, robots] = initialize_env(
 	y = [];
 
 	fig_1 = figure(1); clf;
+	% Set the large obstacles
 	sgtitle("Select points to create obstacles")
 	hold on;
 	grid on;
 	axis equal;
 	axis(param.size_map * [-1 1 -1 1]);
 	
-	% Set the obstacles
-	sgtitle("Select points to create punctual obstacles")
 	idx = 1;
+	FIRST = false;
 	while true
-		[xi, yi ,button] = ginput(1);
-		x = [x xi];
-		y = [y yi];
+		x = [];
+		y = [];
+		X = [];
+		while true
+			if ~FIRST
+				[xi, yi ,button] = ginput(1);
+            end
+			if size(X,1) > 2
+           		if ~isequal(button,1) % if enter is pressed
+					break;
+				end
+			end
+			FIRST = false;
+			x = [x xi];
+			y = [y yi];
+			X = [x' y'];
+			plot(x, y, '--ko');
+		end
+		large_obstacles{idx} = LARGE_OBSTACLE(X);
+		clf;
+		sgtitle("Select points to create obstacles")
+		hold on;
+		grid on;
+		axis equal;
+		axis(param.size_map * [-1 1 -1 1]);
+		for i = 1:length(large_obstacles)
+			large_obstacles{i}.plot();
+		end
+		idx = idx + 1;
+		
+		[xi,yi, button] = ginput(1);
 		if ~isequal(button,1) % if enter is pressed
 			break;
+		else
+			FIRST = true;
 		end
-		obstacles{idx} = OBSTACLE(xi,yi);
-		plot(x, y, 'sk');
-		idx = idx + 1;
 	end
-	print_title("Acquired punctual obstacles",param.title_flags);
+	
+	print_title("Acquired obstacles",param.title_flags);
 
 	
-	% Set the obstacles
+	% Set the punctual obstacles
 	sgtitle("Select points to create punctual obstacles")
 	idx = 1;
+	x = [];
+	y = [];
 	while true
 		[xi, yi ,button] = ginput(1);
 		x = [x xi];
