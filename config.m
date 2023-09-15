@@ -28,7 +28,6 @@ parameters_simulation = struct( ...
 	'MIN_LINEAR_VELOCITY', 			20/3.6, 		... % minimum linear velocity (m/s)
 	'MAX_ANGULAR_VELOCITY', 		pi/2, 			... % maximum angular velocity (rad/s)
 	'MIN_ANGULAR_VELOCITY', 		pi/6, 			... % minimum angular velocity (rad/s)
-	'MAX_ANGULAR_VELOCITY', 		pi/2, 			... % maximum angular velocity (rad/s)
 	... % Target parameters
 	'vmax_target', 					10/3.6,		 	... % velocity of target (m/s)
 	... % Consensous parameters	
