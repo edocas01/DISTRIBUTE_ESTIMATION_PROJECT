@@ -64,6 +64,8 @@ classdef ROBOT < matlab.mixin.Copyable
 		volume; 			% volume occupied by the robot
 		vmax; 				% maximum velocity of the robot
 
+        set_distance_radius % for the control
+
 	end
 %{
 
@@ -130,6 +132,9 @@ classdef ROBOT < matlab.mixin.Copyable
 		obj.neighbors = ["init"];
 		obj.voronoi = [];
 		obj.volume = rand() * (param.MAX_VOLUME - param.MIN_VOLUME) + param.MIN_VOLUME;
+
+        % To control if the robot is on the circle of the target
+        obj.set_distance_radius = false;
     end
 
 	     

@@ -19,20 +19,59 @@ function voronoi_map_consensous(param, robots, obstacles)
 			% move the robot j in the closest point to the agent i according to the uncertainty of j
 			z = moving_closer_point(robots{i}.x_est, robots{i}.all_robots_pos(2*j-1:2*j),...
 			robots{i}.all_cov_pos(2*j-1:2*j,2*j-1:2*j), param.coverage);
-			
 			% move the robot j to consider the max uncertainty of i (max semiaxis of i)
 			robots_d = norm(robots{i}.x_est - z);
-			z = z + 2 * max_semiaxis * (robots{i}.x_est - z) / robots_d;		
-			
+			z = z + 2 * max_semiaxis * (robots{i}.x_est - z) / robots_d;	
+
 			robots_d = norm(robots{i}.x_est - z);
 			% if the vmax allows to exit from the "sicure cell" then reduce it of the volume
 			if robots_d/2 < robots{i}.vmax * param.dt + robots{i}.volume
 				z = z + 2 * robots{i}.volume * (robots{i}.x_est - z) / robots_d;
 			end
+
+			% if the point is behind the robot itself, move it in front of the robot of an epsilon
+			if dot((robots{i}.all_robots_pos(2*j-1:2*j) - robots{i}.x_est),(z - robots{i}.x_est)) < 0
+				if param.DEBUG
+					warning("Robotj behind the roboti");
+				end
+				z = robots{i}.x_est + 1e-4 * (robots{i}.all_robots_pos(2*j-1:2*j) - robots{i}.x_est)/norm((robots{i}.all_robots_pos(2*j-1:2*j) - robots{i}.x_est));
+			end
+
 			% create the vector for the voronoi tesselation
 			modified_positions = [modified_positions, z];
+			
 		end
 
+		% add the obstacles for the voronoi tesselation
+		for k = 1:length(obstacles)
+			obstacle = obstacles{k}.x;
+			obstacle_d = norm(robots{i}.x - obstacle);
+				if obstacle_d <= robots{i}.ComRadius
+					% obstacle in robot reference frame
+					obstacle_measure = robots{i}.H * (obstacle - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
+					% obstacle in world frame
+					obstacle_measure = obstacle_measure + robots{i}.H * robots{i}.x_est;
+					obstacle_covariance = robots{i}.R_dist + robots{i}.H * robots{i}.P * robots{i}.H';
+
+					% move the obstacle in the closest point to the agent i according to the uncertainty on the obstacle 
+					z = moving_closer_point(robots{i}.x_est, obstacle_measure, obstacle_covariance, param.coverage);
+					% move the obstacle according to the max uncertainty of i (max semiaxis of i)
+					obstacle_d = norm(robots{i}.x_est - z);
+					z = z + 2 * max_semiaxis * (robots{i}.x_est - z) / obstacle_d;
+					
+					% if the point is behind the robot itself, move it in front of the robot of an epsilon
+					if dot((obstacle_measure - robots{i}.x_est),(z - robots{i}.x_est)) < 0
+						if param.DEBUG
+							warning("Obstacle behind the robot");
+						end
+						z = robots{i}.x_est + 1e-4 * (obstacle_measure - robots{i}.x_est)/norm((obstacle_measure - robots{i}.x_est));
+					end
+
+					% create the vector for the voronoi tesselation
+					modified_positions = [modified_positions, z];
+				end
+		end
+		
 		% Initialization of the variables
 		P = [];
 		vx = [];

@@ -13,8 +13,7 @@ parameters_simulation = struct( ...
 	'dt', 							0.1,    		... % time step
 	'size_map', 					50,  			... % size of the map
 	'N_MAX', 						15,  			... % maximum number of agents
-    'N',                             2,             ... % number of agents
-	'DEBUG', 						false,           ... % Debug flags
+	'DEBUG', 						false,          ... % Debug flags
 	... % Debug flags 	
 	'title_flags', 					false, 			... % to print the central strings
 	... % Robot parameters 	
@@ -23,10 +22,11 @@ parameters_simulation = struct( ...
 	'std_gps', 						1, 				... % standard deviation of the GPS (m)
 	'std_robots_model', 			1, 				... % standard deviation of the robot model (m)
 	'std_relative_sensor', 			0.3,      		... % standard deviation of the relative sensor (m)
-	'MIN_VOLUME',					0.1, 			... % minimum radius of the robot volume (m)
-	'MAX_VOLUME',					0.3, 			... % maximum radius of the robot volume (m)
-	'MIN_LINEAR_VELOCITY', 			20/3.6, 			... % minimum linear velocity (m/s)
+	'MAX_VOLUME',					0.2, 			... % maximum radius of the robot volume (m)
+	'MIN_VOLUME',					0.4, 			... % minimum radius of the robot volume (m)
 	'MAX_LINEAR_VELOCITY', 			50/3.6, 		... % maximum linear velocity (m/s)
+	'MIN_LINEAR_VELOCITY', 			20/3.6, 		... % minimum linear velocity (m/s)
+	'MAX_ANGULAR_VELOCITY', 		pi/2, 			... % maximum angular velocity (rad/s)
 	'MIN_ANGULAR_VELOCITY', 		pi/6, 			... % minimum angular velocity (rad/s)
 	'MAX_ANGULAR_VELOCITY', 		pi/2, 			... % maximum angular velocity (rad/s)
 	... % Target parameters
@@ -37,8 +37,9 @@ parameters_simulation = struct( ...
 	'coverage', 					3, 				... % coverage for the uncertainties 
 	... % Control parameters
 	'DISTANCE_TARGET',				5, 				... % distance from the target (m)
-	'TOLERANCE_DISTANCE', 			0.2 			... % tolerance distance on the circle (m)
+	'TOLERANCE_DISTANCE', 			0 			... % tolerance distance on the circle (m)
 	);
+	parameters_simulation.TOLERANCE_DISTANCE = parameters_simulation.DISTANCE_TARGET*0.5;
 
 % Define the colors in a matrix 15 by 3 (RGB) without red
 color_matrix = [ ...

@@ -11,6 +11,7 @@ addpath('Classes');
 
 % import parameters
 config;
+parameters_simulation.N = 2;
 N = parameters_simulation.N;
 R = cell(N,1);
 range = 3;
@@ -20,7 +21,7 @@ T = TARGET([0; 1]);
 
 % define robots
 R{1} = ROBOT([-2;-1.5], 1, 'linear' ,parameters_simulation);
-R{2} = ROBOT([1.5;-1], 2, 'linear' ,parameters_simulation);
+R{2} = ROBOT([0.8;-1.1], 2, 'linear' ,parameters_simulation);
 
 
 % exchange information
@@ -118,7 +119,7 @@ R{1}.all_cov_pos = zeros(2*N+2);
 R{2}.all_cov_pos = zeros(2*N+2);
 R{1}.P = zeros(2);
 R{2}.P = zeros(2);
-voronoi_map_consensous(parameters_simulation, R, [1,2]);
+voronoi_map_consensous(parameters_simulation, R, []);
 
 plot(R{1}.voronoi, 'FaceAlpha', 0.2, 'FaceColor', [0.5,0,0.0],  'DisplayName','Voronoi 1 without uncertainty/volume');
 plot(R{2}.voronoi, 'FaceAlpha', 0.2, 'FaceColor', [0.7290 0.6940 0.],  'DisplayName','Voronoi 2 without uncertainty/volume');

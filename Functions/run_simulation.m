@@ -1,5 +1,5 @@
 % This function runs the simulation of the robots
-function results = run_simulation(R, T, u_traj, parameters_simulation)
+function results = run_simulation(R, T, O, u_traj, parameters_simulation)
 	Tmax = length(u_traj(1,:));
 	results = cell(1,Tmax);
     
@@ -11,30 +11,35 @@ function results = run_simulation(R, T, u_traj, parameters_simulation)
         relative_general_consensous(R, T, parameters_simulation);
     end
     % Simulation
-
     for t = 1:Tmax
         [circx, circy] = Circle(T.x(1), T.x(2), parameters_simulation.DISTANCE_TARGET);
         
 
         relative_general_consensous(R, T, parameters_simulation);
-        voronoi_map_consensous(parameters_simulation, R, []);
+        voronoi_map_consensous(parameters_simulation, R, O);
         
-        % Saving the results sss
+        % Saving the results
         data.T = copy(T);
         for i = 1:length(R)
             R{i} = copy(R{i});
         end
         data.R = R;
+        
+        position_obstacles = [];
+        for i = 1:length(O)
+            position_obstacles(i,:) = [O{i}.x(1),O{i}.x(2)];
+        end
+        data.O = position_obstacles;
+
 		data.circle_target = [circx;circy];
 		
         for i = 1:parameters_simulation.N
             
-            [u(:,i), barycenter(:,i)] = compute_control(R{i},parameters_simulation); 
-            
-            
-            if i > 1
-                inters = intersect(R{i}.voronoi,R{i-1}.voronoi);
-                if inters.NumRegions > 0 && parameters_simulation.DEBUG
+            [u(:,i), barycenter(:,i)] = compute_control(R{i},parameters_simulation);
+
+            for j = 1:parameters_simulation.N
+                inters = intersect(R{i}.voronoi,R{j}.voronoi);
+                if inters.NumRegions > 0 && parameters_simulation.DEBUG && i~=j
                     warning("Intersection of cells")
                 end
             end

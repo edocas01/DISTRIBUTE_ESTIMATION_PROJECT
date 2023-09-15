@@ -25,13 +25,9 @@ hold off
 
 pause(1)
 
-%% Calculations 
-tic
-
-toc
 %% Animation
 tic
-
+% Before moving
 for i = 1:100
     for j = 1:length(R)
         EKF(R{j},0);
@@ -65,7 +61,7 @@ for t = 1:length(u_traj(1,:))
         if i > 1
             pippo = intersect(R{i}.voronoi,R{i-1}.voronoi);
             if pippo.NumRegions > 0
-                warning("Aoooo")
+                warning("Problemi")
             end
         end
         if i == N
@@ -82,7 +78,7 @@ for t = 1:length(u_traj(1,:))
 	legend show
 	% legend(h, 'Location', 'bestoutside')
     T.dynamics(u_traj(:,t));
-%     T.dynamics([0;0]);
+    % T.dynamics([0;0]);
     pause(0.01)
 end
 % hold off

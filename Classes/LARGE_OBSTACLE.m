@@ -1,5 +1,6 @@
-classdef OBSTACLE < handle
-
+classdef LARGE_OBSTACLE < handle
+% The large obstacle class is defined by a set of vertices:
+% Notice that the last one is connected to the first one
 %{
 
  
@@ -14,7 +15,8 @@ classdef OBSTACLE < handle
 %}
 
 	properties
-		x 				% position of the obstacle
+		x 				% matrix n by 2 vertices of the obstacle
+		poly 			% polyshape of object
 	end
 
 %{
@@ -32,14 +34,11 @@ classdef OBSTACLE < handle
 
 	methods 
 		% Iniatialization of the obstacle
-    	function obj = OBSTACLE(x,y)
-			obj.x = [x;y];
+    	function obj = LARGE_OBSTACLE(x)
+			obj.x = x;
+			obj.poly = polyshape(x(:,1),x(:,2));
     	end
     
-		% Update the position of the obstacle
-		function obj = dynamics(obj, u)
-			obj.x = obj.x + [u(1);u(2)];
-		end
 
 %{
 
@@ -53,9 +52,8 @@ classdef OBSTACLE < handle
  
 
 %}
-        function plot(obj)
-		    plot(obj.x(1), obj.x(2),'sk','HandleVisibility', 'off','MarkerSize', 10,'LineWidth', 2);
-		    hold on;
+      function plot(obj)
+		    plot(obj.poly,'FaceColor','black','FaceAlpha',0.5,'HandleVisibility', 'off')
 	    end
 			
 	end % methods

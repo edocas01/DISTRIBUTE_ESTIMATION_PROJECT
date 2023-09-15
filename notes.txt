@@ -113,7 +113,8 @@ RIDUZIONE TOTALE:
 - NOTA: la cella va sempre ridotta dell'incertezza perchè entra sempre in gioco. Il delta viene considerato
 		solo in relazione a vmax.
 - NOTA: sembra funzionare anche con un fattore di copertura di 1 (anzichè 3)
-
+- NOTA: è sempre necessario avviciniare del doppio del volume/incertezza perché così la cella si riduce esattamente
+		della quantità desiderata. Altrimenti sposterei solo di una parte del mio volume/incertezza.
 Nel report/presentazione far vedere che le zone si intersecano se non consideriamo le incertezze e far vedere
 come dopo le zone sono modificate
 
@@ -122,3 +123,28 @@ RIDURRE IL FIELD OF VIEW DEI ROBOT -> zona di comunicazione è circolare ma i ro
 ---------- INCONTRO CON FONTANELLI 11/05/2023 ----------
 Il distributed kalmann filter si può fare anche se le misure sono correlate, la matrice di covarianza non verrà diagonale.
 La riduzione della cella come avevamo pensato va bene.
+
+-------------------------------------------------------------------------------------------- dopo pausa estate
+
+- sistemare i bug, sistemare voronoi
+	implementare sicurezza su spostamento voronoi -> FATTO
+- sistemare equidistanza tra robot: -> FATTO
+	- vedere come un robot vede gli altri
+	- salvare una possibile traiettoria del target
+- ostacoli (statici e dinamici):
+	- simulare misurazioni di ostacoli, introdurli in voronoi -> FATTO
+- TODO:
+	- quando un robot si incaglia, potremmo fargli seguire la traiettoria del target
+	- ostacoli come pareti:
+		a differenza degli ostacoli puntuali (che possono anche muoversi ed in quel caso ci sta fare voronoi per essere più conservativi) le pareti
+		possono essere trattate semplicemente considerando che un robot nel caso vi si avvicini, riduca la sua cella quel tanto che basta da non toccarla.
+	- creare ostacolo -> initialize_env
+	- Note: se un ostacolo è fuori dalla cella di voronoi è inutile considerarlo
+	- se non ho vertici dentro la mia cella devo eliminare tutto ciò che sta dietro le intersezioni:
+		- prendo le intersezioni a due a due e vedo se sono visibili
+		- quelle visibili le uso per creare una zona da eliminare
+	- seleziono i punti che sono in voronoi e che vedo
+	- prendo i punti a due a due, "giuntando" i punti tolti
+	- se oggetto è parzialmente visibile, gli estremi di questi segmenti se sono collegati ad una intersezione
+		- non visibile ho già fatto, altrimenti li collego con le intersezioni (e le sposto) ed elimino il nuovo settore
+- dinamica non lineare
