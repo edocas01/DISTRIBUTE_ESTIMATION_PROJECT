@@ -100,8 +100,11 @@ if ~isempty(intersection) % there is intersection
 		for i = 1:length(region_to_delete)
 			poly_voronoi = subtract(poly_voronoi, region_to_delete{i});
 		end
-		figure(2);
+		clf;
+		hold on;
+		grid on;
 		axis equal;
+		axis(10 * [-1 1 -1 1]);
 		plot(poly_voronoi)
 	else
 
