@@ -139,12 +139,19 @@ La riduzione della cella come avevamo pensato va bene.
 		a differenza degli ostacoli puntuali (che possono anche muoversi ed in quel caso ci sta fare voronoi per essere più conservativi) le pareti
 		possono essere trattate semplicemente considerando che un robot nel caso vi si avvicini, riduca la sua cella quel tanto che basta da non toccarla.
 	- creare ostacolo -> initialize_env
-	- Note: se un ostacolo è fuori dalla cella di voronoi è inutile considerarlo
-	- se non ho vertici dentro la mia cella devo eliminare tutto ciò che sta dietro le intersezioni:
-		- prendo le intersezioni a due a due e vedo se sono visibili
-		- quelle visibili le uso per creare una zona da eliminare
-	- seleziono i punti che sono in voronoi e che vedo
-	- prendo i punti a due a due, "giuntando" i punti tolti
-	- se oggetto è parzialmente visibile, gli estremi di questi segmenti se sono collegati ad una intersezione
-		- non visibile ho già fatto, altrimenti li collego con le intersezioni (e le sposto) ed elimino il nuovo settore
-- dinamica non lineare
+	- Note: 
+		- ostacolo senza vertici visibili nella cella: prendiamo intersezioni visibili e rimuovo ciò che sta dietro (sono per forza in coppia)
+		- ostacolo con vertici visibili nella cella:
+			- seleziono punti visibili (e creo intersezioni nel caso di "rotture della catena")
+				l'intersezione deve essere un punto che appartiene alla cella di voronoi e "visibile" -> FATTO
+			- ordino i punti in senso antiorario (non ci possono essere problemi di sovraposizione)
+			- prendo i punti a due a due e rimuovo la parte di ostacolo dietro 
+
+	- spostare ostacoli "mobili" del volume del robot
+	- LO:
+		- simulare le misure sui punti
+		- spostare i punti in base alle incertezze/volumi
+		- controlli:
+			- se due punti hanno lo stesso angolo quello più lontano deve rimanere tale
+			- i punti non posso superare il robot
+			
