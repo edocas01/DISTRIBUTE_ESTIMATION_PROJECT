@@ -67,7 +67,7 @@ if ~isempty(intersection) % there is intersection
 
 	% if there are no visible vertices of the obstacle inside the cell
 	if isempty(visible_points)
-		intersection = [];
+		intersection_voronoi = [];
 		index = 0;
 		% find visible intersection:
 		% find the intersection between the obstacle and the voronoi cell
@@ -76,20 +76,47 @@ if ~isempty(intersection) % there is intersection
 		% add the first vertex at the end to close the polygon
 		LO_vertices = LO_vertices([1:N_vertices,1],:);
 		for i = 1:N_vertices
-			intersection = linexlines2D(poly_voronoi, LO_vertices(i,:), LO_vertices(i+1,:));
-            plot(intersection(1,:),intersection(2,:),'og','MarkerFaceColor','g');
-			% if the are intersections between the obstacle and the voronoi cell the delete the area behind
-			if (~isempty(intersection))
+			intersection_voronoi = linexlines2D(poly_voronoi, LO_vertices(i,:), LO_vertices(i+1,:)); % output given by column
+			% check if the intersection_voronoi is visible:
+			% notice that the function linexlines2D returns the intersection between the voronoi cell and the obstacle but the 
+			% output points are an approximation of the real ones.
+			% So in order to verify if such points are visible or not we remove from the function "intersect" the points that may be 
+			% equal the one given by the function linexlines2D
+			visible_intersection = [];
+			for k = 1:size(intersection_voronoi,2)
+				intersection_obstacle = intersect(LO.poly, [0,0;intersection_voronoi(1,k), intersection_voronoi(2,k)]); % output given by row
+				distances = sum(abs(intersection_obstacle - [intersection_voronoi(1,k), intersection_voronoi(2,k)]).^2,2).^0.5;
+				intersection_obstacle(distances < 1e-4,:) = [];
+				% If after removing "itself" there are still intesections with the obstacle then the intersection with voronoi is not visible
+				% and then we proced with the reduction of the cell
+				if isempty(intersection_obstacle)
+					visible_intersection = [visible_intersection, intersection_voronoi(:,k)]; % output given by column
+					plot(intersection_voronoi(1,k),intersection_voronoi(2,k),'og','MarkerFaceColor','g');
+				end
+			end
+			% if the are visible intersections between the obstacle and the voronoi cell the delete the area behind
+			if (~isempty(visible_intersection))
+				if size(visible_intersection,2) ~= 2
+					error("Problem with intersections between the obstacle and the voronoi cell");
+				end
 				index = index + 1;
                 points_to_delete = [];
-				% define an area to delete
-				for j = 1:size(intersection,1)
-					dir = intersection(:,j) - [0;0];
-					dir = dir/norm(dir);
-					% create a point 1000 meters behind the intersection
-					points_to_delete = [points_to_delete, [intersection(:,j) + 1000*dir , intersection(:,j)]];
-                end
-                plot(points_to_delete(1,:),points_to_delete(2,:),'ok');
+
+				% TODO: move the intersections accordingly to the uncertainties
+
+				% define an area to delete for the first point
+				dir = visible_intersection(:,1) - [0;0];
+				dir = dir/norm(dir);
+				% create a point 1000 meters behind the intersection
+				points_to_delete = [points_to_delete, [visible_intersection(:,1) + 1000*dir , visible_intersection(:,1)]]; % matrix 2 by n
+                
+				% define an area to delete for the second point
+				dir = visible_intersection(:,2) - [0;0];
+				dir = dir/norm(dir);
+				% create a point 1000 meters behind the intersection
+				points_to_delete = [points_to_delete, [visible_intersection(:,2) + 1000*dir , visible_intersection(:,2)]];
+
+				plot(points_to_delete(1,:),points_to_delete(2,:),'ok');
 				% reorder the points to delete and create a polyshape
                 points_to_delete = points_to_delete(:,convhull(points_to_delete'));
 				region_to_delete{index} = polyshape(points_to_delete(1,:),points_to_delete(2,:));
