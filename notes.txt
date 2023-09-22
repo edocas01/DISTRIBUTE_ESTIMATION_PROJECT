@@ -139,12 +139,34 @@ La riduzione della cella come avevamo pensato va bene.
 		a differenza degli ostacoli puntuali (che possono anche muoversi ed in quel caso ci sta fare voronoi per essere più conservativi) le pareti
 		possono essere trattate semplicemente considerando che un robot nel caso vi si avvicini, riduca la sua cella quel tanto che basta da non toccarla.
 	- creare ostacolo -> initialize_env
-	- Note: se un ostacolo è fuori dalla cella di voronoi è inutile considerarlo
-	- se non ho vertici dentro la mia cella devo eliminare tutto ciò che sta dietro le intersezioni:
-		- prendo le intersezioni a due a due e vedo se sono visibili
-		- quelle visibili le uso per creare una zona da eliminare
-	- seleziono i punti che sono in voronoi e che vedo
-	- prendo i punti a due a due, "giuntando" i punti tolti
-	- se oggetto è parzialmente visibile, gli estremi di questi segmenti se sono collegati ad una intersezione
-		- non visibile ho già fatto, altrimenti li collego con le intersezioni (e le sposto) ed elimino il nuovo settore
-- dinamica non lineare
+	- Note: 
+		- ostacolo senza vertici visibili nella cella: prendiamo intersezioni visibili e rimuovo ciò che sta dietro (sono per forza in coppia)
+		- ostacolo con vertici visibili nella cella:
+			- seleziono punti visibili (e creo intersezioni nel caso di "rotture della catena")
+				l'intersezione deve essere un punto che appartiene alla cella di voronoi e "visibile" -> FATTO
+			- ordino i punti in senso antiorario (non ci possono essere problemi di sovraposizione)
+			- prendo i punti a due a due e rimuovo la parte di ostacolo dietro 
+
+	- spostare ostacoli "mobili" del volume del robot
+	- LO:
+		- simulare le misure sui punti
+		- spostare i punti in base alle incertezze/volumi
+		- controlli:
+			- se due punti hanno lo stesso angolo quello più lontano deve rimanere tale
+			- i punti non posso superare il robot
+			
+
+IDEE: negli LO i punti di proiezione che cadono al limite della cella di voronoi o le intersezioni tra ostacolo e cella di voronoi vanno davvero
+		spostate per le incertezze? Perchè tanto se non è un vertice effettivo del LO allora non è un punto reale di spigolo dell'ostacolo.
+		Forse si puo fare questo ragionamento solo con la proiezione che cade al limite di voronoi (con le intersezioni si perche effettivamente è un punto reale?)
+		Sennò per "sicurezza" spostiamo tutto.
+
+PROBLEMS: 
+	- ordini degli angoli problemi quello che diceva max di angoli negativi (se il primo angolo è negativo) -> (FIXED line 176?)
+		- quando controllo i punti a due a due se dietro ho punti dell' ostacolo allora rimuovo ma se dietro non ho nulla proseguo (il primo va messo per ultimo):
+			per vedere se non ho nulla dietro basta che prendo un punto quasi sul segmento che congiunge i due punti (dalla parte opposta rispetto al robot) e vedo se è dentro l'ostacolo
+	- se ho due intersezioni con voronoi vicine allora non faccio niente tra quei due punti (tanto è limitato da voronoi)
+	- ordini dei punti quando l'angolo è uguale
+	- ogni tanto quando l'ostacolo è completamente dentro ci sono problemi con le proiezioni che sembrano essere visibili ma non lo sono (FIXED line 210)
+
+Quando ci sarà la dinamica non lineare bisogna fare partire l'angolo dal sistema di riferimento del robot (FORSE)
