@@ -233,6 +233,7 @@ if ~isempty(intersection) % there is intersection
 			end
 		end
 		plot(visible_points(:,1), visible_points(:,2), 'or');
+		% TODO: move the intersections accordingly to the uncertainties
 	end
 end
 % 		% find, if any, the intersection between the obstacle and the voronoi cell
