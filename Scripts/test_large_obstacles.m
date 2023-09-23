@@ -180,19 +180,44 @@ if ~isempty(intersection) % there is intersection
 					end
 					distance = norm(LO_vertices_copy(i,1:2));
 					th = 1e-10;
-					distance = distance + th;
 					% create a new ideal point with a small different angle, if it is inside the obstacle, then move the angle on the other side
-					% if the "problem" is after then add a small angle, otherwise subtract it
-					if prev_point(3) == 0
-						angle = angle - th;
-					elseif next_point(3) == 0
-						angle = angle + th;
-					elseif prev_point(3) == -1
-						angle = angle - th;
-					elseif next_point(3) == -1
-						angle = angle + th;
+					% plot(LO_vertices_copy(i,1),LO_vertices_copy(i,2),'*k');
+                    ideal_point_1 = [distance*cos(angle - th), distance*sin(angle - th)];
+					id_1 = ideal_point_1;
+					% plot(ideal_point_1(1), ideal_point_1(2), 'ob');
+					ideal_point_1 = ideal_point_1 + 1000*(ideal_point_1 - [0,0])/norm(ideal_point_1 - [0,0]);
+					% plot(ideal_point_1(1), ideal_point_1(2), 'ob');
+					intersection_1 = intersect(LO.poly, [0,0;ideal_point_1]); % output given by row
+					distances = sum(abs(intersection_1 - [0,0]).^2,2).^0.5;
+					[~,index] = min(distances);
+					if ~isempty(intersection_1)
+						intersection_1 = intersection_1(index,:);
 					end
-					ideal_point = [distance*cos(angle), distance*sin(angle)];
+					% plot(intersection_1(1), intersection_1(2), 'ob');
+					ideal_point_2 = [distance*cos(angle + th), distance*sin(angle + th)];
+					id_2 = ideal_point_2;
+					% plot(ideal_point_2(1), ideal_point_2(2), 'or');
+					ideal_point_2 = ideal_point_2 + 1000*(ideal_point_2 - [0,0])/norm(ideal_point_2 - [0,0]);
+					% plot(ideal_point_2(1), ideal_point_2(2), 'or');
+					intersection_2 = intersect(LO.poly, [0,0;ideal_point_2]); % output given by row
+					distances = sum(abs(intersection_1 - [0,0]).^2,2).^0.5;
+					[~,index] = min(distances);
+					if ~isempty(intersection_2)
+						intersection_2 = intersection_2(index,:);
+					end
+					% plot(intersection_2(1), intersection_2(2), 'or');
+					% take the largest ideal point
+					if ~isempty(intersection_1) && ~isempty(intersection_2)
+						if norm(intersection_1) < norm(intersection_2)
+							ideal_point = id_2;
+						else
+							ideal_point = id_1;
+						end
+					else
+						ideal_point = LO_vertices_copy(i,1:2);
+						% plot(ideal_point(1), ideal_point(2), 'og');
+					end
+
 					% elongate the visible point to find intersections
 					elongated_point = ideal_point(1:2) + 1000*(ideal_point(1:2) - [0,0])/norm(ideal_point(1:2) - [0,0]);
 					% find the projection point
@@ -290,6 +315,7 @@ if ~isempty(intersection) % there is intersection
 		% copy the first point at the end to close the polygon
 		visible_points = [visible_points; visible_points(1,:)];
         points_to_delete = [];
+		index = 1;
 		for i = 1:size(visible_points,1)-1
 			% if two consecutive points are on the edge then do nothing
 			if visible_points(i,3) == 1 && visible_points(i+1,3) == 1
@@ -313,7 +339,9 @@ if ~isempty(intersection) % there is intersection
 
 				% reorder the points to delete and create a polyshape
 				points_to_delete = points_to_delete(convhull(points_to_delete(:,1:2)),1:2);
-				region_to_delete{i} = polyshape(points_to_delete(:,1),points_to_delete(:,2));
+				region_to_delete{index} = polyshape(points_to_delete(:,1),points_to_delete(:,2));
+				plot(region_to_delete{index});
+				index = index + 1;
 				continue;
 			end
 
@@ -337,16 +365,16 @@ if ~isempty(intersection) % there is intersection
 
 				% reorder the points to delete and create a polyshape
 				points_to_delete = points_to_delete(convhull(points_to_delete(:,1:2)),1:2);
-				region_to_delete{i} = polyshape(points_to_delete(:,1),points_to_delete(:,2));
+				region_to_delete{index} = polyshape(points_to_delete(:,1),points_to_delete(:,2));
+				plot(region_to_delete{index});
+				index = index + 1;
             end
 
 		end
 	end
     % delete the area behind the intersection
 	for i = 1:length(region_to_delete)
-        if ~isempty(region_to_delete{i})
-		    poly_voronoi = subtract(poly_voronoi, region_to_delete{i});
-    	end
+		poly_voronoi = subtract(poly_voronoi, region_to_delete{i});
     end
 	
 end
@@ -371,11 +399,12 @@ end
 % 	end
 % end
 
-clf;
+figure(2);
 hold on;
 grid on;
 axis equal;
 axis(10 * [-1 1 -1 1]);
 plot(poly_voronoi)
+
 LO.plot();
 
