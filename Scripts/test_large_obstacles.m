@@ -21,6 +21,7 @@ axis equal;
 axis(10 * [-1 1 -1 1]);
 
 plot(poly_voronoi)
+plot(0,0,'*k');
 
 while true
 	
@@ -46,7 +47,6 @@ axis equal;
 axis(10 * [-1 1 -1 1]);
 LO.plot();
 plot(poly_voronoi)
-plot(0,0,'*k');
 
 
 
@@ -145,14 +145,15 @@ if ~isempty(intersection) % there is intersection
 
 	else % THERE ARE VISIBLE VERTICES OF THE OBSTACLE INSIDE THE VORONOI CELL
 		
-		% projection_points 
+		% projection_points is a matrix that contains the projection of the visible vertices of the obstacle on the obstacle itself
+		% since the projection point comes from a visible vertex then they have the same angle. To avoid problem on that
+		% the third column of the matrix is a flag to reconstruct the order of the points.
 		%{
-		|x  | y | tag |
-		| - | - | preced |
-		| - | - |  succ|
-		| - | - |  0
-		|- -| - |  0
-		|
+		projection_points:
+		| x  | y | tag  |
+		| -  | - | 100  | this point has to go after the associated visible vertex
+		| -  | - | -100 | this point has to go before the associated visible vertex
+		| -  | - | 0    | this means that the projection point is the point itself (there are not other points with the same angle)
 		%}
 
 		prev_point = [];
@@ -174,9 +175,8 @@ if ~isempty(intersection) % there is intersection
 				end
 				% find the projection point if either the previous or the next point is not visible
 				if (prev_point(3) == 0 || next_point(3) == 0 || prev_point(3) == -1 || next_point(3) == -1)
-
-					% trovare proiezione ideale e mettere flag prima o dopo 
-
+					% String to verify the order of the angle
+					order = -1;
 					% check the angle in order to find the projection point (and give it a slightly different angle)
 					angle = atan2(LO_vertices_copy(i,2), LO_vertices_copy(i,1));
 					% if the angle is negative then add 2*pi
@@ -185,55 +185,60 @@ if ~isempty(intersection) % there is intersection
 					end
 					distance = norm(LO_vertices_copy(i,1:2));
 					th = 1e-10;
-					% create a new ideal point with a small different angle, if it is inside the obstacle, then move the angle on the other side
-					% plot(LO_vertices_copy(i,1),LO_vertices_copy(i,2),'*k');
-                    ideal_point_1 = [distance*cos(angle - th), distance*sin(angle - th)];
-					id_1 = ideal_point_1;
-					% plot(ideal_point_1(1), ideal_point_1(2), 'ob');
-					ideal_point_1 = ideal_point_1 + 1000*(ideal_point_1 - [0,0])/norm(ideal_point_1 - [0,0]);
-					% plot(ideal_point_1(1), ideal_point_1(2), 'ob');
-					intersection_1 = intersect(LO.poly, [0,0;ideal_point_1]); % output given by row
-					distances = sum(abs(intersection_1 - [0,0]).^2,2).^0.5;
-					[~,index] = min(distances);
-					if ~isempty(intersection_1)
-						intersection_1 = intersection_1(index,:);
-					end
-					% plot(intersection_1(1), intersection_1(2), 'ob');
-					ideal_point_2 = [distance*cos(angle + th), distance*sin(angle + th)];
-					id_2 = ideal_point_2;
-					% plot(ideal_point_2(1), ideal_point_2(2), 'or');
-					ideal_point_2 = ideal_point_2 + 1000*(ideal_point_2 - [0,0])/norm(ideal_point_2 - [0,0]);
-					% plot(ideal_point_2(1), ideal_point_2(2), 'or');
-					intersection_2 = intersect(LO.poly, [0,0;ideal_point_2]); % output given by row
-					distances = sum(abs(intersection_1 - [0,0]).^2,2).^0.5;
-					[~,index] = min(distances);
-					if ~isempty(intersection_2)
-						intersection_2 = intersection_2(index,:);
-					end
-					% plot(intersection_2(1), intersection_2(2), 'or');
-					% take the largest ideal point
-					if ~isempty(intersection_1) && ~isempty(intersection_2)
-						if norm(intersection_1) < norm(intersection_2)
-							ideal_point = id_2;
-						else
-							ideal_point = id_1;
+					% create a new ideal point with a small different angle
+                    ideal_point_min = [distance*cos(angle - th), distance*sin(angle - th)];
+					ideal_point_plus = [distance*cos(angle + th), distance*sin(angle + th)];
+					visible_point_min = intersect(LO.poly, [0,0;ideal_point_min]); % output given by row
+					visible_point_plus = intersect(LO.poly, [0,0;ideal_point_plus]); % output given by row
+
+					% If a point is visible and the other not then the correct one is the visible one
+					% In the other cases we have to check the projections
+					if isempty(visible_point_min) && ~isempty(visible_point_plus) % only the min is visible
+						order = -100;
+					elseif ~isempty(visible_point_min) && isempty(visible_point_plus) % only the plus is visible
+						order = 100;
+					else % both are visible
+						% find the two projection points and take the farthest one 
+						% min
+						ideal_point_min = ideal_point_min + 1000*(ideal_point_min - [0,0])/norm(ideal_point_min - [0,0]);
+						intersection_min = intersect(LO.poly, [0,0;ideal_point_min]); % output given by row
+						distances = sum(abs(intersection_min - [0,0]).^2,2).^0.5;
+						[~,index] = min(distances);
+						if ~isempty(intersection_min)
+							intersection_min = intersection_min(index,:);
 						end
-					else
-						ideal_point = LO_vertices_copy(i,1:2);
-						% plot(ideal_point(1), ideal_point(2), 'og');
+						% plus
+						ideal_point_plus = ideal_point_plus + 1000*(ideal_point_plus - [0,0])/norm(ideal_point_plus - [0,0]);
+						intersection_plus = intersect(LO.poly, [0,0;ideal_point_plus]); % output given by row
+						distances = sum(abs(intersection_min - [0,0]).^2,2).^0.5;
+						[~,index] = min(distances);
+						if ~isempty(intersection_plus)
+							intersection_plus = intersection_plus(index,:);
+						end
+						
+						% take the farthest projection point
+						if ~isempty(intersection_min) && ~isempty(intersection_plus)
+							if norm(intersection_min) < norm(intersection_plus)
+								order = 100;
+							else
+								order = -100;
+							end
+						else
+							order = 0;
+						end
 					end
 
+					% generate the projection point accordingly to the order
 					% elongate the visible point to find intersections
-					elongated_point = ideal_point(1:2) + 1000*(ideal_point(1:2) - [0,0])/norm(ideal_point(1:2) - [0,0]);
+					elongated_point = LO_vertices_copy(i,1:2) + 1000*(LO_vertices_copy(i,1:2) - [0,0])/norm(LO_vertices_copy(i,1:2) - [0,0]);
 					% find the projection point
 					intersections_obstacle = intersect(LO.poly, [0,0;elongated_point]); % output given by row
 					% remove the visible point itself from the intersection
-					intersections_obstacle = intersections_obstacle(sum(abs(intersections_obstacle - ideal_point(1:2)).^2,2).^0.5 > 1e-4, :);
+					intersections_obstacle = intersections_obstacle(sum(abs(intersections_obstacle - LO_vertices_copy(i,1:2)).^2,2).^0.5 > 1e-4, :);
 					% select the visible intersection
 					distances = sum(abs(intersections_obstacle - [0,0]).^2,2).^0.5;
 					[~,index] = min(distances);
 					intersections_obstacle = intersections_obstacle(index,:);
-					
 					% check if it is really visible
 					% Check if a point between the projection point and the hiding point is inside the obstacle
 					% If yes, then the projection point is not visible
@@ -244,27 +249,11 @@ if ~isempty(intersection) % there is intersection
 						inpolygon_ideal_point = inpolygon(ideal_point(1), ideal_point(2), LO.poly.Vertices(:,1), LO.poly.Vertices(:,2));
 						if inpolygon_ideal_point
 							% if the ideal point is inside the obstacle then the projection point is not visible
-							intersections_obstacle = [];							
+							continue;							
+						else
+							projection_points = [projection_points; [intersections_obstacle, order]];
 						end
 					end
-					
-					% % check if the projection point is inside the voronoi cell
-					% intersection_voronoi = intersect(poly_voronoi, [0,0;elongated_point]); % output given by row
-					% % remove the robot position itself from the intersection
-					% intersection_voronoi = intersection_voronoi(sum(abs(intersection_voronoi - [0,0]).^2,2).^0.5 > 1e-4, :);
-
-					% if ~isempty(intersections_obstacle)
-					% 	if (norm(intersection_voronoi - [0;0]) < norm(intersections_obstacle - [0;0]))
-					% 		% add the point only if it is outside the obstacle
-					% 		if ~inpolygon(intersection_voronoi(1), intersection_voronoi(2), LO.poly.Vertices(:,1), LO.poly.Vertices(:,2))
-					% 			projection_points = [projection_points; [intersection_voronoi,1]];
-					% 		end
-					% 	else
-					% 		projection_points = [projection_points; [intersections_obstacle, 0]];
-							
-					% 	end	
-                    % end
-                    
 				end
 			end
 		end
@@ -289,76 +278,67 @@ if ~isempty(intersection) % there is intersection
 				% If after removing "itself" there are still intesections with the obstacle then the intersection with voronoi is not visible
 				% and then we proced with the reduction of the cell
 				if isempty(intersection_obstacle)
-					% IL FLAG 1 non serve a niente
-					visible_intersection = [visible_intersection; [intersection_voronoi(:,k)',1]]; % output given by row
+					visible_intersection = [visible_intersection; [intersection_voronoi(:,k)',0]]; % output given by row
 				end
 			end
 		end
-		% join the matrices with: intersections btween voronoi and the obstacle, projections and visible vertices
-		% GLI UNICI FLAG SONO QUELLI DELLE PROIEZIONI PER ORDINARE I PUNTI
+		% join the matrices with: intersections between voronoi and the obstacle, projections and visible vertices
 		visible_points = [visible_intersection; projection_points; [LO_vertices_copy(LO_vertices_copy(:,3) == 1, 1:2), zeros(size(LO_vertices_copy(LO_vertices_copy(:,3) == 1, 1:2),1),1)]];
 
-		% order the points in anticlockwise order (if two points have the same angle then the closest one is the first)
+		% order the points in anticlockwise order (if two points have the same angle then take the one accordingly to the flag)
 		angles = atan2(visible_points(:,2), visible_points(:,1));
 		% if an angle is negative then add 2*pi
 		angles(angles < 0) = angles(angles < 0) + 2*pi;
 		[~,index] = sort(angles);
-		angle = angles(index);
+		angles = angles(index);
 		visible_points = visible_points(index,:);
-		for i = 1:size(visible_points,1)
-			if visible_points(i,3) == 1 % on the edge
-				plot(visible_points(i,1), visible_points(i,2), 'or');
-			else
-				plot(visible_points(i,1), visible_points(i,2), 'ob');
-			end
+		for i = 1:size(visible_points,1)-1
+			if abs(angles(i) - angles(i+1)) < 1e-5
+				flag_i = visible_points(i,3);
+				flag_i1 = visible_points(i+1,3);
+				if flag_i == 0 && flag_i1 == 0
+					error("Problem in the order of the points");
+				elseif ((flag_i == 0 && flag_i1 == 100) || (flag_i == -100 && flag_i1 == 0))
+					continue;
+				elseif ((flag_i == 0 && flag_i1 == -100) || (flag_i == 100 && flag_i1 == 0))
+					tmp = visible_points(i+1,:);
+					visible_points(i+1,:) = visible_points(i,:);
+					visible_points(i,:) = tmp;
+				end
+			end			
 		end
+
+		for i = 1:size(visible_points,1)
+			plot(visible_points(i,1), visible_points(i,2), 'or');
+		end
+		% remove the third column
+		visible_points = visible_points(:,1:2);
+
 		% TODO: move the intersections accordingly to the uncertainties
 
 		% test the points 2 by 2
-		% if two points have more or less the same angle then remove the area in every case
-		% if two consecutive points are on the edge then do nothing
+		% if two points have more or less the same angle then do nothing
 		% if two consecutive points "behind" them have not the obstacle then do nothing
-		
 		% copy the first point at the end to close the polygon
 		visible_points = [visible_points; visible_points(1,:)];
         points_to_delete = [];
 		index = 1;
 		for i = 1:size(visible_points,1)-1
-			% IMPLEMENTARE IL CONTROLLO NUOVO 
-			% % if two consecutive points are on the edge then do nothing
-			% if visible_points(i,3) == 1 && visible_points(i+1,3) == 1
-			% 	continue;
-			% end
 			% if two points have more or less the same angle then remove the area in every case
 			angle_i = atan2(visible_points(i,2), visible_points(i,1));
 			angle_i1 = atan2(visible_points(i+1,2), visible_points(i+1,1));
-			% if abs(angle_i - angle_i1) < 1e-4 % NON ELIMINO PIU PERCHE SONO LO STESSO ANGOLO
-			% 	% define an area to delete for the first point
-			% 	dir = visible_points(i,1:2) - [0,0];
-			% 	dir = dir/norm(dir);
-			% 	% create a point 1000 meters behind the intersection
-			% 	points_to_delete = [visible_points(i,1:2) + 1000*dir ; visible_points(i,1:2)]; % matrix 2 by n
-
-			% 	% define an area to delete for the second point
-			% 	dir = visible_points(i+1,1:2) - [0,0];
-			% 	dir = dir/norm(dir);
-			% 	% create a point 1000 meters behind the intersection
-			% 	points_to_delete = [points_to_delete; [visible_points(i+1,1:2) + 1000*dir ; visible_points(i+1,1:2)]];
-
-			% 	% reorder the points to delete and create a polyshape
-			% 	points_to_delete = points_to_delete(convhull(points_to_delete(:,1:2)),1:2);
-			% 	region_to_delete{index} = polyshape(points_to_delete(:,1),points_to_delete(:,2));
-			% 	plot(region_to_delete{index});
-			% 	index = index + 1;
-			% 	continue;
-			% end
+			if abs(angle_i - angle_i1) < 1e-4
+				continue;
+			end
 
 			% if two consecutive points "behind" them have not the obstacle then do nothing
-			% create an ideal point in the middle of the two points but on the other side with respect to the robot
-			% NUOVO CONTROLLO 
-			ideal_point = (visible_points(i,1:2) + visible_points(i+1,1:2))/2;
-			dir = (ideal_point - [0,0])/norm(ideal_point);
-			ideal_point = ideal_point + 1e-4*dir;
+			% create an ideal point in the "middle" of the two points but on the other side with respect to the robot 
+
+			dir = (visible_points(i+1,:) - visible_points(i,:))/norm(visible_points(i+1,:) - visible_points(i,:));
+			ideal_point = visible_points(i,:) + 1e-3*dir;
+			% move the point a little bit further to the robot
+			ideal_point = ideal_point + 1e-7*(ideal_point - [0,0])/norm(ideal_point - [0,0]);
+
 			if inpolygon(ideal_point(1),ideal_point(2),LO.poly.Vertices(:,1),LO.poly.Vertices(:,2))
 				% define an area to delete for the first point
 				dir = visible_points(i,1:2) - [0,0];
@@ -388,25 +368,6 @@ if ~isempty(intersection) % there is intersection
 	
 end
 
-% 		% find, if any, the intersection between the obstacle and the voronoi cell
-% 		intersection = [];
-%         pp = [];
-% 		LO_vertices = LO.poly.Vertices;
-% 		N_vertices = size(LO_vertices,1);
-% 		% add the first vertex at the end to close the polygon
-% 		LO_vertices = LO_vertices([1:N_vertices,1],:);
-% 		for i = 1:N_vertices
-% 			intersection = linexlines2D(poly_voronoi, LO_vertices(i,:), LO_vertices(i+1,:));
-% 			pp = [pp, intersection];
-%             plot(intersection(1,:),intersection(2,:),'og','MarkerFaceColor','g');
-% 		end
-        
-% 		for i = 1:size(visible_points,1)
-% 			plot(visible_points(i,1), visible_points(i,2), 'or');
-%             pp = [pp, visible_points(i,:)'];
-% 		end
-% 	end
-% end
 
 figure(2);
 hold on;
