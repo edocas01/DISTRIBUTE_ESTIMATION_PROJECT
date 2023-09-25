@@ -51,8 +51,8 @@ plot(0,0,'*k');
 
 
 % check if the obstacle is inside the voronoi cell
-count_visible_points = 0;
-intersection = intersect(LO.poly, poly_voronoi);
+count_visible_points = 0; % in order to se if there are visible vertices of the obstacle inside the voronoi cell
+intersection = intersect(LO.poly, poly_voronoi); % find if there is an overlap between the obstacle and the voronoi cell
 LO_vertices_copy = LO.x; % This matrix has on the third column a 1 if the vertex is visible and 0 otherwise
 LO_vertices_copy(:,3) = -1; % -1 means that the vertex is outside the voronoi cell
 
@@ -84,8 +84,8 @@ if ~isempty(intersection) % there is intersection
 	if count_visible_points == 0 
 		intersection_voronoi = [];
 		index = 0;
-		% find visible intersection:
 		% find the intersection between the obstacle and the voronoi cell
+		% find visible intersection:
 		LO_vertices = LO.poly.Vertices;
 		N_vertices = size(LO_vertices,1);
 		% add the first vertex at the end to close the polygon
@@ -106,10 +106,10 @@ if ~isempty(intersection) % there is intersection
 				% and then we proced with the reduction of the cell
 				if isempty(intersection_obstacle)
 					visible_intersection = [visible_intersection, intersection_voronoi(:,k)]; % output given by column
-					plot(intersection_voronoi(1,k),intersection_voronoi(2,k),'og','MarkerFaceColor','g');
+					% plot(intersection_voronoi(1,k),intersection_voronoi(2,k),'og','MarkerFaceColor','g');
 				end
 			end
-			% if the are visible intersections between the obstacle and the voronoi cell the delete the area behind
+			% if the are visible intersections between the obstacle and the voronoi cell then delete the area behind
 			if (~isempty(visible_intersection))
 				if size(visible_intersection,2) ~= 2
 					error("Problem with intersections between the obstacle and the voronoi cell");
@@ -141,18 +141,20 @@ if ~isempty(intersection) % there is intersection
 			poly_voronoi = subtract(poly_voronoi, region_to_delete{i});
 		end
 	
-	% THERE ARE VISIBLE VERTICES OF THE OBSTACLE INSIDE THE VORONOI CELL 
-	% Since in the last passage the points have to be taken 2 by 2, we have to keep track if the points belong to the edge of the voronoi cell
-	% (if two consecutive points are on the edge we have to do nothing)
+		
+			 
 
-	%{
-	visible points:
-	x | y | tag
-	- | - | 0 -> point inside the voronoi cell
-	- | - | 1 -> point on the edge of the voronoi cell
-	%}
-
-	else
+	else % THERE ARE VISIBLE VERTICES OF THE OBSTACLE INSIDE THE VORONOI CELL
+		
+		% Since in the last passage the points have to be taken 2 by 2, we have to keep track if the points belong to the edge of the voronoi cell
+		% (if two consecutive points are on the edge we have to do nothing)
+		
+		%{
+			visible points:
+			x | y | tag
+			- | - | 0 -> point inside the voronoi cell
+			- | - | 1 -> point on the edge of the voronoi cell
+		%}
 		prev_point = [];
 		next_point = [];
 		projection_points = [];

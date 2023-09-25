@@ -156,10 +156,7 @@ La riduzione della cella come avevamo pensato va bene.
 			- i punti non posso superare il robot
 			
 
-IDEE: negli LO i punti di proiezione che cadono al limite della cella di voronoi o le intersezioni tra ostacolo e cella di voronoi vanno davvero
-		spostate per le incertezze? Perchè tanto se non è un vertice effettivo del LO allora non è un punto reale di spigolo dell'ostacolo.
-		Forse si puo fare questo ragionamento solo con la proiezione che cade al limite di voronoi (con le intersezioni si perche effettivamente è un punto reale?)
-		Sennò per "sicurezza" spostiamo tutto.
+
 
 PROBLEMS: 
 	- ordini degli angoli problemi quello che diceva max di angoli negativi (se il primo angolo è negativo) -> (FIXED line 176?)
@@ -168,5 +165,10 @@ PROBLEMS:
 	- se ho due intersezioni con voronoi vicine allora non faccio niente tra quei due punti (tanto è limitato da voronoi)
 	- ordini dei punti quando l'angolo è uguale
 	- ogni tanto quando l'ostacolo è completamente dentro ci sono problemi con le proiezioni che sembrano essere visibili ma non lo sono (FIXED line 210)
+
+	- se due angoli sono molto simili mi trovo la proiezione vera e tra quei due punti non devo eliminare nulla
+	- per evitare problemi nel punto intermedio lo mettiamo a 10e-10
+
+
 
 Quando ci sarà la dinamica non lineare bisogna fare partire l'angolo dal sistema di riferimento del robot (FORSE)
