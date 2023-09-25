@@ -152,5 +152,3 @@ La riduzione della cella come avevamo pensato va bene.
 		- segnare le zone da eliminare prima di spostare i punti
 		- simulare le misure sui punti
 		- spostare i punti in base alle incertezze/volumi
-
-			
