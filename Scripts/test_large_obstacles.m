@@ -64,7 +64,6 @@ x | y | tag
 - | - | 1   -> vertix of the obstacle visible from the robot
 %}
 
-
 if ~isempty(intersection) % there is intersection
 	% check if the are vertices of the obstacle inside the cell
 	for i = 1 : size(LO.x,1)
@@ -146,15 +145,16 @@ if ~isempty(intersection) % there is intersection
 
 	else % THERE ARE VISIBLE VERTICES OF THE OBSTACLE INSIDE THE VORONOI CELL
 		
-		% Since in the last passage the points have to be taken 2 by 2, we have to keep track if the points belong to the edge of the voronoi cell
-		% (if two consecutive points are on the edge we have to do nothing)
-		
+		% projection_points 
 		%{
-			visible points:
-			x | y | tag
-			- | - | 0 -> point inside the voronoi cell
-			- | - | 1 -> point on the edge of the voronoi cell
+		|x  | y | tag |
+		| - | - | preced |
+		| - | - |  succ|
+		| - | - |  0
+		|- -| - |  0
+		|
 		%}
+
 		prev_point = [];
 		next_point = [];
 		projection_points = [];
@@ -174,6 +174,9 @@ if ~isempty(intersection) % there is intersection
 				end
 				% find the projection point if either the previous or the next point is not visible
 				if (prev_point(3) == 0 || next_point(3) == 0 || prev_point(3) == -1 || next_point(3) == -1)
+
+					% trovare proiezione ideale e mettere flag prima o dopo 
+
 					% check the angle in order to find the projection point (and give it a slightly different angle)
 					angle = atan2(LO_vertices_copy(i,2), LO_vertices_copy(i,1));
 					% if the angle is negative then add 2*pi
@@ -245,22 +248,22 @@ if ~isempty(intersection) % there is intersection
 						end
 					end
 					
-					% check if the projection point is inside the voronoi cell
-					intersection_voronoi = intersect(poly_voronoi, [0,0;elongated_point]); % output given by row
-					% remove the robot position itself from the intersection
-					intersection_voronoi = intersection_voronoi(sum(abs(intersection_voronoi - [0,0]).^2,2).^0.5 > 1e-4, :);
+					% % check if the projection point is inside the voronoi cell
+					% intersection_voronoi = intersect(poly_voronoi, [0,0;elongated_point]); % output given by row
+					% % remove the robot position itself from the intersection
+					% intersection_voronoi = intersection_voronoi(sum(abs(intersection_voronoi - [0,0]).^2,2).^0.5 > 1e-4, :);
 
-					if ~isempty(intersections_obstacle)
-						if (norm(intersection_voronoi - [0;0]) < norm(intersections_obstacle - [0;0]))
-							% add the point only if it is outside the obstacle
-							if ~inpolygon(intersection_voronoi(1), intersection_voronoi(2), LO.poly.Vertices(:,1), LO.poly.Vertices(:,2))
-								projection_points = [projection_points; [intersection_voronoi,1]];
-							end
-						else
-							projection_points = [projection_points; [intersections_obstacle, 0]];
+					% if ~isempty(intersections_obstacle)
+					% 	if (norm(intersection_voronoi - [0;0]) < norm(intersections_obstacle - [0;0]))
+					% 		% add the point only if it is outside the obstacle
+					% 		if ~inpolygon(intersection_voronoi(1), intersection_voronoi(2), LO.poly.Vertices(:,1), LO.poly.Vertices(:,2))
+					% 			projection_points = [projection_points; [intersection_voronoi,1]];
+					% 		end
+					% 	else
+					% 		projection_points = [projection_points; [intersections_obstacle, 0]];
 							
-						end	
-                    end
+					% 	end	
+                    % end
                     
 				end
 			end
@@ -286,11 +289,13 @@ if ~isempty(intersection) % there is intersection
 				% If after removing "itself" there are still intesections with the obstacle then the intersection with voronoi is not visible
 				% and then we proced with the reduction of the cell
 				if isempty(intersection_obstacle)
+					% IL FLAG 1 non serve a niente
 					visible_intersection = [visible_intersection; [intersection_voronoi(:,k)',1]]; % output given by row
 				end
 			end
 		end
 		% join the matrices with: intersections btween voronoi and the obstacle, projections and visible vertices
+		% GLI UNICI FLAG SONO QUELLI DELLE PROIEZIONI PER ORDINARE I PUNTI
 		visible_points = [visible_intersection; projection_points; [LO_vertices_copy(LO_vertices_copy(:,3) == 1, 1:2), zeros(size(LO_vertices_copy(LO_vertices_copy(:,3) == 1, 1:2),1),1)]];
 
 		% order the points in anticlockwise order (if two points have the same angle then the closest one is the first)
@@ -319,36 +324,38 @@ if ~isempty(intersection) % there is intersection
         points_to_delete = [];
 		index = 1;
 		for i = 1:size(visible_points,1)-1
-			% if two consecutive points are on the edge then do nothing
-			if visible_points(i,3) == 1 && visible_points(i+1,3) == 1
-				continue;
-			end
+			% IMPLEMENTARE IL CONTROLLO NUOVO 
+			% % if two consecutive points are on the edge then do nothing
+			% if visible_points(i,3) == 1 && visible_points(i+1,3) == 1
+			% 	continue;
+			% end
 			% if two points have more or less the same angle then remove the area in every case
 			angle_i = atan2(visible_points(i,2), visible_points(i,1));
 			angle_i1 = atan2(visible_points(i+1,2), visible_points(i+1,1));
-			if abs(angle_i - angle_i1) < 1e-4
-				% define an area to delete for the first point
-				dir = visible_points(i,1:2) - [0,0];
-				dir = dir/norm(dir);
-				% create a point 1000 meters behind the intersection
-				points_to_delete = [visible_points(i,1:2) + 1000*dir ; visible_points(i,1:2)]; % matrix 2 by n
+			% if abs(angle_i - angle_i1) < 1e-4 % NON ELIMINO PIU PERCHE SONO LO STESSO ANGOLO
+			% 	% define an area to delete for the first point
+			% 	dir = visible_points(i,1:2) - [0,0];
+			% 	dir = dir/norm(dir);
+			% 	% create a point 1000 meters behind the intersection
+			% 	points_to_delete = [visible_points(i,1:2) + 1000*dir ; visible_points(i,1:2)]; % matrix 2 by n
 
-				% define an area to delete for the second point
-				dir = visible_points(i+1,1:2) - [0,0];
-				dir = dir/norm(dir);
-				% create a point 1000 meters behind the intersection
-				points_to_delete = [points_to_delete; [visible_points(i+1,1:2) + 1000*dir ; visible_points(i+1,1:2)]];
+			% 	% define an area to delete for the second point
+			% 	dir = visible_points(i+1,1:2) - [0,0];
+			% 	dir = dir/norm(dir);
+			% 	% create a point 1000 meters behind the intersection
+			% 	points_to_delete = [points_to_delete; [visible_points(i+1,1:2) + 1000*dir ; visible_points(i+1,1:2)]];
 
-				% reorder the points to delete and create a polyshape
-				points_to_delete = points_to_delete(convhull(points_to_delete(:,1:2)),1:2);
-				region_to_delete{index} = polyshape(points_to_delete(:,1),points_to_delete(:,2));
-				plot(region_to_delete{index});
-				index = index + 1;
-				continue;
-			end
+			% 	% reorder the points to delete and create a polyshape
+			% 	points_to_delete = points_to_delete(convhull(points_to_delete(:,1:2)),1:2);
+			% 	region_to_delete{index} = polyshape(points_to_delete(:,1),points_to_delete(:,2));
+			% 	plot(region_to_delete{index});
+			% 	index = index + 1;
+			% 	continue;
+			% end
 
 			% if two consecutive points "behind" them have not the obstacle then do nothing
 			% create an ideal point in the middle of the two points but on the other side with respect to the robot
+			% NUOVO CONTROLLO 
 			ideal_point = (visible_points(i,1:2) + visible_points(i+1,1:2))/2;
 			dir = (ideal_point - [0,0])/norm(ideal_point);
 			ideal_point = ideal_point + 1e-4*dir;
