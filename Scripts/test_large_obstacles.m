@@ -341,17 +341,21 @@ if ~isempty(intersection) % there is intersection
 				continue;
 			end
 
+			check_inside = [];
 			% if two consecutive points "behind" them have not the obstacle then do nothing
-			% create two ideal point in the "middle" of the two points but on the other side with respect to the robot 
-			dir = (visible_points(i+1,:) - visible_points(i,:))/norm(visible_points(i+1,:) - visible_points(i,:));
-			ideal_point_prev = visible_points(i,:) + 1e-3*dir;
-			% move the point a little bit further to the robot
-			ideal_point_prev = ideal_point_prev + 1e-7*(ideal_point_prev - [0,0])/norm(ideal_point_prev - [0,0]);
-			ideal_point_next = visible_points(i+1,:) - 1e-3*dir;
-			% move the point a little bit further to the robot
-			ideal_point_next = ideal_point_next + 1e-7*(ideal_point_next - [0,0])/norm(ideal_point_next - [0,0]);
-
-			if inpolygon(ideal_point_prev(1),ideal_point_prev(2),LO.poly.Vertices(:,1),LO.poly.Vertices(:,2)) && inpolygon(ideal_point_next(1),ideal_point_next(2),LO.poly.Vertices(:,1),LO.poly.Vertices(:,2))
+			% create 5 points between the two points and check if there is the obstacle behind them
+			% Obviously is not a perfect solution but it is a good approximation
+			dir = (visible_points(i+1,:) - visible_points(i,:)) / norm(visible_points(i+1,:) - visible_points(i,:));
+			dist = norm(visible_points(i+1,:) - visible_points(i,:));	
+			check_inside = [check_inside; visible_points(i,:) 	+ 1e-3*dir];
+			check_inside = [check_inside; visible_points(i,:) 	+ 0.25*dist*dir];
+			check_inside = [check_inside; visible_points(i,:) 	+ 00.5*dist*dir];
+			check_inside = [check_inside; visible_points(i,:) 	+ 0.75*dist*dir];
+			check_inside = [check_inside; visible_points(i+1,:) - 1e-3*dir];
+			% move the points a little bit further to the robot
+			check_inside = check_inside + 1e-7*(check_inside - [0,0])./(sum(abs(check_inside - [0,0]).^2,2).^0.5);
+			% plot(check_inside(:,1),check_inside(:,2),'*r');
+			if inpolygon(check_inside(:,1),check_inside(:,2),LO.poly.Vertices(:,1),LO.poly.Vertices(:,2))
 				couples_to_delete = [couples_to_delete; [visible_points(i,1:2) ; visible_points(i+1,1:2)]];
             end
 			
@@ -378,8 +382,8 @@ if ~isempty(intersection) % there is intersection
 	for i = 1:2:size(couples_to_delete,1)
 		% measure points
 		% TODO: move the intersections accordingly to the uncertainties
-		couples_to_delete(i,:) = couples_to_delete(i,:) - 0.7*(couples_to_delete(i,:) - [0,0])/norm(couples_to_delete(i,:) - [0,0]);
-		couples_to_delete(i+1,:) = couples_to_delete(i+1,:) - 0.7*(couples_to_delete(i+1,:) - [0,0])/norm(couples_to_delete(i+1,:) - [0,0]);
+		% couples_to_delete(i,:) = couples_to_delete(i,:) - 0.7*(couples_to_delete(i,:) - [0,0])/norm(couples_to_delete(i,:) - [0,0]);
+		% couples_to_delete(i+1,:) = couples_to_delete(i+1,:) - 0.7*(couples_to_delete(i+1,:) - [0,0])/norm(couples_to_delete(i+1,:) - [0,0]);
 
 		% define an area to delete for the first point
 		dir = couples_to_delete(i,:) - [0,0];
@@ -399,11 +403,15 @@ if ~isempty(intersection) % there is intersection
 		plot(region_to_delete{index});
 		index = index + 1;
 	end
-
+	total_region = region_to_delete{1};
 	% delete the area behind the intersection
-	for i = 1:length(region_to_delete)
-		poly_voronoi = subtract(poly_voronoi, region_to_delete{i});
+	for i = 2:length(region_to_delete)
+		total_region = union(region_to_delete{i},total_region);
 	end
+	% TODO: iterate untill the robot is inside the voronoi cell
+	total_region = polybuffer(total_region,rand(),'JointType','miter','MiterLimit',2);
+	plot(total_region)
+	new_poly_voronoi = subtract(poly_voronoi, total_region);
 	
 end
 
@@ -413,8 +421,8 @@ hold on;
 grid on;
 axis equal;
 axis(10 * [-1 1 -1 1]);
-plot(poly_voronoi)
-
+plot(new_poly_voronoi)
+plot(0,0,'*k');
 LO.plot();
 if exist('visible_points')
 	for i = 1:size(visible_points,1)
@@ -425,3 +433,149 @@ end
 for i = 1:size(couples_to_delete,1)
 	plot(couples_to_delete(i,1), couples_to_delete(i,2), 'or');
 end
+
+
+% new_intersections = [];
+% region_to_delete = [];
+% % find new points
+% new_points = setdiff(new_poly_voronoi.Vertices,poly_voronoi.Vertices,'rows','stable');
+% non_visible_points_before = [];
+% non_visible_points_after = [];
+% seen_visible = false;
+% % delete the area of the voronoi cell that are not visible from the robot
+% while index < size(new_points,1) 
+% 	% check if the point is visible
+% 	% find the intersection with the voronoi cell
+% 	% find the projection point
+% 	intersections_voronoi = intersect(new_poly_voronoi, [0,0;new_points(index,:)]); % output given by row
+% 	% remove itself from the intersection
+% 	intersections_voronoi = intersections_voronoi(sum(abs(intersections_voronoi - new_points(index,:)).^2,2).^0.5 > 1e-4, :);
+% 	% remove the position of the robot
+% 	intersections_voronoi = intersections_voronoi(sum(abs(intersections_voronoi).^2,2).^0.5 > 1e-4, :);
+% 	% the point is not visible if the intersection is between the point and the robot
+% 	if ~isempty(intersections_voronoi) % If I have interserction I check if it is closer to the robot w.r.t the considered point
+% 		if norm(intersection_voronoi - [0,0]) <= norm(new_points(index,:) - [0,0]) 
+% 			% Point is not visible 
+% 			if seen_visible == false
+% 				non_visible_points_before = [non_visible_points_before; new_points(index,:)];
+% 			elseif isempty(non_visible_points_before) % before there is a visible point
+% 				non_visible_points_after = [non_visible_points_after; new_points(index,:)];
+% 			else
+% 				non_visible_points_before = [non_visible_points_before; new_points(index,:)];
+% 			end
+% 		else
+% 			% Visible point with intersection
+% 			% if I have already covered some points I have to "delete" them
+% 			% otherwise I have to check the following points
+% 			if ~isempty(non_visible_points)
+% 				% Non visible points before me 
+% 				% create a polyshape with the non visible points, me, my intersection and the elongation of the first point and the projection
+
+% 			else
+% 				% Visible points next to me
+% 			end
+% 		end
+% 	else 
+% 		% Visible point without intersection (do nothing)
+% 	end
+% 	index = index + 1;
+
+
+	
+
+% 	% if ~isempty(intersections_voronoi)
+% 	% 	plot(intersections_voronoi(:,1),intersections_voronoi(:,2),'*r');
+% 	% 	new_intersections = [new_intersections; intersections_voronoi];
+% 	% end
+
+% end
+% plot(new_points(:,1),new_points(:,2),'og');
+% new_points_intersections = [new_points; new_intersections];
+% new_points_intersections = new_points_intersections(convhull(new_points_intersections(:,1:2)),1:2);
+
+if new_poly_voronoi.NumRegions > 1
+	% Keep only the biggest region
+	% find the biggest region
+	test_1 = rmboundary(new_poly_voronoi,1);
+	test_2 = rmboundary(new_poly_voronoi,2);
+	if area(test_1) > area(test_2)
+		new_poly_voronoi = test_1;
+	else
+		new_poly_voronoi = test_2;
+	end
+end
+
+new_points = setdiff(new_poly_voronoi.Vertices,poly_voronoi.Vertices,'rows','stable');
+index = 1;
+index_visible = 0;
+visible_points = [];
+% while index < size(new_points,1)
+% 	% check if the point is visible
+% 	% find the intersection with the voronoi cell
+% 	% find the projection point
+% 	elongated_point = new_points(index,:) + 1000*(new_points(index,:) - [0,0])/norm(new_points(index,:) - [0,0]);
+% 	intersections_voronoi = intersect(new_poly_voronoi, [0,0;elongated_point]); % output given by row
+% 	% remove itself from the intersection
+% 	intersections_voronoi = intersections_voronoi(sum(abs(intersections_voronoi - new_points(index,:)).^2,2).^0.5 > 1e-4, :);
+% 	% remove the position of the robot
+% 	intersections_voronoi = intersections_voronoi(sum(abs(intersections_voronoi).^2,2).^0.5 > 1e-4, :);
+
+% 	if ~isempty(intersections_voronoi) % If I have interserction I check if it is closer to the robot w.r.t the considered point
+% 		if size(intersections_voronoi,1) < 2 && norm(intersections_voronoi - [0,0]) >= norm(new_points(index,:) - [0,0]) 
+% 			visible_points = [visible_points; new_points(index,:)];
+% 			if index_visible == index - 1
+% 				plot(new_points(index,1),new_points(index,2),'og');
+% 				plot(new_points(index-1,1),new_points(index-1,2),'og');
+% 			else % The point is visible
+% 				plot(new_points(index,1),new_points(index,2),'*b');
+% 			end
+% 			index_visible = index;
+% 			plot(intersections_voronoi(:,1),intersections_voronoi(:,2),'*r');
+% 		end
+% 	else
+% 		visible_points = [visible_points; new_points(index,:)];
+% 		index_visible = index;
+% 	end
+
+% 	index = index + 1;
+
+% end
+region_to_delete = [];
+for i = 1:size(new_points,1)-1
+	% delete the area two by two points
+	% define an area to delete for the first point
+	dir = new_points(i,:) - [0,0];
+	dir = dir/norm(dir);
+	% create a point 1000 meters behind the intersection
+	points_to_delete = [new_points(i,:) + 1000*dir; new_points(i,:)]; % matrix n by 2
+
+	% define an area to delete for the second point
+	dir = new_points(i+1,1:2) - [0,0];
+	dir = dir/norm(dir);
+	% create a point 1000 meters behind the intersection
+	points_to_delete = [points_to_delete; [new_points(i+1,1:2) + 1000*dir ; new_points(i+1,1:2)]];
+
+	% reorder the points to delete and create a polyshape
+	points_to_delete = points_to_delete(convhull(points_to_delete(:,1:2)),1:2);
+	region_to_delete{i} = polyshape(points_to_delete(:,1),points_to_delete(:,2));
+end
+
+for i = 1:length(region_to_delete)
+	plot(region_to_delete{i});
+end
+total_region = region_to_delete{1};
+% delete the area behind the intersection
+for i = 2:length(region_to_delete)
+	total_region = union(region_to_delete{i},total_region);
+end
+
+final_voronoi = subtract(new_poly_voronoi, total_region);
+
+figure(3);
+hold on;
+grid on;
+axis equal;
+axis(10 * [-1 1 -1 1]);
+plot(final_voronoi)
+plot(0,0,'*k');
+LO.plot();
