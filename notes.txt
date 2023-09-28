@@ -149,26 +149,6 @@ La riduzione della cella come avevamo pensato va bene.
 
 	- spostare ostacoli "mobili" del volume del robot
 	- LO:
+		- segnare le zone da eliminare prima di spostare i punti
 		- simulare le misure sui punti
 		- spostare i punti in base alle incertezze/volumi
-		- controlli:
-			- se due punti hanno lo stesso angolo quello più lontano deve rimanere tale
-			- i punti non posso superare il robot
-			
-
-
-
-PROBLEMS: 
-	- ordini degli angoli problemi quello che diceva max di angoli negativi (se il primo angolo è negativo) -> (FIXED line 176?)
-		- quando controllo i punti a due a due se dietro ho punti dell' ostacolo allora rimuovo ma se dietro non ho nulla proseguo (il primo va messo per ultimo):
-			per vedere se non ho nulla dietro basta che prendo un punto quasi sul segmento che congiunge i due punti (dalla parte opposta rispetto al robot) e vedo se è dentro l'ostacolo
-	- se ho due intersezioni con voronoi vicine allora non faccio niente tra quei due punti (tanto è limitato da voronoi)
-	- ordini dei punti quando l'angolo è uguale
-	- ogni tanto quando l'ostacolo è completamente dentro ci sono problemi con le proiezioni che sembrano essere visibili ma non lo sono (FIXED line 210)
-
-	- se due angoli sono molto simili mi trovo la proiezione vera e tra quei due punti non devo eliminare nulla
-	- per evitare problemi nel punto intermedio lo mettiamo a 10e-10
-
-
-
-Quando ci sarà la dinamica non lineare bisogna fare partire l'angolo dal sistema di riferimento del robot (FORSE)
