@@ -435,15 +435,12 @@ for i = 1:size(couples_to_delete,1)
 end
 
 
-if new_poly_voronoi.NumRegions > 1
-	% Keep only the biggest region
-	% find the biggest region
-	test_1 = rmboundary(new_poly_voronoi,1);
-	test_2 = rmboundary(new_poly_voronoi,2);
-	if area(test_1) > area(test_2)
-		new_poly_voronoi = test_1;
-	else
-		new_poly_voronoi = test_2;
+for i = new_poly_voronoi.NumRegions
+	% Kee the region in which the robot is
+	tmp = rmboundary(new_poly_voronoi,1);
+	if inpolygon(0,0,tmp.Vertices(:,1),tmp.Vertices(:,2))
+		new_poly_voronoi = tmp;
+		break;
 	end
 end
 
