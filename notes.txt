@@ -26,21 +26,22 @@ far vedere performance di ogni setp:
 	Localizzazione
 	stima target
 	controllo
-	...
+	equiditanza tra robot
+
 fare stessa simulazione con diverso numero di ROBOT
 far vedere cosa "vede" ad esempio il robot 1 durante le simulazioni come sono le incertezze e cose così
 fare unicicli  
-fare laserscan
-valutare piu forme
+
 far vedere le performance (definire dei parametri)
 far vedere voronoi
-estrazione features di ostacoli (eventuali pareti ...)
 
 SE aggiungo o tolgo robot cosa succede
 
 alcuni robot più lenti di altri
 
-far vedere i potenziali delle gaussiane
+
+-------------------------************************ IMPORTANTE ************************-------------------------
+far vedere i potenziali delle gaussiane NB
 
 
 Ci si puo muovere fino a metà del raggio di comunicazione per essere sicuri di non sbattere con altri robot
