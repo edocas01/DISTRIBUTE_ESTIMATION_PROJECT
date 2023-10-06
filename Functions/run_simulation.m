@@ -1,5 +1,5 @@
 % This function runs the simulation of the robots
-function results = run_simulation(R, T, O, u_traj, parameters_simulation)
+function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
 	Tmax = length(u_traj(1,:));
 	results = cell(1,Tmax);
     
@@ -16,7 +16,7 @@ function results = run_simulation(R, T, O, u_traj, parameters_simulation)
         
 
         relative_general_consensous(R, T, parameters_simulation);
-        voronoi_map_consensous(parameters_simulation, R, O);
+        voronoi_map_consensous(parameters_simulation, R, T, O, LO);
         
         % Saving the results
         data.T = copy(T);
@@ -30,6 +30,10 @@ function results = run_simulation(R, T, O, u_traj, parameters_simulation)
             position_obstacles(i,:) = [O{i}.x(1),O{i}.x(2)];
         end
         data.O = position_obstacles;
+
+        for i = 1:length(LO)
+            data.LO{i} = LO{i};
+        end
 
 		data.circle_target = [circx;circy];
 		
@@ -57,7 +61,10 @@ function results = run_simulation(R, T, O, u_traj, parameters_simulation)
             fprintf("Percentage of simulation: %d%%\n",round(t/Tmax*100))
             pause(0.5)
         end
+        
+        show_simulation(results{t});
     end
+
 
 
 end

@@ -1,4 +1,4 @@
-function voronoi_map_consensous(param, robots, obstacles)
+function voronoi_map_consensous(param, robots, target, obstacles, LO)
 	N = length(robots);
 	% move the neighbors according to:
 	% - the uncertainty of j
@@ -12,8 +12,16 @@ function voronoi_map_consensous(param, robots, obstacles)
 		max_semiaxis = sqrt(max(diag(eigenvalues)));
 
 		for j = 1:length(robots{i}.all_robots_pos)/2
-			% continue if the robot is itself or if the robot has no information on the others inside all_robots_pos
-			if i == j || norm(robots{i}.x_est - robots{i}.all_robots_pos(2*j-1:2*j)) > robots{i}.ComRadius*2
+			% continue if the robot is itself or if the robot cannot see
+            % the other one I skip beacuse if I cannot see the other robot
+            % surely it will not affect my voronoi cell
+			if j == length(robots) + 1 
+				tmp = target.x;
+			else
+				tmp = robots{j}.x;
+			end
+
+			if i == j || norm(robots{i}.x - tmp) > robots{i}.ComRadius
 				continue;
 			end
 			% move the robot j in the closest point to the agent i according to the uncertainty of j
@@ -219,7 +227,9 @@ function voronoi_map_consensous(param, robots, obstacles)
 		end
 
 		% remove large obstacles
-		
+		for z = 1:length(LO)
+			voronoi_LO(LO{z}, robots{i}, max_semiaxis, param);
+		end
 	end
 end
 

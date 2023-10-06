@@ -41,6 +41,7 @@ end
 % - if a robot start seeing the trget it moves towards the target
 % - if a robot reaches the maximium covariance on the target it moves randomly
 function [center, phi] = decide_target_barycenter(robot,param)
+    radius = 0;
     % Set false the radius for the reaching of the target    
     robot.set_distance_radius = false;
 	% if a robot is not seeing the target
@@ -53,6 +54,7 @@ function [center, phi] = decide_target_barycenter(robot,param)
 		if length(neighbor) > 0 % robot must have at least one good neighbour 
 			k = randsample(1:2:length(neighbor)-1,1);
 			center = neighbor(k:k+1);
+			func = @(x,y,r,x_t,y_t) exp(-((x-x_t)^2 + (y-y_t)^2)); % KEEP the "4"
 		else % Moves randomly
 			xmin = min(robot.voronoi.Vertices(:,1));
 			xmax = max(robot.voronoi.Vertices(:,1));
@@ -66,6 +68,7 @@ function [center, phi] = decide_target_barycenter(robot,param)
 				in = inpolygon(x, y, robot.voronoi.Vertices(:,1), robot.voronoi.Vertices(:,2));
 			end
 			center = [x;y];
+			func = @(x,y,r,x_t,y_t) exp(-((x-x_t)^2 + (y-y_t)^2)); % KEEP the "4"
 		end
 	else % The target estimate is not updated and the uncertainty grows (target is lost)
 		if robot.all_cov_pos(end-1,end-1) > 1000 || robot.all_cov_pos(end,end) > 1000
@@ -81,14 +84,15 @@ function [center, phi] = decide_target_barycenter(robot,param)
 				in = inpolygon(x, y, robot.voronoi.Vertices(:,1), robot.voronoi.Vertices(:,2));
 			end
 			center = [x;y];
+			func = @(x,y,r,x_t,y_t) exp(-((x-x_t)^2 + (y-y_t)^2)); % KEEP the "4"
 		else % The target estimate is updated and the uncertainty is low
 			center = robot.all_robots_pos(end-1:end);
             robot.set_distance_radius = true;
+			radius = param.DISTANCE_TARGET;
+			func = @(x,y,r,x_t,y_t) exp(-r/10*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2); % KEEP the "4"
 		end
 	end
 	% control on the circle around the target
-	radius = param.DISTANCE_TARGET;
-	func = @(x,y,r,x_t,y_t) exp(-r/10*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2); % KEEP the "4"
 	phi = @(x,y) func(x, y, radius, center(1), center(2));
 
 end

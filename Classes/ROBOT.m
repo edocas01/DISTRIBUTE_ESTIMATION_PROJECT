@@ -65,6 +65,8 @@ classdef ROBOT < matlab.mixin.Copyable
 		vmax; 				% maximum velocity of the robot
 
         set_distance_radius % for the control
+		count_random_step   % for the control in case of random movement
+		random_direction    % for the control in case of random movement
 
 	end
 %{
@@ -135,7 +137,9 @@ classdef ROBOT < matlab.mixin.Copyable
 
         % To control if the robot is on the circle of the target
         obj.set_distance_radius = false;
-    end
+		obj.count_random_step = 0;
+		obj.random_direction = 0;
+	end
 
 	     
 	% Update the position of the robot

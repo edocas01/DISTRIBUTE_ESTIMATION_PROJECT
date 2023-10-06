@@ -319,7 +319,9 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 		points_to_delete = [];
 		index = 1;
 		% measure the points and create the region to be deleted
-		tmp = couples_to_delete(2,:);
+		if size(couples_to_delete,1) > 1
+            tmp = couples_to_delete(2,:);
+        end
 		for i = 1:2:size(couples_to_delete,1)
 			% perform the measure
 			if couples_to_delete(i,:) == tmp
@@ -331,10 +333,7 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 			tmp = couples_to_delete(i+1,:);
 			couples_to_delete(i+1,:) = (robot.H * (couples_to_delete(i+1,:)' - robot.x) + mvnrnd([0;0], robot.R_dist)')';
 			couples_to_delete(i+1,:) = (couples_to_delete(i+1,:)' + robot.H * robot.x_est)';
-			
-			plot(couples_to_delete(i,1), couples_to_delete(i,2), 'b*');
-			plot(couples_to_delete(i+1,1), couples_to_delete(i+1,2), 'b*');
-			
+					
 			% define an area to delete for the first point
 			dir = couples_to_delete(i,:) - [x_e,y_e];
 			dir = dir/norm(dir);
@@ -350,7 +349,6 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 			% reorder the points to delete and create a polyshape
 			points_to_delete = points_to_delete(convhull(points_to_delete(:,1:2)),1:2);
 			region_to_delete{index} = polyshape(points_to_delete(:,1),points_to_delete(:,2));
-			plot(region_to_delete{index});
 			index = index + 1;
 		end
 		total_region = region_to_delete{1};
@@ -370,7 +368,6 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 			if inpolygon(x_e,y_e,tmp.Vertices(:,1),tmp.Vertices(:,2))
 				percentage = percentage - 0.1;
 			else
-				plot(tmp);
 				new_poly_voronoi = subtract(poly_voronoi, tmp);
 				break;
 			end
@@ -385,9 +382,9 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 		
 	
 
-		for i = new_poly_voronoi.NumRegions
+		for i = 1:new_poly_voronoi.NumRegions
 			% Kee the region in which the robot is
-			tmp = rmboundary(new_poly_voronoi,1);
+			tmp = rmboundary(new_poly_voronoi,i);
 			if inpolygon(x_e,y_e,tmp.Vertices(:,1),tmp.Vertices(:,2))
 				new_poly_voronoi = tmp;
 				break;
@@ -408,6 +405,8 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 		%}
 
 		new_points = setdiff(new_poly_voronoi.Vertices,poly_voronoi.Vertices,'rows','stable');
+		% remove the points if they are Nan
+		% new_points(isnan(new_points(:,1)),:) = [];
 		index = 1;
 		index_visible = 0;
 		visible_points = [];
@@ -431,17 +430,15 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 			points_to_delete = points_to_delete(convhull(points_to_delete(:,1:2)),1:2);
 			region_to_delete{i} = polyshape(points_to_delete(:,1),points_to_delete(:,2));
 		end
-
-		total_region = region_to_delete{1};
-		% delete the area behind the intersection
-		for i = 2:length(region_to_delete)
-			total_region = union(region_to_delete{i},total_region);
-		end
-
+        if ~isempty(region_to_delete)
+		    total_region = region_to_delete{1};
+		    % delete the area behind the intersection
+		    for i = 2:length(region_to_delete)
+			    total_region = union(region_to_delete{i},total_region);
+            end
 		final_voronoi = subtract(new_poly_voronoi, total_region);
-
 		% Update the voronoi cell
 		robot.voronoi = final_voronoi;
-	
+    	end
 	end
 end
