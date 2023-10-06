@@ -217,6 +217,9 @@ function voronoi_map_consensous(param, robots, obstacles)
 			% find the intersection between the two polyshapes
 			robots{i}.voronoi = intersect(poly_circle, poly_voronoi);
 		end
+
+		% remove large obstacles
+		
 	end
 end
 
