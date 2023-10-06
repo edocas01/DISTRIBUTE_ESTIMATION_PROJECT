@@ -29,6 +29,7 @@ function voronoi_map_consensous(param, robots, obstacles)
 				z = z + 2 * robots{i}.volume * (robots{i}.x_est - z) / robots_d;
 			end
 
+			
 			% if the point is behind the robot itself, move it in front of the robot of an epsilon
 			if dot((robots{i}.all_robots_pos(2*j-1:2*j) - robots{i}.x_est),(z - robots{i}.x_est)) < 0
 				if param.DEBUG
@@ -59,6 +60,12 @@ function voronoi_map_consensous(param, robots, obstacles)
 					obstacle_d = norm(robots{i}.x_est - z);
 					z = z + 2 * max_semiaxis * (robots{i}.x_est - z) / obstacle_d;
 					
+					obstacle_d = norm(robots{i}.x_est - z);
+					% if the vmax allows to exit from the "sicure cell" then reduce it of the volume
+					if obstacle_d/2 < robots{i}.vmax * param.dt + robots{i}.volume
+						z = z + 2 * robots{i}.volume * (robots{i}.x_est - z) / obstacle_d;
+					end
+
 					% if the point is behind the robot itself, move it in front of the robot of an epsilon
 					if dot((obstacle_measure - robots{i}.x_est),(z - robots{i}.x_est)) < 0
 						if param.DEBUG
