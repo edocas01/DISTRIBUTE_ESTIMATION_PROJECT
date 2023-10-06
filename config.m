@@ -30,13 +30,16 @@ parameters_simulation = struct( ...
 	'MIN_ANGULAR_VELOCITY', 		pi/6, 			... % minimum angular velocity (rad/s)
 	... % Target parameters
 	'vmax_target', 					10/3.6,		 	... % velocity of target (m/s)
+	... % Punctual obstacles parameters
+	'vmax_obstacle', 				10/3.6, 			... % velocity of the obstacle (m/s)
+	'percentage_static_obstacles',  0.8, 			... % percentage of static obstacles
 	... % Consensous parameters	
 	'MSG_PROTOCOL', 				50,				... % protocol used for message passing
 	... % Voronoi parameters
 	'coverage', 					3, 				... % coverage for the uncertainties 
 	... % Control parameters
 	'DISTANCE_TARGET',				5, 				... % distance from the target (m)
-	'TOLERANCE_DISTANCE', 			0 			... % tolerance distance on the circle (m)
+	'TOLERANCE_DISTANCE', 			0 				... % tolerance distance on the circle (m)
 	);
 	parameters_simulation.TOLERANCE_DISTANCE = parameters_simulation.DISTANCE_TARGET*0.5;
 

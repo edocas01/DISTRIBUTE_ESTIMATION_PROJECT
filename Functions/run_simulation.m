@@ -25,11 +25,10 @@ function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
         end
         data.R = R;
         
-        position_obstacles = [];
         for i = 1:length(O)
-            position_obstacles(i,:) = [O{i}.x(1),O{i}.x(2)];
+            O{i} = copy(O{i});
         end
-        data.O = position_obstacles;
+        data.O = O;
 
         for i = 1:length(LO)
             data.LO{i} = LO{i};
@@ -56,13 +55,15 @@ function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
 
         % Move the target
         T.dynamics(u_traj(:,t));
+        % Move the obstacles
+        for i = 1:length(O)
+            O{i}.dynamics(parameters_simulation);
+        end
 
         if mod(t,round(Tmax/4)) == 0
             fprintf("Percentage of simulation: %d%%\n",round(t/Tmax*100))
             pause(0.5)
         end
-        
-        show_simulation(results{t});
     end
 
 

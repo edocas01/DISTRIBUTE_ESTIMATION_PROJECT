@@ -45,17 +45,9 @@ function [center, phi] = decide_target_barycenter(robot,param)
     % Set false the radius for the reaching of the target    
     robot.set_distance_radius = false;
 	% if a robot is not seeing the target
-	if (robot.all_robots_pos(end-1) > 1e4 && robot.all_robots_pos(end) > 1e4)
-		% select a random neighbour
-		neighbor = robot.all_robots_pos;
-        % delete myself from the neighbour
-		neighbor(2*robot.id-1:2*robot.id) = [];
-		neighbor(neighbor > 1e4) = [];
-		if length(neighbor) > 0 % robot must have at least one good neighbour 
-			k = randsample(1:2:length(neighbor)-1,1);
-			center = neighbor(k:k+1);
-			func = @(x,y,r,x_t,y_t) exp(-((x-x_t)^2 + (y-y_t)^2)); % KEEP the "4"
-		else % Moves randomly
+	if (robot.all_robots_pos(end-1) > 1e4 && robot.all_robots_pos(end) > 1e4) || (robot.all_cov_pos(end-1,end-1) > 1000 || robot.all_cov_pos(end,end) > 1000)
+		if robot.count_random_step > 10 || robot.count_random_step == 0
+			robot.count_random_step = 0;
 			xmin = min(robot.voronoi.Vertices(:,1));
 			xmax = max(robot.voronoi.Vertices(:,1));
 			ymin = min(robot.voronoi.Vertices(:,2));
@@ -67,30 +59,16 @@ function [center, phi] = decide_target_barycenter(robot,param)
 				y = ymin + (ymax-ymin)*rand();
 				in = inpolygon(x, y, robot.voronoi.Vertices(:,1), robot.voronoi.Vertices(:,2));
 			end
-			center = [x;y];
-			func = @(x,y,r,x_t,y_t) exp(-((x-x_t)^2 + (y-y_t)^2)); % KEEP the "4"
+			robot.random_direction = ([x;y] - robot.x_est)/norm([x;y] - robot.x_est);
 		end
-	else % The target estimate is not updated and the uncertainty grows (target is lost)
-		if robot.all_cov_pos(end-1,end-1) > 1000 || robot.all_cov_pos(end,end) > 1000
-			xmin = min(robot.voronoi.Vertices(:,1));
-			xmax = max(robot.voronoi.Vertices(:,1));
-			ymin = min(robot.voronoi.Vertices(:,2));
-			ymax = max(robot.voronoi.Vertices(:,2));
-
-			in = 0;
-			while ~in
-				x = xmin + (xmax-xmin)*rand();
-				y = ymin + (ymax-ymin)*rand();
-				in = inpolygon(x, y, robot.voronoi.Vertices(:,1), robot.voronoi.Vertices(:,2));
-			end
-			center = [x;y];
-			func = @(x,y,r,x_t,y_t) exp(-((x-x_t)^2 + (y-y_t)^2)); % KEEP the "4"
-		else % The target estimate is updated and the uncertainty is low
-			center = robot.all_robots_pos(end-1:end);
-            robot.set_distance_radius = true;
-			radius = param.DISTANCE_TARGET;
-			func = @(x,y,r,x_t,y_t) exp(-r/10*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2); % KEEP the "4"
-		end
+		robot.count_random_step = robot.count_random_step + 1;
+		center = robot.x_est + robot.random_direction * robot.ComRadius;
+		func = @(x,y,r,x_t,y_t) exp(-((x-x_t)^2 + (y-y_t)^2)); % KEEP the "4"
+	else % The target estimate is updated
+		center = robot.all_robots_pos(end-1:end);
+		robot.set_distance_radius = true;
+		radius = param.DISTANCE_TARGET;
+		func = @(x,y,r,x_t,y_t) exp(-r/10*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2); % KEEP the "4"
 	end
 	% control on the circle around the target
 	phi = @(x,y) func(x, y, radius, center(1), center(2));
@@ -112,9 +90,12 @@ function [center, phi] = decide_circle_barycenter(robot, param)
 	neighbors_on_circle(distances < radius - tolerance | distances > radius + tolerance,:) = [];
 
 	% if there are no sufficient neighbors on the circle, the robot stay still (at least 2)
-	if size(neighbors_on_circle,1) < 2
-		center = robot.x_est;
-		phi = 0;
+	if size(neighbors_on_circle,1) < 1
+		center = robot.all_robots_pos(end-1:end);
+		robot.set_distance_radius = true;
+		radius = param.DISTANCE_TARGET;
+		func = @(x,y,r,x_t,y_t) exp(-r/10*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2); % KEEP the "4"
+		phi = @(x,y) func(x, y, radius, center(1), center(2));
 	else
 		neighbors_on_circle(end+1,:) = robot.x_est';
 		my_idx = length(neighbors_on_circle(:,1));

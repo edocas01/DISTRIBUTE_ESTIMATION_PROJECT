@@ -138,7 +138,7 @@ classdef ROBOT < matlab.mixin.Copyable
         % To control if the robot is on the circle of the target
         obj.set_distance_radius = false;
 		obj.count_random_step = 0;
-		obj.random_direction = 0;
+		obj.random_direction = [];
 	end
 
 	     

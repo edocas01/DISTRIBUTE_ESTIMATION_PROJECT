@@ -73,8 +73,12 @@ function [target, trajectory, u_trajectory, obstacles, large_obstacles, robots] 
 		if ~isequal(button,1) % if enter is pressed
 			break;
 		end
-		obstacles{idx} = OBSTACLE(xi,yi);
-		plot(x, y, 'sk');
+		if rand() < param.percentage_static_obstacles
+			obstacles{idx} = OBSTACLE(xi,yi, false, param);
+		else
+			obstacles{idx} = OBSTACLE(xi,yi, true, param);
+		end
+		obstacles{idx}.plot();
 		idx = idx + 1;
 	end
 	print_title("Acquired punctual obstacles",param.title_flags);
