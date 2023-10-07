@@ -1,12 +1,13 @@
 % This function is used to show the simulation results
 function show_simulation(results)
 	config;
+    size_map = parameters_simulation.size_map;
 	figure(3);
 	for t = 1:length(results)
 		clf
 		hold on; grid on; 
         axis equal
-		xlim([-40 40]); ylim([-40 40]);
+		xlim([-size_map size_map]); ylim([-size_map size_map]);
 		datas = results{t};
 		datas.T.plot()
 		plot(datas.circle_target(1,:), datas.circle_target(2,:),'b--', 'LineWidth', 1.5);

@@ -17,7 +17,7 @@ parameters_simulation = struct( ...
 	... % Debug flags 	
 	'title_flags', 					false, 			... % to print the central strings
 	... % Robot parameters 	
-	'MIN_Rc', 						5, 				... % minimum radius of the communication range (m)
+	'MIN_Rc', 						7, 				... % minimum radius of the communication range (m)
 	'MAX_Rc', 						15, 			... % maximum radius of the communication range (m)
 	'std_gps', 						1, 				... % standard deviation of the GPS (m)
 	'std_robots_model', 			1, 				... % standard deviation of the robot model (m)
@@ -38,7 +38,7 @@ parameters_simulation = struct( ...
 	... % Voronoi parameters
 	'coverage', 					3, 				... % coverage for the uncertainties 
 	... % Control parameters
-	'DISTANCE_TARGET',				5, 				... % distance from the target (m)
+	'DISTANCE_TARGET',				3, 				... % distance from the target (m)
 	'TOLERANCE_DISTANCE', 			0 				... % tolerance distance on the circle (m)
 	);
 	parameters_simulation.TOLERANCE_DISTANCE = parameters_simulation.DISTANCE_TARGET*0.5;

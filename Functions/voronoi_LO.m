@@ -378,71 +378,97 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 			    end
 			    
             end
-        end
+        
 		
 	
 
-		for i = 1:new_poly_voronoi.NumRegions
-			% Kee the region in which the robot is
-			tmp = rmboundary(new_poly_voronoi,i);
-			if inpolygon(x_e,y_e,tmp.Vertices(:,1),tmp.Vertices(:,2))
-				new_poly_voronoi = tmp;
-				break;
-			end
-        end
-
-%         if new_poly_voronoi.NumRegions > 1
-%             error("Not unique voronoi area")
-%         end
-
-		%{
-
-		
-     	 __  __       _           ____                          
-		|  \/  | __ _| | _____   / ___|___  _ ____   _______  __
-		| |\/| |/ _` | |/ / _ \ | |   / _ \| '_ \ \ / / _ \ \/ /
-		| |  | | (_| |   <  __/ | |__| (_) | | | \ V /  __/>  < 
-		|_|  |_|\__,_|_|\_\___|  \____\___/|_| |_|\_/ \___/_/\_\
-																
-		
-
-		%}
-
-		new_points = setdiff(new_poly_voronoi.Vertices,poly_voronoi.Vertices,'rows','stable');
-		% remove the points if they are Nan
-		new_points(isnan(new_points(:,1)),:) = [];
-		index = 1;
-		index_visible = 0;
-		visible_points = [];
-
-		region_to_delete = [];
-		for i = 1:size(new_points,1)-1
-			% delete the area two by two points
-			% define an area to delete for the first point
-			dir = new_points(i,:) - [x_e,y_e];
-			dir = dir/norm(dir);
-			% create a point 1000 meters behind the intersection
-			points_to_delete = [new_points(i,:) + 1000*dir; new_points(i,:)]; % matrix n by 2
-
-			% define an area to delete for the second point
-			dir = new_points(i+1,1:2) - [x_e,y_e];
-			dir = dir/norm(dir);
-			% create a point 1000 meters behind the intersection
-			points_to_delete = [points_to_delete; [new_points(i+1,1:2) + 1000*dir ; new_points(i+1,1:2)]];
-
-			% reorder the points to delete and create a polyshape
-			points_to_delete = points_to_delete(convhull(points_to_delete(:,1:2)),1:2);
-			region_to_delete{i} = polyshape(points_to_delete(:,1),points_to_delete(:,2));
-		end
-        if ~isempty(region_to_delete)
-		    total_region = region_to_delete{1};
-		    % delete the area behind the intersection
-		    for i = 2:length(region_to_delete)
-			    total_region = union(region_to_delete{i},total_region);
+		    % for i = 1:new_poly_voronoi.NumRegions
+		    % 	% Keep the region in which the robot is
+		    % 	tmp = rmboundary(new_poly_voronoi,i);
+		    % 	if inpolygon(x_e,y_e,tmp.Vertices(:,1),tmp.Vertices(:,2))
+		    % 		new_poly_voronoi = tmp;
+		    % 		break;
+		    % 	end
+            % end
+		    index = 1;
+		    while new_poly_voronoi.NumRegions > 1
+			    % if the robot is inside the voronoi cell then remove the region in which the robot is
+			    tmp = rmboundary(new_poly_voronoi,index);
+			    if inpolygon(x_e,y_e,tmp.Vertices(:,1),tmp.Vertices(:,2))
+				    new_poly_voronoi = tmp;
+				    index = 1;
+				    continue;
+			    end
+			    index = index + 1;
+			    if index > new_poly_voronoi.NumRegions
+				    % take the largest area
+				    max_area = 0;
+				    index_poly = 0;
+				    for i = 1:new_poly_voronoi.NumRegions
+					    tmp = rmboundary(new_poly_voronoi,i);
+					    area = polyarea(tmp.Vertices(:,1),tmp.Vertices(:,2));
+					    if area >= max_area
+						    max_area = area;
+						    index_poly = i;
+					    end
+				    end
+				    new_poly_voronoi = rmboundary(new_poly_voronoi,index_poly);
+			    end
+		    end
+    
+            if new_poly_voronoi.NumRegions > 1
+                warning("Two regions in voronoi_LO")
             end
-		final_voronoi = subtract(new_poly_voronoi, total_region);
-		% Update the voronoi cell
-		robot.voronoi = final_voronoi;
+    
+		    %{
+    
+		    
+     	     __  __       _           ____                          
+		    |  \/  | __ _| | _____   / ___|___  _ ____   _______  __
+		    | |\/| |/ _` | |/ / _ \ | |   / _ \| '_ \ \ / / _ \ \/ /
+		    | |  | | (_| |   <  __/ | |__| (_) | | | \ V /  __/>  < 
+		    |_|  |_|\__,_|_|\_\___|  \____\___/|_| |_|\_/ \___/_/\_\
+																    
+		    
+    
+		    %}
+    
+		    new_points = setdiff(new_poly_voronoi.Vertices,poly_voronoi.Vertices,'rows','stable');
+		    % remove the points if they are Nan
+		    % new_points(isnan(new_points(:,1)),:) = [];
+		    index = 1;
+		    index_visible = 0;
+		    visible_points = [];
+    
+		    region_to_delete = [];
+		    for i = 1:size(new_points,1)-1
+			    % delete the area two by two points
+			    % define an area to delete for the first point
+			    dir = new_points(i,:) - [x_e,y_e];
+			    dir = dir/norm(dir);
+			    % create a point 1000 meters behind the intersection
+			    points_to_delete = [new_points(i,:) + 1000*dir; new_points(i,:)]; % matrix n by 2
+    
+			    % define an area to delete for the second point
+			    dir = new_points(i+1,1:2) - [x_e,y_e];
+			    dir = dir/norm(dir);
+			    % create a point 1000 meters behind the intersection
+			    points_to_delete = [points_to_delete; [new_points(i+1,1:2) + 1000*dir ; new_points(i+1,1:2)]];
+    
+			    % reorder the points to delete and create a polyshape
+			    points_to_delete = points_to_delete(convhull(points_to_delete(:,1:2)),1:2);
+			    region_to_delete{i} = polyshape(points_to_delete(:,1),points_to_delete(:,2));
+		    end
+            if ~isempty(region_to_delete)
+		        total_region = region_to_delete{1};
+		        % delete the area behind the intersection
+		        for i = 2:length(region_to_delete)
+			        total_region = union(region_to_delete{i},total_region);
+                end
+		    final_voronoi = subtract(new_poly_voronoi, total_region);
+		    % Update the voronoi cell
+		    robot.voronoi = final_voronoi;
+    	    end
     	end
-	end
+    end
 end
