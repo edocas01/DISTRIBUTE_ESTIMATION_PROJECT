@@ -321,64 +321,64 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 		% measure the points and create the region to be deleted
 		if size(couples_to_delete,1) > 1
             tmp = couples_to_delete(2,:);
+		    for i = 1:2:size(couples_to_delete,1)
+			    % perform the measure
+			    if couples_to_delete(i,:) == tmp
+				    couples_to_delete(i,:) = couples_to_delete(i-1,:);
+			    else
+				    couples_to_delete(i,:) = (robot.H * (couples_to_delete(i,:)' - robot.x) + mvnrnd([0;0], robot.R_dist)')';
+				    couples_to_delete(i,:) = (couples_to_delete(i,:)' + robot.H * robot.x_est)';
+			    end
+			    tmp = couples_to_delete(i+1,:);
+			    couples_to_delete(i+1,:) = (robot.H * (couples_to_delete(i+1,:)' - robot.x) + mvnrnd([0;0], robot.R_dist)')';
+			    couples_to_delete(i+1,:) = (couples_to_delete(i+1,:)' + robot.H * robot.x_est)';
+					    
+			    % define an area to delete for the first point
+			    dir = couples_to_delete(i,:) - [x_e,y_e];
+			    dir = dir/norm(dir);
+			    % create a point 1000 meters behind the intersection
+			    points_to_delete = [couples_to_delete(i,:) + 1000*dir; couples_to_delete(i,:)]; % matrix n by 2
+    
+			    % define an area to delete for the second point
+			    dir = couples_to_delete(i+1,1:2) - [x_e,y_e];
+			    dir = dir/norm(dir);
+			    % create a point 1000 meters behind the intersection
+			    points_to_delete = [points_to_delete; [couples_to_delete(i+1,1:2) + 1000*dir ; couples_to_delete(i+1,1:2)]];
+    
+			    % reorder the points to delete and create a polyshape
+			    points_to_delete = points_to_delete(convhull(points_to_delete(:,1:2)),1:2);
+			    region_to_delete{index} = polyshape(points_to_delete(:,1),points_to_delete(:,2));
+			    index = index + 1;
+		    end
+		    total_region = region_to_delete{1};
+		    % delete the area behind the intersection
+		    for i = 2:length(region_to_delete)
+			    total_region = union(region_to_delete{i},total_region);
+		    end
+		    % compute the reduction 
+		    covariance = robot.R_dist + robot.H * robot.P * robot.H'; % covariance of the measurement
+		    [V, D] = eig(covariance * param.coverage);
+		    max_semiaxis_points = sqrt(max(diag(D))); % max semiaxis of the covariance for the measurement
+		    total_reduction = max_semiaxis + robot.volume + max_semiaxis_points;
+		    percentage = 1;
+		    while true
+			    tmp = polybuffer(total_region,total_reduction*percentage,'JointType','miter','MiterLimit',2);
+			    % if the robot is iniside the augmented obstacle then reduce the percentage reduction
+			    if inpolygon(x_e,y_e,tmp.Vertices(:,1),tmp.Vertices(:,2))
+				    percentage = percentage - 0.1;
+			    else
+				    new_poly_voronoi = subtract(poly_voronoi, tmp);
+				    break;
+			    end
+    
+			    if percentage < 0.1
+				    warning("Not so sure on the reduction of the voronoi cell");
+				    new_poly_voronoi = subtract(poly_voronoi, total_region);
+				    break;
+			    end
+			    
+            end
         end
-		for i = 1:2:size(couples_to_delete,1)
-			% perform the measure
-			if couples_to_delete(i,:) == tmp
-				couples_to_delete(i,:) = couples_to_delete(i-1,:);
-			else
-				couples_to_delete(i,:) = (robot.H * (couples_to_delete(i,:)' - robot.x) + mvnrnd([0;0], robot.R_dist)')';
-				couples_to_delete(i,:) = (couples_to_delete(i,:)' + robot.H * robot.x_est)';
-			end
-			tmp = couples_to_delete(i+1,:);
-			couples_to_delete(i+1,:) = (robot.H * (couples_to_delete(i+1,:)' - robot.x) + mvnrnd([0;0], robot.R_dist)')';
-			couples_to_delete(i+1,:) = (couples_to_delete(i+1,:)' + robot.H * robot.x_est)';
-					
-			% define an area to delete for the first point
-			dir = couples_to_delete(i,:) - [x_e,y_e];
-			dir = dir/norm(dir);
-			% create a point 1000 meters behind the intersection
-			points_to_delete = [couples_to_delete(i,:) + 1000*dir; couples_to_delete(i,:)]; % matrix n by 2
-
-			% define an area to delete for the second point
-			dir = couples_to_delete(i+1,1:2) - [x_e,y_e];
-			dir = dir/norm(dir);
-			% create a point 1000 meters behind the intersection
-			points_to_delete = [points_to_delete; [couples_to_delete(i+1,1:2) + 1000*dir ; couples_to_delete(i+1,1:2)]];
-
-			% reorder the points to delete and create a polyshape
-			points_to_delete = points_to_delete(convhull(points_to_delete(:,1:2)),1:2);
-			region_to_delete{index} = polyshape(points_to_delete(:,1),points_to_delete(:,2));
-			index = index + 1;
-		end
-		total_region = region_to_delete{1};
-		% delete the area behind the intersection
-		for i = 2:length(region_to_delete)
-			total_region = union(region_to_delete{i},total_region);
-		end
-		% compute the reduction 
-		covariance = robot.R_dist + robot.H * robot.P * robot.H'; % covariance of the measurement
-		[V, D] = eig(covariance * param.coverage);
-		max_semiaxis_points = sqrt(max(diag(D))); % max semiaxis of the covariance for the measurement
-		total_reduction = max_semiaxis + robot.volume + max_semiaxis_points;
-		percentage = 1;
-		while true
-			tmp = polybuffer(total_region,total_reduction*percentage,'JointType','miter','MiterLimit',2);
-			% if the robot is iniside the augmented obstacle then reduce the percentage reduction
-			if inpolygon(x_e,y_e,tmp.Vertices(:,1),tmp.Vertices(:,2))
-				percentage = percentage - 0.1;
-			else
-				new_poly_voronoi = subtract(poly_voronoi, tmp);
-				break;
-			end
-
-			if percentage < 0.1
-				warning("Not so sure on the reduction of the voronoi cell");
-				new_poly_voronoi = subtract(poly_voronoi, total_region);
-				break;
-			end
-			
-		end
 		
 	
 
@@ -389,7 +389,11 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 				new_poly_voronoi = tmp;
 				break;
 			end
-		end
+        end
+
+%         if new_poly_voronoi.NumRegions > 1
+%             error("Not unique voronoi area")
+%         end
 
 		%{
 
@@ -406,7 +410,7 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 
 		new_points = setdiff(new_poly_voronoi.Vertices,poly_voronoi.Vertices,'rows','stable');
 		% remove the points if they are Nan
-		% new_points(isnan(new_points(:,1)),:) = [];
+		new_points(isnan(new_points(:,1)),:) = [];
 		index = 1;
 		index_visible = 0;
 		visible_points = [];

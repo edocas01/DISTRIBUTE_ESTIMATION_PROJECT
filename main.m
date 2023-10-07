@@ -2,7 +2,7 @@
 % Robot_cell_array = select_shape(N_robots, type_dynamics, shape, center_point, distance, randdistance, param)
 
 clc;
-clear;
+clear all;
 close all;
 clearvars;
 rng default;

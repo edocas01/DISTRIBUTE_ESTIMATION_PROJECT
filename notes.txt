@@ -157,3 +157,6 @@ La riduzione della cella come avevamo pensato va bene.
 
 --------------------
 - non lineare
+- problemi in voronoi ogni tanto con le incertezze (segna una incertezza alta anche se i robot son visti)
+- problemi con il fatto che ogni tanto le celle di voronoi sono divise in due (in voronoi_LO)
+- ogni tanto i robot sbagliano il controllo e rimangono fermi
