@@ -482,6 +482,7 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 %         axis equal
 %         plot(x_e,y_e,'*r');
 % 		plot(couples_to_delete(:,1),couples_to_delete(:,2),'*b');
+%         plot(visible_points(:,1),visible_points(:,2),'og');
 % 		plot(poly_voronoi);
 % 		LO.plot();
 % 		plot(robot.voronoi);
