@@ -12,11 +12,15 @@ function show_simulation(results)
 		datas.T.plot()
 		plot(datas.circle_target(1,:), datas.circle_target(2,:),'b--', 'LineWidth', 1.5);
 		for i = 1:length(datas.R)
-			datas.R{i}.plot_real(all_markers, color_matrix, true);
-			plot(datas.R{i}.voronoi);
-			plot(datas.barycenter(1,i), datas.barycenter(2,i),'kx', 'LineWidth', 1);
+			if datas.R{i}.robot_crash == false
+				datas.R{i}.plot_real(all_markers, color_matrix, true);
+				plot(datas.R{i}.voronoi, 'HandleVisibility', 'off');
+				plot(datas.barycenter(1,i), datas.barycenter(2,i),'kx', 'LineWidth', 1, 'HandleVisibility', 'off');
+			else
+				plot(datas.R{i}.x(1),datas.R{i}.x(2),'kx', 'LineWidth', 2, 'HandleVisibility', 'off');
+            end
 		end
-
+% 		legend('Location', 'EastOutside');
 		for i = 1:length(datas.O)
             datas.O{i}.plot();
 		end

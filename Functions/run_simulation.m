@@ -19,6 +19,7 @@ function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
         voronoi_map_consensous(parameters_simulation, R, T, O, LO);
         
         % Saving the results
+        data.u_traj = u_traj;
         data.T = copy(T);
         for i = 1:length(R)
             R{i} = copy(R{i});
@@ -48,8 +49,19 @@ function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
             end
                      
             EKF(R{i}, u(:,i));
+
+            if R{i}.robot_crash == false
+                for k = 1:length(LO)
+                    if inpolygon(R{i}.x(1),R{i}.x(2),LO{k}.poly.Vertices(:,1),LO{k}.poly.Vertices(:,2))
+                        R{i}.robot_crash = true;
+                        warning("Robot crashed");
+                        break;
+                    end
+                end
+            end
         end
-        
+
+        data.u = u;
         data.barycenter = barycenter;
 		results{t} = data;
 

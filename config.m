@@ -17,8 +17,8 @@ parameters_simulation = struct( ...
 	... % Debug flags 	
 	'title_flags', 					false, 			... % to print the central strings
 	... % Robot parameters 	
-	'MIN_Rc', 						7, 				... % minimum radius of the communication range (m)
-	'MAX_Rc', 						15, 			... % maximum radius of the communication range (m)
+	'MIN_Rc', 						12, 				... % minimum radius of the communication range (m)
+	'MAX_Rc', 						12, 			... % maximum radius of the communication range (m)
 	'std_gps', 						1, 				... % standard deviation of the GPS (m)
 	'std_robots_model', 			1, 				... % standard deviation of the robot model (m)
 	'std_relative_sensor', 			0.3,      		... % standard deviation of the relative sensor (m)
@@ -29,7 +29,7 @@ parameters_simulation = struct( ...
 	'MAX_ANGULAR_VELOCITY', 		pi/2, 			... % maximum angular velocity (rad/s)
 	'MIN_ANGULAR_VELOCITY', 		pi/6, 			... % minimum angular velocity (rad/s)
 	... % Target parameters
-	'vmax_target', 					10/3.6,		 	... % velocity of target (m/s)
+	'vmax_target', 					20/3.6,		 	... % velocity of target (m/s)
 	... % Punctual obstacles parameters
 	'vmax_obstacle', 				10/3.6, 			... % velocity of the obstacle (m/s)
 	'percentage_static_obstacles',  0.8, 			... % percentage of static obstacles

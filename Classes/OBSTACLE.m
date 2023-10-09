@@ -59,6 +59,15 @@ classdef OBSTACLE < matlab.mixin.Copyable
 				u = obj.vmax*param.dt*obj.random_direction;
 			end
 			obj.x = obj.x + [u(1);u(2)];
+			if abs(obj.x(1)) > param.size_map 
+				obj.x(1) = sign(obj.x(1))*param.size_map;
+				obj.count_random_step = 0;
+			end
+			if abs(obj.x(2)) > param.size_map 
+				obj.x(2) = sign(obj.x(2))*param.size_map;
+				obj.count_random_step = 0;
+			end
+			 
 		end
 
 %{
@@ -79,7 +88,6 @@ classdef OBSTACLE < matlab.mixin.Copyable
 			else
 		    	plot(obj.x(1), obj.x(2),'sk','HandleVisibility', 'off','MarkerSize', 10,'LineWidth', 2);
 			end
-		    hold on;
 	    end
 			
 	end % methods

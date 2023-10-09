@@ -317,22 +317,34 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 		%}
 
 		points_to_delete = [];
+        couples_to_delete_before = couples_to_delete;
 		index = 1;
 		% measure the points and create the region to be deleted
 		if size(couples_to_delete,1) > 1
-            tmp = couples_to_delete(2,:);
 		    for i = 1:2:size(couples_to_delete,1)
 			    % perform the measure
-			    if couples_to_delete(i,:) == tmp
-				    couples_to_delete(i,:) = couples_to_delete(i-1,:);
-			    else
-				    couples_to_delete(i,:) = (robot.H * (couples_to_delete(i,:)' - robot.x) + mvnrnd([0;0], robot.R_dist)')';
-				    couples_to_delete(i,:) = (couples_to_delete(i,:)' + robot.H * robot.x_est)';
-			    end
-			    tmp = couples_to_delete(i+1,:);
-			    couples_to_delete(i+1,:) = (robot.H * (couples_to_delete(i+1,:)' - robot.x) + mvnrnd([0;0], robot.R_dist)')';
-			    couples_to_delete(i+1,:) = (couples_to_delete(i+1,:)' + robot.H * robot.x_est)';
-					    
+				if i > 1
+					if isequal(couples_to_delete(i,:), couples_to_delete_before(i-1,:));
+						couples_to_delete(i,:) = couples_to_delete(i-1,:);
+					else
+						couples_to_delete(i,:) = (robot.H * (couples_to_delete(i,:)' - robot.x) + mvnrnd([0;0], robot.R_dist)')';
+						couples_to_delete(i,:) = (couples_to_delete(i,:)' + robot.H * robot.x_est)';
+					end
+				else
+					couples_to_delete(i,:) = (robot.H * (couples_to_delete(i,:)' - robot.x) + mvnrnd([0;0], robot.R_dist)')';
+					couples_to_delete(i,:) = (couples_to_delete(i,:)' + robot.H * robot.x_est)';
+				end
+				if i+1 == size(couples_to_delete,1)
+					if isequal(couples_to_delete(i+1,:),couples_to_delete_before(1,:))
+						couples_to_delete(i+1,:) = couples_to_delete(1,:);
+					else
+						couples_to_delete(i+1,:) = (robot.H * (couples_to_delete(i+1,:)' - robot.x) + mvnrnd([0;0], robot.R_dist)')';
+						couples_to_delete(i+1,:) = (couples_to_delete(i+1,:)' + robot.H * robot.x_est)';
+					end
+				else
+					couples_to_delete(i+1,:) = (robot.H * (couples_to_delete(i+1,:)' - robot.x) + mvnrnd([0;0], robot.R_dist)')';
+					couples_to_delete(i+1,:) = (couples_to_delete(i+1,:)' + robot.H * robot.x_est)';
+				end
 			    % define an area to delete for the first point
 			    dir = couples_to_delete(i,:) - [x_e,y_e];
 			    dir = dir/norm(dir);
@@ -380,44 +392,36 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
             end
         
 		
-	
-
-		    % for i = 1:new_poly_voronoi.NumRegions
-		    % 	% Keep the region in which the robot is
-		    % 	tmp = rmboundary(new_poly_voronoi,i);
-		    % 	if inpolygon(x_e,y_e,tmp.Vertices(:,1),tmp.Vertices(:,2))
-		    % 		new_poly_voronoi = tmp;
-		    % 		break;
-		    % 	end
-            % end
-		    index = 1;
-		    while new_poly_voronoi.NumRegions > 1
-			    % if the robot is inside the voronoi cell then remove the region in which the robot is
-			    tmp = rmboundary(new_poly_voronoi,index);
-			    if inpolygon(x_e,y_e,tmp.Vertices(:,1),tmp.Vertices(:,2))
-				    new_poly_voronoi = tmp;
-				    index = 1;
-				    continue;
-			    end
-			    index = index + 1;
-			    if index > new_poly_voronoi.NumRegions
-				    % take the largest area
-				    max_area = 0;
-				    index_poly = 0;
-				    for i = 1:new_poly_voronoi.NumRegions
-					    tmp = rmboundary(new_poly_voronoi,i);
-					    area = polyarea(tmp.Vertices(:,1),tmp.Vertices(:,2));
-					    if area >= max_area
-						    max_area = area;
-						    index_poly = i;
-					    end
-				    end
-				    new_poly_voronoi = rmboundary(new_poly_voronoi,index_poly);
-			    end
-		    end
+	        Num_prev = 0;
+            Num = 0;
+            while new_poly_voronoi.NumRegions > 1
+                Num_prev = new_poly_voronoi.NumRegions;
+		        for i = 1:new_poly_voronoi.NumRegions
+                    % Keep the region in which the robot is
+		    	    tmp = rmboundary(new_poly_voronoi,i);
+		    	    if inpolygon(x_e,y_e,tmp.Vertices(:,1),tmp.Vertices(:,2))
+		    		    new_poly_voronoi = tmp;
+		    		    break;
+		    	    end
+                end
+                Num = new_poly_voronoi.NumRegions;
+                if Num == Num_prev
+                    break;
+                end
+            end
+		    
     
             if new_poly_voronoi.NumRegions > 1
                 warning("Two regions in voronoi_LO")
+				figure(3)
+				hold on;
+				grid on;
+				axis equal;
+				plot(x_e,y_e,'*r');
+				plot(couples_to_delete(:,1),couples_to_delete(:,2),'*b');
+				plot(poly_voronoi);
+				LO.plot();
+				plot(new_poly_voronoi);
             end
     
 		    %{
@@ -438,7 +442,6 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 		    % new_points(isnan(new_points(:,1)),:) = [];
 		    index = 1;
 		    index_visible = 0;
-		    visible_points = [];
     
 		    region_to_delete = [];
 		    for i = 1:size(new_points,1)-1
@@ -471,4 +474,16 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
     	    end
     	end
     end
+
+%     intersection = intersect(robot.voronoi, LO.poly);
+%     if size(intersection.Vertices,1) > 0
+%         figure(100)
+%         hold on
+%         axis equal
+%         plot(x_e,y_e,'*r');
+% 		plot(couples_to_delete(:,1),couples_to_delete(:,2),'*b');
+% 		plot(poly_voronoi);
+% 		LO.plot();
+% 		plot(robot.voronoi);
+%     end
 end

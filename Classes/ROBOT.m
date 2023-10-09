@@ -68,6 +68,8 @@ classdef ROBOT < matlab.mixin.Copyable
 		count_random_step   % for the control in case of random movement
 		random_direction    % for the control in case of random movement
 
+		robot_crash         % flag to check if the robot is crashed
+
 	end
 %{
 
@@ -138,7 +140,11 @@ classdef ROBOT < matlab.mixin.Copyable
         % To control if the robot is on the circle of the target
         obj.set_distance_radius = false;
 		obj.count_random_step = 0;
-		obj.random_direction = [];
+		tmp = 2*pi*rand();
+		obj.random_direction = [cos(tmp);sin(tmp)];
+
+		% To check if the robot is crashed
+		obj.robot_crash = false;
 	end
 
 	     
