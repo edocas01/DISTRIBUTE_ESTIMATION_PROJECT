@@ -6,8 +6,19 @@ function [u, barycenter] = compute_control(robot,param)
 		barycenter = robot.x_est;
 	else
 		% decide the control for the robot
-		[objective, phi] = is_on_circle(robot, param);
+		[objective, phi, RANDOM] = is_on_circle(robot, param);
 		[barycenter, msh] = compute_centroid(robot, phi, objective, param);
+
+		if RANDOM && norm(barycenter - robot.x_est) < 0.1
+			figure(1000);clf; axis equal; grid on; 
+			config;
+			hold on
+			robot.plot_real(all_markers, color_matrix, true);
+            plot(robot.voronoi)
+			plot(barycenter(1), barycenter(2), 'ok');
+			plot(objective(1), objective(2), 'om');
+            a=1;
+		end
 
 		if norm(barycenter - robot.x_est) == 0
 			u = [0;0];
@@ -45,15 +56,19 @@ end
 % - if a robot start whithout seeing the target and without neighbors it moves randomly
 % - if a robot start seeing the trget it moves towards the target
 % - if a robot reaches the maximium covariance on the target it moves randomly
-function [center, phi] = decide_target_barycenter(robot,param)
+function [center, phi, RANDOM] = decide_target_barycenter(robot,param)
     radius = 0;
+	RANDOM = false;
     % Set false the radius for the reaching of the target    
     robot.set_distance_radius = false;
 	% if a robot is not seeing the target
 	if (robot.all_robots_pos(end-1) > 1e4 && robot.all_robots_pos(end) > 1e4) || (robot.all_cov_pos(end-1,end-1) > 1000 || robot.all_cov_pos(end,end) > 1000)
+		RANDOM = true; % DA RIMUOVERE
 		if robot.count_random_step > 20 || robot.count_random_step == 0
-			angle = atan2(robot.random_direction(2),robot.random_direction(1));
-			th = (angle - pi/4) + pi/2 * rand();
+            robot.count_random_step = 0;
+			distances = sum(abs(robot.voronoi.Vertices - robot.x_est').^2,2).^0.5;
+			[maxdist, idx] = max(distances);
+			th = atan2(robot.voronoi.Vertices(idx,2)-robot.x_est(2),robot.voronoi.Vertices(idx,1)-robot.x_est(1));
 			robot.random_direction = [cos(th); sin(th)];
 		end
 		robot.count_random_step = robot.count_random_step + 1;
@@ -144,14 +159,14 @@ function [center, phi] = decide_circle_barycenter(robot, param)
 end
 
 % Decide if the robot is on the circle or it has still to reach it
-function [center, phi] = is_on_circle(robot, param)
+function [center, phi, RANDOM] = is_on_circle(robot, param)
 	radius = param.DISTANCE_TARGET;
 	tolerance = param.TOLERANCE_DISTANCE;
 	target = robot.all_robots_pos(end-1:end);
-
+	RANDOM = false;
 	if norm(robot.x_est - target) >= radius - tolerance && norm(robot.x_est - target) <= radius + tolerance
 		[center, phi] = decide_circle_barycenter(robot,param);
 	else
-		[center, phi] = decide_target_barycenter(robot,param);
+		[center, phi, RANDOM] = decide_target_barycenter(robot,param);
 	end
 end

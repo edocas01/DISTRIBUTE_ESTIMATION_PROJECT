@@ -14,6 +14,7 @@ parameters_simulation = struct( ...
 	'size_map', 					50,  			... % size of the map
 	'N_MAX', 						15,  			... % maximum number of agents
 	'DEBUG', 						false,          ... % Debug flags
+	'Setup_folder',					'Setup', 		... % folder with the saved setup
 	... % Debug flags 	
 	'title_flags', 					false, 			... % to print the central strings
 	... % Robot parameters 	

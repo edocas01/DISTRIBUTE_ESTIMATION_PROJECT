@@ -8,7 +8,7 @@ clearvars;
 rng default;
 
 addpath('Scripts');
-
+addpath('Setup');
 addpath('Functions');
 addpath('Classes');
 addpath('Results');
@@ -47,8 +47,11 @@ end
 hold off
 legend('Location','eastoutside')
 pause(1)
+
+
 %% Calculations	
 tic
+save_setup(R, T, O, LO, u_traj, parameters_simulation);
 results = run_simulation(R, T, O, LO, u_traj, parameters_simulation);
 if (~isempty(name))
     name = ['Results/',name,'.mat'];
