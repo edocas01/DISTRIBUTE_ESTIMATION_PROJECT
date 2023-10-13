@@ -39,11 +39,13 @@ classdef ROBOT < matlab.mixin.Copyable
 	properties
 		type; 				% type of robot (linear, unicycle, etc.)
 		x_est; 				% estimated state
+		th_est;			 	% estimated angle (only for unicycle)
 		P;       			% covariance matrix of the state
 		ComRadius; 			% communication radius
 		id; 				% id of the robot
 		
 		x; 					% real position of the robot
+		th; 				% real angle (only for unicycle)
 		x_in; 				% initial (real) position of the robot 
 		R_gps; 				% GPS measurement covariance matrix
 		Q; 					% Uncertainty matrix of the dynamics model
@@ -92,24 +94,31 @@ classdef ROBOT < matlab.mixin.Copyable
 			obj.x = zeros(2,1); 
 			obj.x(1) = x(1);
 			obj.x(2) = x(2);
+			obj.th = 0;
 			obj.x_in = obj.x; % Save initial position in case of initiailzation
 			obj.x_est = obj.x;
+			obj.th_est = obj.th;
 			obj.P = eye(2);
 			obj.Q = (rand(2,2) - 0.5) * param.std_relative_sensor;
 			obj.Q = obj.Q * obj.Q';
 			obj.vmax = rand() * (param.MAX_LINEAR_VELOCITY - param.MIN_LINEAR_VELOCITY) + param.MIN_LINEAR_VELOCITY;
 		elseif strcmp(obj.type, 'unicycle')
-			obj.x = zeros(3,1); 
+			obj.x = zeros(2,1); 
 			obj.x(1) = x(1);
 			obj.x(2) = x(2);
-			obj.x(3) = x(3);
+			obj.th = x(3);
 			obj.x_in = obj.x;
 			obj.x_est = obj.x;
+			obj.th_est = obj.th;
 			obj.P = eye(3);
-			obj.Q = (rand(3,3) - 0.5) * param.std_relative_sensor;
-			obj.Q = obj.Q * obj.Q';
+			obj.Q = zeros(3,3);
+			obj.Q(1:2,1:2) = (rand(2,2) - 0.5) * param.std_relative_sensor;
+			obj.Q(1:2,1:2) = obj.Q(1:2,1:2) * obj.Q(1:2,1:2)';
+			obj.Q(end,end) = (param.std_relative_sensor_theta)^2*rand(); 
 			obj.vmax = [rand() * (param.MAX_LINEAR_VELOCITY - param.MIN_LINEAR_VELOCITY) + param.MIN_LINEAR_VELOCITY;...
 					    rand() * (param.MAX_ANGULAR_VELOCITY - param.MIN_ANGULAR_VELOCITY) + param.MIN_ANGULAR_VELOCITY];
+		else
+			error('The type of robot is not defined');
 		end
 			
 		obj.ComRadius = rand()*(param.MAX_Rc - param.MIN_Rc) + param.MIN_Rc;
@@ -150,20 +159,30 @@ classdef ROBOT < matlab.mixin.Copyable
 	     
 	% Update the position of the robot
 	function obj = dynamics(obj, u)
+		% if the dynamics is linear the input is the increment of coordinates in meters,
+		% otherwise is the increment along the forward direction and the increment of the angle
 		if strcmp(obj.type, 'linear')   
 			% linear dynamics with noise
 			obj.x_est = obj.x_est + u + mvnrnd([0;0], obj.Q)';
 			% linear dynamics without noise used in the gps measurement
 			obj.x = obj.x + u;
 		elseif strcmp(obj.type, 'unicycle')
-			% rotation matrix 3x3
-			R = [cos(obj.x_est(3)), -sin(obj.x_est(3)), 0;
-				 sin(obj.x_est(3)),  cos(obj.x_est(3)), 0;
-				 0, 0, 1];
+			% we consider to have already v*dt and w*dt as inputs
+			% x = x + dt*(v)*cos(theta) + noise_x
+			% y = y + dt*(v)*sin(theta) + noise_y
+			% theta = theta + dt*(w) + noise_theta
+			th = obj.th_est;
+			R = [cos(th), 0;
+				 sin(th), 0;
+				 0, 1];
 			% unicycle dynamics with noise
-			obj.x_est = obj.x_est + R*u + mvnrnd([0;0;0], obj.Q)';
+			tmp = [obj.x_est;obj.th_est] + R*u + mvnrnd([0;0;0], obj.Q)';
+			obj.x_est = tmp(1:2);
+			obj.th_est = wrapTo2Pi(tmp(3));
 			% unicycle dynamics without noise used in the gps measurement
-			obj.x = obj.x + R*u;
+			tmp = [obj.x;obj.th] + R*u;
+			obj.x = tmp(1:2);
+			obj.th = wrapTo2Pi(tmp(3));
 		end
 	end
 	
@@ -172,9 +191,10 @@ classdef ROBOT < matlab.mixin.Copyable
 		if strcmp(obj.type, 'linear')
 			J_X = eye(2);
 		elseif strcmp(obj.type, 'unicycle')
-			J_X = [1, 0, -obj.x_est(2)*u(1) - obj.x_est(1)*u(2);
-				   0, 1,  obj.x_est(1)*u(1) - obj.x_est(2)*u(2);
-				   0, 0,  1];
+			theta = obj.th_est;
+			J_X = [1, 0, -sin(theta);
+				   0, 1, cos(theta);
+				   0, 0, 1];
 		end
 	end
 
@@ -191,7 +211,10 @@ classdef ROBOT < matlab.mixin.Copyable
 	function J_H = jacobian_measurement(obj)
 		if strcmp(obj.type, 'linear')
 			J_H = eye(2);
+		else
+			J_H = [eye(2),[0;0]];
 		end
+
 	end
 	
 	% Perform a gps measure considering the real position of the robot
