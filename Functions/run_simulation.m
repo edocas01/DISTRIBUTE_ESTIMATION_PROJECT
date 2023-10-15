@@ -1,5 +1,5 @@
 % This function runs the simulation of the robots
-function results = run_simulation(R, T, O, u_traj, parameters_simulation)
+function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
 	Tmax = length(u_traj(1,:));
 	results = cell(1,Tmax);
     
@@ -16,20 +16,24 @@ function results = run_simulation(R, T, O, u_traj, parameters_simulation)
         
 
         relative_general_consensous(R, T, parameters_simulation);
-        voronoi_map_consensous(parameters_simulation, R, O);
+        voronoi_map_consensous(parameters_simulation, R, T, O, LO);
         
         % Saving the results
+        data.u_traj = u_traj;
         data.T = copy(T);
         for i = 1:length(R)
             R{i} = copy(R{i});
         end
         data.R = R;
         
-        position_obstacles = [];
         for i = 1:length(O)
-            position_obstacles(i,:) = [O{i}.x(1),O{i}.x(2)];
+            O{i} = copy(O{i});
         end
-        data.O = position_obstacles;
+        data.O = O;
+
+        for i = 1:length(LO)
+            data.LO{i} = LO{i};
+        end
 
 		data.circle_target = [circx;circy];
 		
@@ -45,19 +49,35 @@ function results = run_simulation(R, T, O, u_traj, parameters_simulation)
             end
                      
             EKF(R{i}, u(:,i));
+
+            if R{i}.robot_crash == false
+                for k = 1:length(LO)
+                    if inpolygon(R{i}.x(1),R{i}.x(2),LO{k}.poly.Vertices(:,1),LO{k}.poly.Vertices(:,2))
+                        R{i}.robot_crash = true;
+                        warning("Robot crashed");
+                        break;
+                    end
+                end
+            end
         end
-        
+
+        data.u = u;
         data.barycenter = barycenter;
 		results{t} = data;
 
         % Move the target
         T.dynamics(u_traj(:,t));
+        % Move the obstacles
+        for i = 1:length(O)
+            O{i}.dynamics(parameters_simulation);
+        end
 
         if mod(t,round(Tmax/4)) == 0
             fprintf("Percentage of simulation: %d%%\n",round(t/Tmax*100))
             pause(0.5)
         end
     end
+
 
 
 end

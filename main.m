@@ -8,6 +8,7 @@ clearvars;
 rng default;
 
 addpath('Scripts');
+addpath('Setup');
 addpath('Functions');
 addpath('Classes');
 addpath('Results');
@@ -18,7 +19,7 @@ name = input("Save the results: ", "s");
 config;
 clc;
 
-[T,~,u_traj,O,L_O,R] = initialize_env(parameters_simulation);
+[T,~,u_traj,O,LO,R] = initialize_env(parameters_simulation);
 fprintf("Target initial position: (%.2f m, %.2f m)\n", T.x(1), T.x(2));
 parameters_simulation.N = length(R);
 N = length(R);
@@ -39,16 +40,19 @@ for i = 1:length(O)
     O{i}.plot();
 end
 
-for i = 1:length(L_O)
-    L_O{i}.plot();
+for i = 1:length(LO)
+    LO{i}.plot();
 end
 
 hold off
 legend('Location','eastoutside')
 pause(1)
+
+
 %% Calculations	
 tic
-results = run_simulation(R, T, O, u_traj, parameters_simulation);
+save_setup(R, T, O, LO, u_traj, parameters_simulation);
+results = run_simulation(R, T, O, LO, u_traj, parameters_simulation);
 if (~isempty(name))
     name = ['Results/',name,'.mat'];
     save(name, "results");

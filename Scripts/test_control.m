@@ -1,11 +1,13 @@
 clc;
 close all;
-clearvars;
-rng default;
 config;
-% [T, trajectory, u_trajectory, obstacles] = initialize_env(parameters_simulation);
 
+index = 2;
+distances = sum(abs(R{index}.voronoi.Vertices - R{index}.x_est').^2,2).^0.5;
+[maxdist, idx] = max(distances);
+vert = R{index}.voronoi.Vertices(idx,:);
 
+<<<<<<< HEAD
 
 [T,~,u_traj,~] = initialize_env(parameters_simulation);
 fprintf("Target initial position: (%.2f m, %.2f m)\n", T.x(1), T.x(2));
@@ -92,3 +94,10 @@ end
 
 
 toc
+=======
+figure(100);
+hold on; axis equal; grid on;
+R{index}.plot_real(all_markers, color_matrix, true);
+plot(vert(1), vert(2), 'or');
+plot(R{index}.voronoi);
+>>>>>>> c04de915b6b0c7981ce206f81b0678c9e67f4e87

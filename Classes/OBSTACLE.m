@@ -1,4 +1,4 @@
-classdef OBSTACLE < handle
+classdef OBSTACLE < matlab.mixin.Copyable
 
 %{
 
@@ -14,7 +14,10 @@ classdef OBSTACLE < handle
 %}
 
 	properties
-		x 				% position of the obstacle
+		x 					% position of the obstacle
+		vmax				% maximum velocity of the obstacle
+		count_random_step 	% counter for the random step
+		random_direction  	% random direction
 	end
 
 %{
@@ -32,13 +35,39 @@ classdef OBSTACLE < handle
 
 	methods 
 		% Iniatialization of the obstacle
-    	function obj = OBSTACLE(x,y)
+    	function obj = OBSTACLE(x, y, mobility, param)
 			obj.x = [x;y];
+			if mobility
+				obj.vmax = param.vmax_obstacle;
+			else
+				obj.vmax = 0;
+			end
+			obj.count_random_step = 0;
+			obj.random_direction = [];
     	end
     
 		% Update the position of the obstacle
-		function obj = dynamics(obj, u)
+		function obj = dynamics(obj, param)
+			u = [0;0];
+			if obj.vmax > 0
+				if obj.count_random_step == 0 || obj.count_random_step > 10 
+					obj.count_random_step = 0;
+					th = 2*pi*rand();
+					obj.random_direction = [cos(th), sin(th)];
+				end
+				obj.count_random_step = obj.count_random_step + 1;
+				u = obj.vmax*param.dt*obj.random_direction;
+			end
 			obj.x = obj.x + [u(1);u(2)];
+			if abs(obj.x(1)) > param.size_map 
+				obj.x(1) = sign(obj.x(1))*param.size_map;
+				obj.count_random_step = 0;
+			end
+			if abs(obj.x(2)) > param.size_map 
+				obj.x(2) = sign(obj.x(2))*param.size_map;
+				obj.count_random_step = 0;
+			end
+			 
 		end
 
 %{
@@ -54,8 +83,11 @@ classdef OBSTACLE < handle
 
 %}
         function plot(obj)
-		    plot(obj.x(1), obj.x(2),'sk','HandleVisibility', 'off','MarkerSize', 10,'LineWidth', 2);
-		    hold on;
+			if obj.vmax > 0
+				plot(obj.x(1), obj.x(2),'sb','HandleVisibility', 'off','MarkerSize', 10,'LineWidth', 2);
+			else
+		    	plot(obj.x(1), obj.x(2),'sk','HandleVisibility', 'off','MarkerSize', 10,'LineWidth', 2);
+			end
 	    end
 			
 	end % methods

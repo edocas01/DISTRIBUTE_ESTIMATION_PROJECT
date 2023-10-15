@@ -31,6 +31,7 @@ function relative_general_consensous(robots, target, param)
 				else
 					% the roboti cannot measure the robotj so it uses the last estimate of the robot
 					% and the covariance matrix of the robot estimate is set to a high value
+					% If robot a cannot see b, it can still inform the robot c (who is seeing b) about its position
 					robots{i}.all_robots_pos(2*j-1:2*j) = robots{i}.all_robots_pos(2*j-1:2*j);
 					if norm(robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) * 5) >= norm(eye(2)*1e6)
 						robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = eye(2)*1e6;

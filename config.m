@@ -14,14 +14,16 @@ parameters_simulation = struct( ...
 	'size_map', 					50,  			... % size of the map
 	'N_MAX', 						15,  			... % maximum number of agents
 	'DEBUG', 						false,          ... % Debug flags
+	'Setup_folder',					'Setup', 		... % folder with the saved setup
 	... % Debug flags 	
 	'title_flags', 					false, 			... % to print the central strings
 	... % Robot parameters 	
-	'MIN_Rc', 						4, 				... % minimum radius of the communication range (m)
-	'MAX_Rc', 						5, 			... % maximum radius of the communication range (m)
-	'std_gps', 						1, 				... % standard deviation of the GPS (m)
-	'std_robots_model', 			1, 				... % standard deviation of the robot model (m)
-	'std_relative_sensor', 			0.3,      		... % standard deviation of the relative sensor (m)
+	'MIN_Rc', 						12, 			... % minimum radius of the communication range (m)
+	'MAX_Rc', 						12, 			... % maximum radius of the communication range (m)
+	'std_gps', 						3/3, 			... % standard deviation of the GPS (m)
+	'std_robots_model', 			1/3, 			... % standard deviation of the robot model (m)
+	'std_relative_sensor', 			0.3/3,      	... % standard deviation of the relative sensor (m)
+	'std_relative_sensor_theta',    5*pi/180/3, 	... % standard deviation of the relative sensor (rad)
 	'MAX_VOLUME',					0.2, 			... % maximum radius of the robot volume (m)
 	'MIN_VOLUME',					0.4, 			... % minimum radius of the robot volume (m)
 	'MAX_LINEAR_VELOCITY', 			50/3.6, 		... % maximum linear velocity (m/s)
@@ -29,14 +31,17 @@ parameters_simulation = struct( ...
 	'MAX_ANGULAR_VELOCITY', 		pi/2, 			... % maximum angular velocity (rad/s)
 	'MIN_ANGULAR_VELOCITY', 		pi/6, 			... % minimum angular velocity (rad/s)
 	... % Target parameters
-	'vmax_target', 					10/3.6,		 	... % velocity of target (m/s)
+	'vmax_target', 					20/3.6,		 	... % velocity of target (m/s)
+	... % Punctual obstacles parameters
+	'vmax_obstacle', 				10/3.6, 			... % velocity of the obstacle (m/s)
+	'percentage_static_obstacles',  0.8, 			... % percentage of static obstacles
 	... % Consensous parameters	
 	'MSG_PROTOCOL', 				50,				... % protocol used for message passing
 	... % Voronoi parameters
 	'coverage', 					3, 				... % coverage for the uncertainties 
 	... % Control parameters
-	'DISTANCE_TARGET',				5, 				... % distance from the target (m)
-	'TOLERANCE_DISTANCE', 			0 			... % tolerance distance on the circle (m)
+	'DISTANCE_TARGET',				3, 				... % distance from the target (m)
+	'TOLERANCE_DISTANCE', 			0 				... % tolerance distance on the circle (m)
 	);
 	parameters_simulation.TOLERANCE_DISTANCE = parameters_simulation.DISTANCE_TARGET*0.5;
 

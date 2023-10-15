@@ -16,8 +16,23 @@ function [target, trajectory, u_trajectory, obstacles, large_obstacles, robots] 
 	grid on;
 	axis equal;
 	axis(param.size_map * [-1 1 -1 1]);
-	
-	idx = 1;
+	% create an obstacle to limit the map
+	size_map = param.size_map - 0.8;
+	th = 0.01;
+	X = [-size_map-30 size_map];
+	X = [X; [size_map size_map]];
+	X = [X; [size_map -size_map]];
+	X = [X; [-size_map -size_map]];
+	X = [X; [-size_map size_map-th]];
+	X = [X; [-size_map+th size_map-th]];
+	X = [X; [-size_map+th -size_map+th]];
+	X = [X; [size_map-th -size_map+th]];
+	X = [X; [size_map-th size_map-th/2]];
+	X = [X; [-size_map-30 size_map-th/2]];
+
+	large_obstacles{1} = LARGE_OBSTACLE(X);
+    large_obstacles{1}.plot();
+	idx = 2;
 	FIRST = false;
 	while true
 		x = [];
@@ -73,8 +88,12 @@ function [target, trajectory, u_trajectory, obstacles, large_obstacles, robots] 
 		if ~isequal(button,1) % if enter is pressed
 			break;
 		end
-		obstacles{idx} = OBSTACLE(xi,yi);
-		plot(x, y, 'sk');
+		if rand() < param.percentage_static_obstacles
+			obstacles{idx} = OBSTACLE(xi,yi, false, param);
+		else
+			obstacles{idx} = OBSTACLE(xi,yi, true, param);
+		end
+		obstacles{idx}.plot();
 		idx = idx + 1;
 	end
 	print_title("Acquired punctual obstacles",param.title_flags);
