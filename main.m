@@ -8,7 +8,6 @@ clearvars;
 rng default;
 
 addpath('Scripts');
-addpath('Setup');
 addpath('Functions');
 addpath('Classes');
 addpath('Results');

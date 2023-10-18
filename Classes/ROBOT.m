@@ -178,7 +178,7 @@ classdef ROBOT < matlab.mixin.Copyable
 			% unicycle dynamics with noise
 			tmp = [obj.x_est;obj.th_est] + R*u + mvnrnd([0;0;0], obj.Q)';
 			obj.x_est = tmp(1:2);
-			obj.th_est = wrapTo2Pi(tmp(3));
+			obj.th_est = tmp(3);% wrapTo2Pi(tmp(3));
 			% real unicycle dynamics without noise used in the gps measurement
 			th = obj.th;
 			R = [cos(th), 0;
@@ -186,7 +186,7 @@ classdef ROBOT < matlab.mixin.Copyable
 				 0, 1];
 			tmp = [obj.x;obj.th] + R*u;
 			obj.x = tmp(1:2);
-			obj.th = wrapTo2Pi(tmp(3));
+			obj.th = tmp(3);%wrapTo2Pi(tmp(3));
 		end
 	end
 	
