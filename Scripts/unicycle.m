@@ -7,12 +7,13 @@ dt = parameters_simulation.dt;
 kp = 1/dt;
 
 X_f = [30;70];
-Tmax = 100;
+Tmax = 10;
 T = 0:dt:Tmax;
 X = [];
 TH = [];
 X_est = [];
 TH_est = [];
+figure(1)
 for i = 1:length(T)
 	if norm(X_f - R.x_est) > 1
 		v = kp*(norm(X_f - R.x_est));
@@ -31,6 +32,11 @@ for i = 1:length(T)
 	X = [X,R.x];
 	TH = [TH,R.th];
 	EKF(R, [v;omega]);
+	
+	clf;
+	axis equal; grid on; hold on;
+	R.plot_real(all_markers, color_matrix, true);
+	drawnow
 end
 
 figure()
@@ -38,10 +44,11 @@ plot(X(1,:),X(2,:),'b')
 hold on
 plot(X_est(1,:),X_est(2,:),'r')
 plot(X_f(1), X_f(2), 'om')
+legend('real','estimated','final point')
 
 figure()
 plot(T,rad2deg(TH),'b')
 hold on
 plot(T,rad2deg(TH_est),'r')
-
+legend('real','estimated')
 

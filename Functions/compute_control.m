@@ -17,7 +17,6 @@ function [u, barycenter] = compute_control(robot,param)
             plot(robot.voronoi)
 			plot(barycenter(1), barycenter(2), 'ok');
 			plot(objective(1), objective(2), 'om');
-            a=1;
 		end
 
 		if norm(barycenter - robot.x_est) == 0
