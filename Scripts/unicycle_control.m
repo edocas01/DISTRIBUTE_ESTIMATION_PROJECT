@@ -2,8 +2,8 @@ clear; close all; clc;
 rng default;
 config;
 parameters_simulation.N = 1;
-
-R = ROBOT([0,0,pi/5],1,'unicycle',parameters_simulation);
+initial = [0;0;0];
+R = ROBOT(initial,1,'unicycle',parameters_simulation);
 
 dt = parameters_simulation.dt;
 
@@ -15,57 +15,64 @@ quadratox = [1 1 10 10];
 quadratoy = [-6 10 10 -6];
 R.voronoi = subtract(R.voronoi,polyshape(quadratox,quadratoy));
 
-figure(1)
-hold on
-axis equal
-grid on
-plot(R.voronoi)
-R.plot_real(all_markers, color_matrix, false);
+% genera una serie di punti nel piano in un raggio di 10 metri
+% anche con coordinate negative
+X_ff = 10*rand(5,2) - 5;
 
-X_f = [-4; 4];
+for j = 1:size(X_ff,1)
+	R.x = initial(1:2);
+	R.th = initial(3);
+	figure(j)
+	hold on
+	axis equal
+	grid on
+	% plot(R.voronoi)
+	R.plot_real(all_markers, color_matrix, false);
 
-[x,y,theta] = generate_trajectory(R, X_f, dt, parameters_simulation);
-plot(X_f(1),X_f(2),'*r','LineWidth',2);
-plot(x,y,'-*r','LineWidth',1.1);
-
-% movimentare il robot
-[dx,dtheta] = generate_control(R, X_f,dt,parameters_simulation);
-R.dynamics([dx; dtheta]);
-R.plot_real(all_markers, color_matrix, false);
-
-
-
-function [x,y,th] = generate_trajectory(R, X_f, dt, parameters_simulation)
-		dt_new = 0:dt/100:dt;
-		x = [R.x(1)];
-		y = [R.x(2)];
-		th = [R.th];
-		[dx,dtheta] = generate_control(R, X_f,dt,parameters_simulation);
-		dx = dx/(length(dt_new)-1);
-		dtheta = dtheta/(length(dt_new)-1);
-		
-		
-		for i = 1:length(dt_new)-1
-			R = [cos(th(end) + dtheta), 0;
-				 sin(th(end) + dtheta), 0;
-				 0, 1];
-			tmp = [x(1);y(1);th(1)] + R*[dx*i;dtheta*i];
-			x_new = tmp(1);
-			y_new = tmp(2);
-			th_new = wrapTo2Pi(tmp(3));
-			x = [x; x_new];
-			y = [y; y_new];
-			th = [th; th_new];
-		end
+	X_f = X_ff(j,:); 
+	plot(X_f(1),X_f(2),'*r')
+	% movimentare il robot
+	for i = 1:10
+	[dx,dtheta] = generate_control(R, X_f,dt,parameters_simulation);
+		R.dynamics([dx; dtheta]);
+		R.plot_real(all_markers, color_matrix, false);
+	end
 end
 
 function [dx,dtheta] = generate_control(R, X_f,dt,parameters_simulation)
 	kp = 1/dt;
+	flag = 1;
+	alpha = wrapTo2Pi(atan2(X_f(2)-R.x(2),X_f(1)-R.x(1)));
+	gamma = alpha - R.th;
+	cos_gamma = cos(gamma);
+
 	v = kp*(norm(X_f - R.x));
 	v = min(v,parameters_simulation.MAX_LINEAR_VELOCITY);
-	dx = v*dt;
-	angle = atan2(X_f(2)-R.x(2),X_f(1)-R.x(1));
-	omega = kp*(wrapTo2Pi(angle) - R.th);
-	omega = min(omega,parameters_simulation.MAX_ANGULAR_VELOCITY);
-	dtheta = omega*dt;
+	dx = v*dt*cos_gamma;
+
+	% if cos_gamma < 0
+	% 	angle_final = angle_final + pi;
+	% 	gamma = wrapTo2Pi(angle_final) - R.th;
+	% end
+	if alpha >= R.th 
+		if gamma > pi
+			gamma = 2*pi - gamma;
+			flag = -1;
+		else
+			flag = 1;
+		end
+	else
+		gamma = R.th - alpha;
+		if gamma > pi
+			gamma = 2*pi - gamma;
+			flag = 1;
+		else
+			flag = -1;
+		end
+		
+	end
+
+	omega = kp*(gamma);
+	omega = min(abs(omega),parameters_simulation.MAX_ANGULAR_VELOCITY);
+	dtheta = omega*dt*flag;
 end
