@@ -101,9 +101,13 @@ function [dx,dtheta] = generate_control(R, X_f,dt)
 	Xf_angle = atan2(X_f(2) - R.x(2), X_f(1) - R.x(1)) - R.th;
     rad2deg(Xf_angle)
 	kp = 1/dt;
-	if Xf_angle > pi/6 && Xf_angle < 2 * pi - pi / 6
+
+	if Xf_angle == -R.th
+		v = min(kp * norm(X_f - R.x), R.vmax(1));
+		omega = 0;
+	elseif Xf_angle > pi/6 && Xf_angle < 2 * pi - pi / 6
 		% go backwards
-		v = -min(kp * norm(X_f - R.x), R.vmax(1));
+		v = -min(kp * norm(X_f - R.x), R.vmax(1)) * cos(Xf_angle);
 		omega = min(kp * Xf_angle, R.vmax(2));
 	else
 		% go forward
