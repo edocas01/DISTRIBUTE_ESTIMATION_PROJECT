@@ -1,8 +1,8 @@
 % This function runs the simulation of the robots
 function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
+    parameters_simulation.N = length(R);
 	Tmax = length(u_traj(1,:));
 	results = cell(1,Tmax);
-    
     % Initial localizations of the robots
     for i = 1:10
         for j = 1:length(R)
