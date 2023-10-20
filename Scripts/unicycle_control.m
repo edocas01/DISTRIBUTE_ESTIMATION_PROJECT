@@ -17,7 +17,8 @@ R.voronoi = subtract(R.voronoi,polyshape(quadratox,quadratoy));
 
 % genera una serie di punti nel piano in un raggio di 10 metri
 % anche con coordinate negative
-X_ff = 10*rand(5,2) - 5;
+% X_ff = 10*rand(5,2) - 5;
+X_ff = [0 0; -5 5; 5 5; 5 -5; -5 -5];
 
 for j = 1:size(X_ff,1)
 	R.x = initial(1:2);
@@ -50,10 +51,6 @@ function [dx,dtheta] = generate_control(R, X_f,dt,parameters_simulation)
 	v = min(v,parameters_simulation.MAX_LINEAR_VELOCITY);
 	dx = v*dt*cos_gamma;
 
-	% if cos_gamma < 0
-	% 	angle_final = angle_final + pi;
-	% 	gamma = wrapTo2Pi(angle_final) - R.th;
-	% end
 	if alpha >= R.th 
 		if gamma > pi
 			gamma = 2*pi - gamma;
