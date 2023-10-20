@@ -34,6 +34,8 @@ function [target, trajectory, u_trajectory, obstacles, large_obstacles, robots] 
     large_obstacles{1}.plot();
 	idx = 2;
 	FIRST = false;
+	first_time = true;
+	exit = false;
 	while true
 		x = [];
 		y = [];
@@ -42,6 +44,15 @@ function [target, trajectory, u_trajectory, obstacles, large_obstacles, robots] 
 			if ~FIRST
 				[xi, yi ,button] = ginput(1);
             end
+
+			if first_time
+				if ~isequal(button,1) % if enter is pressed
+					exit = true;
+					break;
+				end
+			end
+			first_time = false;
+
 			if size(X,1) > 2
            		if ~isequal(button,1) % if enter is pressed
 					break;
@@ -52,7 +63,12 @@ function [target, trajectory, u_trajectory, obstacles, large_obstacles, robots] 
 			y = [y yi];
 			X = [x' y'];
 			plot(x, y, '--ko');
+		end 
+		
+		if exit
+			break;
 		end
+		
 		large_obstacles{idx} = LARGE_OBSTACLE(X);
 		clf;
 		sgtitle("Select points to create obstacles")
@@ -157,7 +173,11 @@ function [target, trajectory, u_trajectory, obstacles, large_obstacles, robots] 
 
 	param.N = idx - 1;
 	for i = 1:param.N
-		robots{i} = ROBOT([x(i);y(i)], i, 'linear', param);
+		if rand() < param.percentage_linear_dynamics
+			robots{i} = ROBOT([x(i);y(i)], i, 'linear', param);
+		else
+			robots{i} = ROBOT([x(i);y(i);rand()*2*pi], i, 'unicycle', param);
+		end
 		robots{i}.plot_real(all_markers, color_matrix, true);
 	end
 

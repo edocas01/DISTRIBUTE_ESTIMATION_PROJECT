@@ -71,7 +71,6 @@ classdef ROBOT < matlab.mixin.Copyable
 		random_direction    % for the control in case of random movement
 
 		robot_crash         % flag to check if the robot is crashed
-
 	end
 %{
 
@@ -255,7 +254,7 @@ classdef ROBOT < matlab.mixin.Copyable
 			plot(x,y, '--k', 'HandleVisibility', 'off');
 		end
 		if strcmp(obj.type, 'unicycle')
-			plot([obj.x_est(1), obj.x_est(1) + cos(obj.th_est)*2*obj.volume], [obj.x_est(2), obj.x_est(2) + sin(obj.th_est)*2*obj.volume], 'k','LineWidth', 3, 'HandleVisibility', 'off');
+			plot([obj.x_est(1), obj.x_est(1) + cos(obj.th_est)*5*obj.volume], [obj.x_est(2), obj.x_est(2) + sin(obj.th_est)*5*obj.volume], 'k','LineWidth', 3, 'HandleVisibility', 'off');
 		end
 	end
 
@@ -270,7 +269,7 @@ classdef ROBOT < matlab.mixin.Copyable
 			plot(x,y, '--k', 'HandleVisibility', 'off');
 		end
 		if strcmp(obj.type, 'unicycle')
-			plot([obj.x(1), obj.x(1) + cos(obj.th)*2*obj.volume], [obj.x(2), obj.x(2) + sin(obj.th)*2*obj.volume], 'k', 'LineWidth', 3, 'HandleVisibility', 'off');
+			plot([obj.x(1), obj.x(1) + cos(obj.th)*5*obj.volume], [obj.x(2), obj.x(2) + sin(obj.th)*5*obj.volume], 'k', 'LineWidth', 3, 'HandleVisibility', 'off');
 		end
 	end
 

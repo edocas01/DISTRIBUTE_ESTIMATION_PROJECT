@@ -154,11 +154,11 @@ La riduzione della cella come avevamo pensato va bene.
 		- simulare le misure sui punti
 		- spostare i punti in base alle incertezze/volumi
 
-
---------------------
-- non lineare
-- ogni tanto i robot sbagliano il controllo e rimangono fermi
-
 --------------------
 fare vedere video del controllo non lineare e lineare (le due traiettorie)
 fare vedere la funzione a vasca 
+far vedere localizzazioni x,y,theta
+far vedere localizzazione sul target
+definire delle metriche per valutare le performance
+far vedere voronoi come funziona con tutti i possibili ostaoli
+fare vedere ellisse di covarianza prima e dopo consenso con tabella annessa

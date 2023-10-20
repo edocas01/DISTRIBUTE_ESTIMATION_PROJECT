@@ -6,15 +6,14 @@ function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
     % Initial localizations of the robots
     for i = 1:10
         for j = 1:length(R)
-            EKF(R{j},0);
+            EKF(R{j},[0;0]);
         end
         relative_general_consensous(R, T, parameters_simulation);
     end
     % Simulation
     for t = 1:Tmax
-        [circx, circy] = Circle(T.x(1), T.x(2), parameters_simulation.DISTANCE_TARGET);
-        
 
+        [circx, circy] = Circle(T.x(1), T.x(2), parameters_simulation.DISTANCE_TARGET);
         relative_general_consensous(R, T, parameters_simulation);
         voronoi_map_consensous(parameters_simulation, R, T, O, LO);
         
@@ -74,7 +73,11 @@ function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
 
         if mod(t,round(Tmax/4)) == 0
             fprintf("Percentage of simulation: %d%%\n",round(t/Tmax*100))
-            pause(0.5)
+            % destroy randomly a robot
+            if rand() < parameters_simulation.CRASH_PERCENTAGE
+                R{randi(length(R))}.robot_crash = true;
+                disp("Robot destroyed on purpose");
+            end
         end
     end
 

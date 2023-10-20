@@ -9,19 +9,19 @@ function [u, barycenter] = compute_control(robot,param)
 		[objective, phi, RANDOM] = is_on_circle(robot, param);
 		[barycenter, msh] = compute_centroid(robot, phi, objective, param);
 
-		if RANDOM && norm(barycenter - robot.x_est) < 0.1
-			figure(1000);clf; axis equal; grid on; 
-			config;
-			hold on
-			robot.plot_real(all_markers, color_matrix, true);
-            plot(robot.voronoi)
-			plot(barycenter(1), barycenter(2), 'ok');
-			plot(objective(1), objective(2), 'om');
-		end
+		% if RANDOM && norm(barycenter - robot.x_est) < 0.1
+		% 	figure(1000);clf; axis equal; grid on; 
+		% 	config;
+		% 	hold on
+		% 	robot.plot_real(all_markers, color_matrix, true);
+        %     plot(robot.voronoi)
+		% 	plot(barycenter(1), barycenter(2), 'ok');
+		% 	plot(objective(1), objective(2), 'om');
+		% end
 
 		if norm(barycenter - robot.x_est) == 0
 			u = [0;0];
-		else
+		elseif robot.type == "linear"
 			kp = 1/param.dt;
 			% compute the control
 			if  kp * norm(barycenter - robot.x_est) < robot.vmax
@@ -29,6 +29,8 @@ function [u, barycenter] = compute_control(robot,param)
 			else
 				u = robot.vmax * param.dt * (barycenter - robot.x_est) / norm(barycenter - robot.x_est);
 			end
+		elseif robot.type == "unicycle"
+			u = generate_control(robot, barycenter, param.dt);
 		end
 	end
     
@@ -168,4 +170,64 @@ function [center, phi, RANDOM] = is_on_circle(robot, param)
 	else
 		[center, phi, RANDOM] = decide_target_barycenter(robot,param);
 	end
+end
+
+% compute the control for non linear robots
+function u = generate_control(R, X_f,dt)
+	kp = 1/dt;
+	flag = 1;
+	alpha = wrapTo2Pi(atan2(X_f(2)-R.x_est(2),X_f(1)-R.x_est(1)));
+	gamma = alpha - R.th_est;
+	cos_gamma = cos(gamma);
+
+	v = kp*(norm(X_f - R.x_est));
+	v = min(v,R.vmax(1));
+	
+	percentage = 1;
+	outside = true;
+	% check if the robot will remain in the voronoi cell
+	while outside 
+		dx = v*dt*cos_gamma*percentage;
+		new_point = R.x_est + [dx*cos(R.th_est); dx*sin(R.th_est)];
+		if inpolygon(new_point(1), new_point(2), R.voronoi.Vertices(:,1), R.voronoi.Vertices(:,2))
+			outside = false;
+		else
+			percentage = percentage - 0.1;
+            % figure(132)
+            % hold on
+            % grid on
+            % axis equal
+            % plot(R.voronoi)
+            % config;
+            % R.plot_est(all_markers, color_matrix, false)
+            % plot(new_point(1),new_point(2),'or');
+		end
+
+		if percentage == 0
+			outside = false;
+			dx = 0;
+		end
+	end
+	if alpha >= R.th_est
+		if gamma > pi
+			gamma = 2*pi - gamma;
+			flag = -1;
+		else
+			flag = 1;
+		end
+	else
+		gamma = R.th_est - alpha;
+		if gamma > pi
+			gamma = 2*pi - gamma;
+			flag = 1;
+		else
+			flag = -1;
+		end
+		
+	end
+
+	omega = kp*(gamma);
+	omega = min(abs(omega),R.vmax(2));
+	dtheta = omega*dt*flag;
+	u = [dx;dtheta];
 end

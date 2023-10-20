@@ -21,7 +21,7 @@ parameters_simulation = struct( ...
 	'MIN_Rc', 						12, 			... % minimum radius of the communication range (m)
 	'MAX_Rc', 						12, 			... % maximum radius of the communication range (m)
 	'std_gps', 						3/3, 			... % standard deviation of the GPS (m)
-	'std_robots_model', 			1/3, 			... % standard deviation of the robot model (m)
+	'std_robots_model', 			0.5/3, 			... % standard deviation of the robot model (m)
 	'std_relative_sensor', 			0.3/3,      	... % standard deviation of the relative sensor (m)
 	'std_relative_sensor_theta',    5*pi/180/3, 	... % standard deviation of the relative sensor (rad)
 	'MAX_VOLUME',					0.2, 			... % maximum radius of the robot volume (m)
@@ -29,7 +29,9 @@ parameters_simulation = struct( ...
 	'MAX_LINEAR_VELOCITY', 			50/3.6, 		... % maximum linear velocity (m/s)
 	'MIN_LINEAR_VELOCITY', 			20/3.6, 		... % minimum linear velocity (m/s)
 	'MAX_ANGULAR_VELOCITY', 		pi/2, 			... % maximum angular velocity (rad/s)
-	'MIN_ANGULAR_VELOCITY', 		pi/4, 			... % minimum angular velocity (rad/s)
+	'MIN_ANGULAR_VELOCITY', 		75/180*pi, 			... % minimum angular velocity (rad/s)
+	'percentage_linear_dynamics', 	0.7, 			... % percentage of linear dynamics robots
+	'CRASH_PERCENTAGE', 			0.1, 			... % percentage of crash
 	... % Target parameters
 	'vmax_target', 					20/3.6,		 	... % velocity of target (m/s)
 	... % Punctual obstacles parameters

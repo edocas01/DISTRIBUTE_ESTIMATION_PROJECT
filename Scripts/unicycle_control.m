@@ -33,25 +33,42 @@ for j = 1:size(X_ff,1)
 	X_f = X_ff(j,:); 
 	plot(X_f(1),X_f(2),'*r')
 	% movimentare il robot
-	for i = 1:10
-	[dx,dtheta] = generate_control(R, X_f,dt,parameters_simulation);
+	for i = 1:20
+	[dx,dtheta] = generate_control(R, X_f,dt);
 		R.dynamics([dx; dtheta]);
 		R.plot_real(all_markers, color_matrix, false);
 	end
 end
 
-function [dx,dtheta] = generate_control(R, X_f,dt,parameters_simulation)
+function [dx,dtheta] = generate_control(R, X_f,dt)
 	kp = 1/dt;
 	flag = 1;
-	alpha = wrapTo2Pi(atan2(X_f(2)-R.x(2),X_f(1)-R.x(1)));
-	gamma = alpha - R.th;
+	alpha = wrapTo2Pi(atan2(X_f(2)-R.x_est(2),X_f(1)-R.x_est(1)));
+	gamma = alpha - R.th_est;
 	cos_gamma = cos(gamma);
 
-	v = kp*(norm(X_f - R.x));
-	v = min(v,parameters_simulation.MAX_LINEAR_VELOCITY);
-	dx = v*dt*cos_gamma;
+	v = kp*(norm(X_f - R.x_est));
+	v = min(v,R.vmax(1));
+	
+	percentage = 1;
+	outside = true;
+	% check if the robot will remain in the voronoi cell
+	while outside 
+		dx = v*dt*cos_gamma*percentage;
+		new_point = R.x_est + [dx*cos(R.th_est); dx*sin(R.th_est)];
+		if inpolygon(new_point(1), new_point(2), R.voronoi.Vertices(:,1), R.voronoi.Vertices(:,2))
+			outside = false;
+		else
+			percentage = percentage - 0.1;
+		end
 
-	if alpha >= R.th 
+		if percentage == 0
+			outside = false;
+			dx = 0;
+		end
+	end
+		
+	if alpha >= R.th_est
 		if gamma > pi
 			gamma = 2*pi - gamma;
 			flag = -1;
@@ -59,7 +76,7 @@ function [dx,dtheta] = generate_control(R, X_f,dt,parameters_simulation)
 			flag = 1;
 		end
 	else
-		gamma = R.th - alpha;
+		gamma = R.th_est - alpha;
 		if gamma > pi
 			gamma = 2*pi - gamma;
 			flag = 1;
@@ -70,6 +87,6 @@ function [dx,dtheta] = generate_control(R, X_f,dt,parameters_simulation)
 	end
 
 	omega = kp*(gamma);
-	omega = min(abs(omega),parameters_simulation.MAX_ANGULAR_VELOCITY);
+	omega = min(abs(omega),R.vmax(2));
 	dtheta = omega*dt*flag;
 end

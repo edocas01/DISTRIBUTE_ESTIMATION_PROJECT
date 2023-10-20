@@ -14,7 +14,7 @@ function show_simulation(results)
 		for i = 1:length(datas.R)
 			if datas.R{i}.robot_crash == false
 				datas.R{i}.plot_real(all_markers, color_matrix, true);
-				plot(datas.R{i}.voronoi, 'HandleVisibility', 'off');
+				plot(datas.R{i}.voronoi, 'HandleVisibility', 'off', 'FaceColor', color_matrix(datas.R{i}.id,:));
 				plot(datas.barycenter(1,i), datas.barycenter(2,i),'kx', 'LineWidth', 1, 'HandleVisibility', 'off');
 			else
 				plot(datas.R{i}.x(1),datas.R{i}.x(2),'kx', 'LineWidth', 2, 'HandleVisibility', 'off');

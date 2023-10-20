@@ -11,7 +11,7 @@ function voronoi_map_consensous(param, robots, target, obstacles, LO)
 		end
 		modified_positions = [];
 		% compute the max semiaxis of the uncertainty of i
-		[~, eigenvalues] = eig(robots{i}.P*param.coverage);
+		[~, eigenvalues] = eig(robots{i}.P(1:2,1:2)*param.coverage);
 		max_semiaxis = sqrt(max(diag(eigenvalues)));
 
 		for j = 1:length(robots{i}.all_robots_pos)/2
@@ -63,7 +63,7 @@ function voronoi_map_consensous(param, robots, target, obstacles, LO)
 					obstacle_measure = robots{i}.H * (obstacle - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
 					% obstacle in world frame
 					obstacle_measure = obstacle_measure + robots{i}.H * robots{i}.x_est;
-					obstacle_covariance = robots{i}.R_dist + robots{i}.H * robots{i}.P * robots{i}.H';
+					obstacle_covariance = robots{i}.R_dist + robots{i}.H * robots{i}.P(1:2,1:2) * robots{i}.H';
 
 					% move the obstacle in the closest point to the agent i according to the uncertainty on the obstacle 
 					z = moving_closer_point(robots{i}.x_est, obstacle_measure, obstacle_covariance, param.coverage);
@@ -153,14 +153,14 @@ function voronoi_map_consensous(param, robots, target, obstacles, LO)
 			robots{i}.voronoi = intersect(poly_circle, poly_voronoi);
 		end
 		
-		if ~inpolygon(robots{i}.x_est(1),robots{i}.x_est(2), robots{i}.voronoi.Vertices(:,1), robots{i}.voronoi.Vertices(:,2))
-			figure(140)
-			hold on
-			axis equal
-			plot(robots{i}.voronoi)
-			plot(robots{i}.x_est(1),robots{i}.x_est(2), 'r*')
-			plot(modified_positions(1,:), modified_positions(2,:), 'b*')
-		end
+		% if ~inpolygon(robots{i}.x_est(1),robots{i}.x_est(2), robots{i}.voronoi.Vertices(:,1), robots{i}.voronoi.Vertices(:,2))
+		% 	figure(140)
+		% 	hold on
+		% 	axis equal
+		% 	plot(robots{i}.voronoi)
+		% 	plot(robots{i}.x_est(1),robots{i}.x_est(2), 'r*')
+		% 	plot(modified_positions(1,:), modified_positions(2,:), 'b*')
+		% end
 
 		% remove large obstacles
 		for z = 1:length(LO)
