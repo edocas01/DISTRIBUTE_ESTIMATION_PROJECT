@@ -155,7 +155,6 @@ La riduzione della cella come avevamo pensato va bene.
 		- spostare i punti in base alle incertezze/volumi
 
 --------------------
-fare vedere la funzione a vasca 
 far vedere localizzazioni x,y,theta
 far vedere localizzazione sul target
 definire delle metriche per valutare le performance
