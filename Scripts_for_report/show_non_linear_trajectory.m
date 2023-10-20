@@ -32,7 +32,7 @@ Y2 = [R2.x(2)];
 X3 = [R3.x(1)];
 Y3 = [R3.x(2)];
 
-myVideo = VideoWriter('IMAGES/CONTROL_PLANNING/trajectory_planning'); %open video file
+myVideo = VideoWriter('IMAGES/TRAJECTORY_PLANNING/trajectory_planning'); %open video file
 myVideo.FrameRate = 6;  
 open(myVideo)
 
@@ -115,8 +115,8 @@ plot(X3,Y3,'-*r','LineWidth',2,'DisplayName','Linear: (0,0)');
 plot(X_f(1),X_f(2),'o','Color',[0.9290 0.6940 0.1250],'LineWidth',4,'MarkerSize',10, 'DisplayName','Goal');
 legend('Location','northwest');
 % save the figure
-saveas(fig,'IMAGES/CONTROL_PLANNING/trajectory_planning.png');
-saveas(fig,'IMAGES/CONTROL_PLANNING/trajectory_planning.fig');
+saveas(fig,'IMAGES/TRAJECTORY_PLANNING/trajectory_planning.png');
+saveas(fig,'IMAGES/TRAJECTORY_PLANNING/trajectory_planning.fig');
 
 
 
