@@ -227,7 +227,7 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 				for k = 1:size(intersection_voronoi,2)
 					intersection_obstacle = intersect(LO.poly, [x_r,y_r;intersection_voronoi(1,k), intersection_voronoi(2,k)]); % output given by row
 					distances = sum(abs(intersection_obstacle - [intersection_voronoi(1,k), intersection_voronoi(2,k)]).^2, 2).^0.5;
-					intersection_obstacle(distances < 1e-20,:) = [];
+					intersection_obstacle(distances < 1e-5,:) = [];
 					% If after removing "itself" there are still intesections with the obstacle then the intersection with voronoi is not visible
 					% and then we proced with the reduction of the cell
 					if isempty(intersection_obstacle)
