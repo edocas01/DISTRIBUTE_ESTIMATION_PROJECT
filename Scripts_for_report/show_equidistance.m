@@ -2,11 +2,7 @@ clear all;
 close all;
 clc;
 config;
-set(0,'defaulttextinterpreter','latex')
-set(groot, 'defaultAxesTickLabelInterpreter','latex');
-set(groot, 'defaultLegendInterpreter','latex');
-set(0,'defaultAxesFontSize',  16)
-set(0,'DefaultLegendFontSize',16)
+settings_scripts;
 
 % show the function to keep a given distance with respect to the robot
 % r = 3;
