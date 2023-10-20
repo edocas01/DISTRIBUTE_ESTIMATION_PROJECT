@@ -186,7 +186,8 @@ classdef ROBOT < matlab.mixin.Copyable
 				 0, 1];
 			tmp = [obj.x;obj.th] + R*u;
 			obj.x = tmp(1:2);
-			obj.th = tmp(3);%wrapTo2Pi(tmp(3));
+			obj.th = tmp(3);
+			% obj.th = wrapTo2Pi(tmp(3));
 		end
 	end
 	

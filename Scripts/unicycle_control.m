@@ -75,28 +75,6 @@ for i = dt:dt:Tmax
 	drawnow
 end
 
-% function [x,y,th] = generate_trajectory(R, X_f, dt, parameters_simulation)
-% 		dt_new = 0:dt/100:dt;
-% 		x = [R.x(1)];
-% 		y = [R.x(2)];
-% 		th = [R.th];
-% 		[dx,dtheta] = generate_control(R, X_f,dt,parameters_simulation);
-% 		dx = dx/(length(dt_new)-1);
-% 		dtheta = dtheta/(length(dt_new)-1);
-% 		for i = 1:length(dt_new)-1
-% 			R = [cos(th(end) + dtheta), 0;
-% 				 sin(th(end) + dtheta), 0;
-% 				 0, 1];
-% 			tmp = [x(1);y(1);th(1)] + R*[dx*i;dtheta*i];
-% 			x_new = tmp(1);
-% 			y_new = tmp(2);
-% 			th_new = wrapTo2Pi(tmp(3));
-% 			x = [x; x_new];
-% 			y = [y; y_new];
-% 			th = [th; th_new];
-% 		end
-% end
-
 function [dx,dtheta] = generate_control(R, X_f,dt)
 	Xf_angle = atan2(X_f(2) - R.x(2), X_f(1) - R.x(1)) - R.th;
     rad2deg(Xf_angle)
@@ -105,17 +83,14 @@ function [dx,dtheta] = generate_control(R, X_f,dt)
 	if Xf_angle == -R.th
 		v = min(kp * norm(X_f - R.x), R.vmax(1));
 		omega = 0;
-	elseif Xf_angle > pi/6 && Xf_angle < 2 * pi - pi / 6
+	elseif Xf_angle > pi / 2 && Xf_angle < -pi / 2
 		% go backwards
-		v = -min(kp * norm(X_f - R.x), R.vmax(1)) * cos(Xf_angle);
-		omega = min(kp * Xf_angle, R.vmax(2));
 	else
 		% go forward
-		v = min(kp * norm(X_f - R.x), R.vmax(1));
-		omega = min(kp * Xf_angle, R.vmax(2));
 	end
+	omega = sign(Xf_angle) * min(kp * abs(Xf_angle), R.vmax(2));
+	v = min(kp * norm(X_f - R.x), R.vmax(1)) * cos(Xf_angle);
 
 	dx = v * dt;
 	dtheta = omega * dt;
 end
-
