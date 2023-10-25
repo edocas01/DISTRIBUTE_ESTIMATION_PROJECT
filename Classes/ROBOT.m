@@ -113,7 +113,7 @@ classdef ROBOT < matlab.mixin.Copyable
 			obj.Q = zeros(3,3);
 			obj.Q(1:2,1:2) = (rand(2,2) - 0.5) * param.std_robots_model;
 			obj.Q(1:2,1:2) = obj.Q(1:2,1:2) * obj.Q(1:2,1:2)';
-			obj.Q(end,end) = (param.std_relative_sensor_theta)^2*rand(); 
+			obj.Q(end,end) = (param.std_robots_model_theta)^2*rand(); 
 			obj.vmax = [rand() * (param.MAX_LINEAR_VELOCITY - param.MIN_LINEAR_VELOCITY) + param.MIN_LINEAR_VELOCITY;...
 					    rand() * (param.MAX_ANGULAR_VELOCITY - param.MIN_ANGULAR_VELOCITY) + param.MIN_ANGULAR_VELOCITY];
 		else

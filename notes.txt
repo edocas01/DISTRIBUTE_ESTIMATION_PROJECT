@@ -156,7 +156,15 @@ La riduzione della cella come avevamo pensato va bene.
 
 --------------------
 far vedere localizzazioni x,y,theta
-far vedere localizzazione sul target
-definire delle metriche per valutare le performance
-far vedere voronoi come funziona con tutti i possibili ostaoli
+definire delle metriche per valutare le performance:
+	- errore di equidistanza in simulazione libera sia statico che dinamico
+far vedere voronoi come funziona con tutti i possibili ostacoli
 fare vedere ellisse di covarianza prima e dopo consenso con tabella annessa
+fare vedere dei casi in cui il target viene perso e dopo vanno da soli
+
+
+
+-------------
+IMPROVEMENTS:
+- Distributed kalman filter
+- controllo ottimo per la traiettoria

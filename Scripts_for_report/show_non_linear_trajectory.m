@@ -9,8 +9,8 @@ set(0,'defaultAxesFontSize',  16)
 set(0,'DefaultLegendFontSize',16)
 dt = parameters_simulation.dt;
 % define parameters
-ic1 = [0;0;pi/2];
-ic2 = [-pi/3];
+ic1 = [0;0;2*pi/3];
+ic2 = [-pi/2];
 X_f = [10;10];
 Tmax = 21;
 
@@ -18,7 +18,7 @@ Tmax = 21;
 parameters_simulation.N = 1;
 R1 = ROBOT(ic1,1,'unicycle',parameters_simulation);
 R1.vmax(1) = 50/3.6;
-R1.vmax(2) = pi/2;
+R1.vmax(2) = pi/1.5;
 R2 = ROBOT([ic1(1:2);ic2],1,'unicycle',parameters_simulation);
 R2.vmax = R1.vmax(1);
 R2.vmax(2) = R1.vmax(2);
@@ -109,8 +109,8 @@ fig = figure(1);
 set(gcf, 'Position', get(0, 'Screensize'));
 hold on;
 axis equal; grid on; xlim([-2 11]); ylim([-1 11]); xlabel('x [m]'); ylabel('y [m]'); title('Robot path');
-plot(X1,Y1,'-*b','LineWidth',2,'DisplayName','Unicycle: (0,0,$\frac{\pi}{2}$)');
-plot(X2,Y2,'-*k','LineWidth',2,'DisplayName','Unicycle: (0,0,$-\frac{\pi}{3}$)');
+plot(X1,Y1,'-*b','LineWidth',2,'DisplayName','Unicycle: (0,0,$\frac{2\pi}{3}$)');
+plot(X2,Y2,'-*k','LineWidth',2,'DisplayName','Unicycle: (0,0,$-\frac{\pi}{2}$)');
 plot(X3,Y3,'-*r','LineWidth',2,'DisplayName','Linear: (0,0)');
 plot(X_f(1),X_f(2),'o','Color',[0.9290 0.6940 0.1250],'LineWidth',4,'MarkerSize',10, 'DisplayName','Goal');
 legend('Location','northwest');
