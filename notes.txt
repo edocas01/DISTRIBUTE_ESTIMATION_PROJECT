@@ -155,13 +155,18 @@ La riduzione della cella come avevamo pensato va bene.
 		- spostare i punti in base alle incertezze/volumi
 
 --------------------
-far vedere localizzazioni x,y,theta
-definire delle metriche per valutare le performance:
-	- errore di equidistanza in simulazione libera sia statico che dinamico
-far vedere voronoi come funziona con tutti i possibili ostacoli
-fare vedere ellisse di covarianza prima e dopo consenso con tabella annessa
-fare vedere dei casi in cui il target viene perso e dopo vanno da soli
+RESULTS:
+- far vedere localizzazioni x,y,theta con le covarianze
+- definire delle metriche per valutare le performance:
+	- errore di equidistanza in simulazione libera sia statico che dinamico sia per banco lineare che misto,
+		- sempre per questi quattro casi valutare l'errore sulla distanza tra robot e target.
+	- std di localizzazione degli altri robot prima e dopo consenso
+- far vedere voronoi come funziona con tutti i possibili ostacoli
 
+PRESENTAZIONE:
+fare vedere dei casi in cui il target viene perso e dopo vanno da soli
+fare vedere una simulazione completa (anche con raggi diversi)
+fare vedere l'aggiornamento di voronoi dinamicamente
 
 
 -------------

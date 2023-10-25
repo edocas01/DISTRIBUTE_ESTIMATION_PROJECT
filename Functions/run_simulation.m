@@ -33,6 +33,7 @@ function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
         for i = 1:length(LO)
             data.LO{i} = LO{i};
         end
+        data.LO = LO;
 
 		data.circle_target = [circx;circy];
 		

@@ -2,7 +2,7 @@
 function show_simulation(results)
 	config;
     size_map = parameters_simulation.size_map;
-	figure(3);
+	fig = figure(3);
 	for t = 1:length(results)
 		clf
 		hold on; grid on; 
@@ -30,4 +30,5 @@ function show_simulation(results)
 		end
     	drawnow
 	end
+	close(fig);
 end
