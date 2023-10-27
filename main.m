@@ -65,3 +65,4 @@ toc
 tic  
 show_simulation(results)
 toc
+display_results

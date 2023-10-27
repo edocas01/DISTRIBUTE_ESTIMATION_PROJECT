@@ -5,9 +5,9 @@ function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
 	results = cell(1,Tmax);
     % Initial localizations of the robots
     for i = 1:10
-        for j = 1:length(R)
-            EKF(R{j},[0;0]);
-        end
+        % for j = 1:length(R)
+        %     EKF(R{j},[0;0]);
+        % end
         relative_general_consensous(R, T, parameters_simulation);
     end
     % Simulation

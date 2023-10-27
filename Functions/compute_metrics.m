@@ -20,11 +20,11 @@ function metrics = compute_metrics(results, param)
 		end
 		
 		% compute robot on the circle
-		robot_pos = robot_pos(:,(sum((robot_pos - T_pos).^2,1).^0.5 >= radius - tolerance & sum((robot_pos - T_pos).^2,1).^0.5 <= radius + tolerance));
 		robot_id = robot_id(sum((robot_pos - T_pos).^2,1).^0.5 >= radius - tolerance & sum((robot_pos - T_pos).^2,1).^0.5 <= radius + tolerance);
+		robot_pos = robot_pos(:,(sum((robot_pos - T_pos).^2,1).^0.5 >= radius - tolerance & sum((robot_pos - T_pos).^2,1).^0.5 <= radius + tolerance));
 
 		% compute the angles of the robots
-		if ~isempty(robot_pos)
+		if size(robot_pos,2) > 1
 			angles = wrapTo2Pi(atan2(robot_pos(2,:) - T_pos(2), robot_pos(1,:) - T_pos(1)));
 			[angles, idx] = sort(angles, 'ascend');
 			robot_id = robot_id(idx);
@@ -46,7 +46,7 @@ function metrics = compute_metrics(results, param)
 				metrics{robot_id(j)}.err_angles(i) = delta_next - delta_prev;
 			end
 			
-			remaning_index = setdiff(1:N, robot_id);
+			remaning_index = setdiff(1:N, robot_id, 'stable');
 			for j = 1:length(remaning_index)
 				metrics{remaning_index(j)}.err_angles(i) = 100;
 			end

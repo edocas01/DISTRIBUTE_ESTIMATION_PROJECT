@@ -2,7 +2,6 @@
 function show_simulation(results)
 	config;
     size_map = parameters_simulation.size_map;
-	fig = figure(3);
 	for t = 1:length(results)
 		clf
 		hold on; grid on; 
@@ -20,6 +19,7 @@ function show_simulation(results)
 				plot(datas.R{i}.x(1),datas.R{i}.x(2),'kx', 'LineWidth', 2, 'HandleVisibility', 'off');
             end
 		end
+		xlabel('x [m]'); ylabel('y [m]');
 % 		legend('Location', 'EastOutside');
 		for i = 1:length(datas.O)
             datas.O{i}.plot();
@@ -27,9 +27,7 @@ function show_simulation(results)
 
 		for i = 1:length(datas.LO)
 			datas.LO{i}.plot();
-		end
-		title(['t = ', num2str(t)]);
+        end
     	drawnow
 	end
-	close(fig);
 end

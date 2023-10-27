@@ -31,7 +31,7 @@ parameters_simulation = struct( ...
 	'MAX_ANGULAR_VELOCITY', 		pi/2, 			... % maximum angular velocity (rad/s)
 	'MIN_ANGULAR_VELOCITY', 		75/180*pi, 			... % minimum angular velocity (rad/s)
 	'percentage_linear_dynamics', 	0.7, 			... % percentage of linear dynamics robots
-	'CRASH_PERCENTAGE', 			0.1, 			... % percentage of crash
+	'CRASH_PERCENTAGE', 			0.0, 			... % percentage of crash
 	... % Target parameters
 	'vmax_target', 					20/3.6,		 	... % velocity of target (m/s)
 	... % Punctual obstacles parameters

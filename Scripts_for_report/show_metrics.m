@@ -9,12 +9,12 @@ if ~exist('Results/results_for_metrics.mat', 'file')
 	end
 	
 	clear R;
-	R = cell(1, 4); % {{5 linear}, {5 linear and unicyle}, {5 linear}, {5 linear and unicyle}}
+	R = cell(1, 2); % {{5 linear}, {5 linear and unicyle}}
 	parameters_simulation.N = 5;
 	parameters_simulation.CRASH_PERCENTAGE = 0;
 	for i = 1:2
 		for j = 1:length(xR)
-			if (j <= 3  && i~=1) || i == 1 
+			if (j <= 2  && i~=1) || i == 1 
 				tmp{j} = ROBOT([xR(j);yR(j)], j, 'linear', parameters_simulation);
 				tmp1{j} = ROBOT([xR(j);yR(j)], j, 'linear', parameters_simulation);
 			else
@@ -30,101 +30,97 @@ if ~exist('Results/results_for_metrics.mat', 'file')
 	tmp = T.x;
 
 	for i = 1:2 % linear or unicycle
-		results{2*i-1} = run_simulation(R{i}, T, [],[], u_traj, parameters_simulation); % Dynamic (first or third simulation)
+		results{i} = run_simulation(R{i}, T, [],[], u_traj, parameters_simulation); % Dynamic
 		T.x = tmp;
 		if i > 1
-			show_simulation(results{2*i-1});
+			show_simulation(results{i});
 		end
-		results{2*i} = run_simulation(R{i+2}, T, [], [], u_traj.*0, parameters_simulation); % Static (second or fourth simulation)
-		T.x = tmp;
-		show_simulation(results{2*i});
-
 	end
 	save('Results/results_for_metrics.mat', 'results');
 else
 	load('Results/results_for_metrics.mat');
 end
-% results = [dinlin, statlin, dinun, statun]
+% results = [dinlin, dinun]
 
 
-% % show the localization of a robot with its covariances
-% % extract a non linear robot for the dynamic symulation
-% X = []; % state of the state (x,y,theta) (N*3)
-% X_est = []; % estimated state of the state (x,y,theta) (N*3)
-% P = []; % std of the state (x,y,theta) (N*3)
-% ERR = []; % error of the state (x,y,theta) (N*3)
-% for i = 1:length(results{1})
-% 	% unicycle robot
-% 	robot = results{3}{i}.R{5};
-% 	X = [X; [robot.x' robot.th]];
-% 	X_est = [X_est; [robot.x_est' robot.th_est]];
-% 	P = [P; [sqrt(robot.P(1,1)) sqrt(robot.P(2,2)) sqrt(robot.P(3,3))]];
-% 	tmp = robot.th-robot.th_est;
-% 	if tmp > pi 
-% 		tmp = 2*pi - tmp;
-% 	elseif tmp < -pi
-% 		tmp = 2*pi + tmp;
-% 	end
+% show the localization of a robot with its covariances
+% extract a non linear robot for the dynamic symulation
+X = []; % state of the state (x,y,theta) (N*3)
+X_est = []; % estimated state of the state (x,y,theta) (N*3)
+P = []; % std of the state (x,y,theta) (N*3)
+ERR = []; % error of the state (x,y,theta) (N*3)
+for i = 1:length(results{1})
+	% unicycle robot
+	robot = results{2}{i}.R{5};
+	X = [X; [robot.x' robot.th]];
+	X_est = [X_est; [robot.x_est' robot.th_est]];
+	P = [P; [sqrt(robot.P(1,1)) sqrt(robot.P(2,2)) sqrt(robot.P(3,3))]];
+	tmp = robot.th-robot.th_est;
+	if tmp > pi 
+		tmp = 2*pi - tmp;
+	elseif tmp < -pi
+		tmp = 2*pi + tmp;
+	end
 
-% 	ERR = [ERR; [robot.x'-robot.x_est' tmp]];
-% end
+	ERR = [ERR; [robot.x'-robot.x_est' tmp]];
+end
 
-% time = 0:1:length(results{1})-1;
-% fig = figure(1); 
-% set(gcf, 'Position', get(0, 'Screensize'));
-% tiledlayout(3,1,'TileSpacing','compact', 'Padding','compact');
+time = 0:1:length(results{1})-1;
+fig = figure(1); 
+set(gcf, 'Position', get(0, 'Screensize'));
+tiledlayout(3,1,'TileSpacing','compact', 'Padding','compact');
 
-% nexttile; hold on; grid on;
-% box on; 
-% plot(time, ERR(:,1), '-or','DisplayName','Error x');
-% plot(time, ERR(:,2), '-ob','DisplayName','Error y');
-% title('Localization error x and y', 'Interpreter', 'latex')
-% ylabel('Err. [m]','Interpreter', 'latex');
-% legend('Location','northwest', 'Interpreter', 'latex', 'Orientation','horizontal');
-% xlim([0, length(results{1})]);
-% ylim([min(ERR(:,1)), max(ERR(:,1))]);
-% set(gca,'xtick',[])
+nexttile; hold on; grid on;
+box on; 
+plot(time, ERR(:,1), '-or','DisplayName','Error x');
+plot(time, ERR(:,2), '-ob','DisplayName','Error y');
+title('Localization error x and y', 'Interpreter', 'latex')
+ylabel('Err. [m]','Interpreter', 'latex');
+legend('Location','northwest', 'Interpreter', 'latex', 'Orientation','horizontal');
+xlim([0, length(results{1})]);
+ylim([min(ERR(:,1)), max(ERR(:,1))]);
+set(gca,'xtick',[])
 
-% nexttile([1,1]); hold on; grid on;
-% box on; 
-% plot(time, ERR(:,3),'-ob','DisplayName','Error $\theta$');
-% title('Localization error $\theta$', 'Interpreter', 'latex')
-% ylabel('Err. [rad]', 'Interpreter', 'latex');
-% legend('Location','northwest', 'Interpreter', 'latex');
-% xlim([0, length(results{1})]);
-% ylim([min(ERR(:,3)), max(ERR(:,3))]);
-% set(gca,'xtick',[])
+nexttile([1,1]); hold on; grid on;
+box on; 
+plot(time, ERR(:,3),'-ob','DisplayName','Error $\theta$');
+title('Localization error $\theta$', 'Interpreter', 'latex')
+ylabel('Err. [rad]', 'Interpreter', 'latex');
+legend('Location','northwest', 'Interpreter', 'latex');
+xlim([0, length(results{1})]);
+ylim([min(ERR(:,3)), max(ERR(:,3))]);
+set(gca,'xtick',[])
 
-% nexttile; hold on; grid on;
-% box on; 
-% yyaxis left
-% ylabel('Std [m]', 'Interpreter', 'latex');
-% plot(time, P(:,1), '-or','DisplayName','Std x');
-% plot(time, P(:,2), '-ok','DisplayName','Std y');
+nexttile; hold on; grid on;
+box on; 
+yyaxis left
+ylabel('Std [m]', 'Interpreter', 'latex');
+plot(time, P(:,1), '-or','DisplayName','Std x');
+plot(time, P(:,2), '-ok','DisplayName','Std y');
 
-% yyaxis right
-% plot(time, P(:,3), '-ob','DisplayName','Std $\theta$');
-% ylabel('Std [rad]', 'Interpreter', 'latex');
-% xlabel('Time [s]','Interpreter', 'latex');
-% title('Standard deviation of the localization', 'Interpreter', 'latex')
-% legend('Location','northwest', 'Interpreter', 'latex', 'Orientation','horizontal');
-% xlim([0, length(results{1})]);
+yyaxis right
+plot(time, P(:,3), '-ob','DisplayName','Std $\theta$');
+ylabel('Std [rad]', 'Interpreter', 'latex');
+xlabel('Time [s]','Interpreter', 'latex');
+title('Standard deviation of the localization', 'Interpreter', 'latex')
+legend('Location','northwest', 'Interpreter', 'latex', 'Orientation','horizontal');
+xlim([0, length(results{1})]);
 
-% ax = gca;
-% ax.YAxis(1).Color = 'k';
-% ax.YAxis(2).Color = 'b';
+ax = gca;
+ax.YAxis(1).Color = 'k';
+ax.YAxis(2).Color = 'b';
 
-% saveas(fig,'IMAGES/ROBOT_LOCALIZATION/robot_localization.png');
-% saveas(fig,'IMAGES/ROBOT_LOCALIZATION/robot_localization.fig');
-
-% close all;
+saveas(fig,'IMAGES/ROBOT_LOCALIZATION/robot_localization.png');
+saveas(fig,'IMAGES/ROBOT_LOCALIZATION/robot_localization.fig');
 
 
+
+%%
 % TODO define the metrics for the equidistance and for the distance w.r.t. the target
 values = [];
 for i = 1:length(results)
 	metrics = compute_metrics(results{i}, parameters_simulation);
-	if i == 3
+	if i == 2
 		metrics_for_plot = metrics;
 	end
 	for j = 1:length(metrics)
@@ -138,11 +134,14 @@ for i = 1:length(results)
 		values(i*4-2,j) = std_err_dist;
 		values(i*4-1,j) = mean_err_angle;
 		values(i*4,j) = std_err_angle;
-
-	
+		% create a latex file for the table
+		create_macro_latex("latex_macros.tex",strjoin(["meandist", num2str(i*4-3), num2str(j)],""),values(i*4-3,j),'a');
+		create_macro_latex("latex_macros.tex",strjoin(["stddist", num2str(i*4-2), num2str(j)],""),values(i*4-2,j),'a');
+		create_macro_latex("latex_macros.tex",strjoin(["meanangle", num2str(i*4-1), num2str(j)],""),values(i*4-1,j),'a');
+		create_macro_latex("latex_macros.tex",strjoin(["stdangle", num2str(i*4), num2str(j)],""),values(i*4,j),'a');
 	end
 end
-%%
+% %%
 fig = figure(2);
 set(gcf, 'Position', get(0, 'Screensize'));
 tiledlayout(2,1,'TileSpacing','compact', 'Padding','compact');
@@ -161,6 +160,7 @@ end
 title('Distance on target error', 'Interpreter', 'latex'); 
 ylabel('Error [m]', 'Interpreter', 'latex');
 set(gca,'xtick',[])
+
 xlim([0, length(metrics_for_plot{1}.err_dist)-1]);
 legend('Location','northwest', 'Interpreter', 'latex', 'Orientation','horizontal');
 
@@ -184,4 +184,8 @@ xlabel('Time [s]', 'Interpreter', 'latex');
 ylim("padded");
 xlim([0, length(metrics_for_plot{1}.err_dist)-1]);
 legend('Location','northwest', 'Interpreter', 'latex', 'Orientation','horizontal');
+
+saveas(fig,'IMAGES/SIMULATION_METRICS/simulation_metrics.png');
+saveas(fig,'IMAGES/SIMULATION_METRICS/simulation_metrics.fig');
+
 
