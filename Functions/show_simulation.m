@@ -28,6 +28,7 @@ function show_simulation(results)
 		for i = 1:length(datas.LO)
 			datas.LO{i}.plot();
 		end
+		title(['t = ', num2str(t)]);
     	drawnow
 	end
 	close(fig);
