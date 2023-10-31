@@ -8,13 +8,13 @@ function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
         % for j = 1:length(R)
         %     EKF(R{j},[0;0]);
         % end
-        relative_general_consensous(R, T, parameters_simulation);
+        relative_general_consensous(R, T, LO, parameters_simulation);
     end
     % Simulation
     for t = 1:Tmax
 
         [circx, circy] = Circle(T.x(1), T.x(2), parameters_simulation.DISTANCE_TARGET);
-        relative_general_consensous(R, T, parameters_simulation);
+        relative_general_consensous(R, T, LO, parameters_simulation);
         voronoi_map_consensous(parameters_simulation, R, T, O, LO);
         
         % Saving the results

@@ -1,5 +1,5 @@
 % This function is used to calculate the relative target consensus
-function relative_general_consensous(robots, target, param)
+function relative_general_consensous(robots, target, LO, param)
 	% Robots is a cell array of robots
 	n = length(robots);
 	% Number of consensous protocols messages
@@ -50,8 +50,18 @@ function relative_general_consensous(robots, target, param)
 		end
 
 		% if the target can be measured by the robot
+		seen_target = true;
+		if ~isempty(LO)
+			for k = 2:size(LO,2)
+				if ~isempty(intersect(LO{k}.poly, [robots{i}.x';target.x']))
+					seen_target = false;
+					break;
+				end
+			end
+		end
+
 		dits_robot_target = norm(target.x - robots{i}.x);
-		if dits_robot_target <= robots{i}.ComRadius
+		if dits_robot_target <= robots{i}.ComRadius && seen_target
 			% target in robot reference frame
 			target_measure = robots{i}.H * (target.x - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
 			% target world frame
