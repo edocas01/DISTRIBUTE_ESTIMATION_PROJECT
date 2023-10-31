@@ -156,9 +156,8 @@ La riduzione della cella come avevamo pensato va bene.
 
 --------------------
 PRESENTAZIONE:
-fare video con grafici dinamici -> FATTO 
+
 fare vedere dei casi in cui il target viene perso e dopo vanno da soli, con andamento della covarianza
-fare vedere una simulazione completa (anche con raggi diversi)
 fare vedere l'aggiornamento di voronoi dinamicamente
 
 
