@@ -51,7 +51,7 @@ function relative_general_consensous(robots, target, LO, param)
 
 		% if the target can be measured by the robot
 		seen_target = true;
-		if ~isempty(LO)
+		if ~isempty(LO) && length(LO) > 1
 			for k = 2:size(LO,2)
 				if ~isempty(intersect(LO{k}.poly, [robots{i}.x';target.x']))
 					seen_target = false;
