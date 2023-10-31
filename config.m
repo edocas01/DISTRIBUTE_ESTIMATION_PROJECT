@@ -50,10 +50,10 @@ parameters_simulation = struct( ...
 % Define the colors in a matrix 15 by 3 (RGB) without red
 color_matrix = [ ...
 				[0, 0, 1]; 			... % blue
+				[1, 0.5, 0]; 		... % orange
 				[0, 1, 0]; 			... % green
 				[0, 1, 1]; 			... % cyan
 				[1, 0, 1]; 			... % magenta
-				[1, 0.5, 0]; 		... % orange
 				[0, 0, 0.5]; 		... % dark blue
 				[0, 0.5, 0]; 		... % dark green
 				[0, 0.5, 0.5]; 		... % dark cyan

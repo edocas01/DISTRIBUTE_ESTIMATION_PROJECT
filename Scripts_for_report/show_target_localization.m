@@ -78,43 +78,75 @@ for i = 1:length(number_robots)
 end
 
 % Plot errors
-fig = figure(1); grid on; hold on;
+fig1 = figure(1); grid on; hold on; box on;
 set(gcf, 'Position', get(0, 'Screensize'));
 color = ['k','r','b'];
 idx = 1;
 for i = 1:length(number_robots)
 	if number_robots(i) == 1 || number_robots(i) == 7 || number_robots(i) == 15
-		plot(0:(size(err,1)-1),err(:,i), 'LineWidth', 1, 'DisplayName', ['Number of robots = ', num2str(number_robots(i))], 'Color', color(idx));
+		plot(0:(size(err,1)-1),err(:,i), 'LineWidth', 1, 'DisplayName', ['N = ', num2str(number_robots(i))], 'Color', color(idx));
 		idx = idx + 1;
 	end
 end
-title("Target estimation error vs number of robots");
-xlabel('Time [s]');
-ylabel('Error [m]');
+title("Target estimation error vs number of robots", 'Interpreter', 'latex');
+xlabel('Time [s]', 'Interpreter', 'latex');
+ylabel('Error [m]', 'Interpreter', 'latex');
 xlim([0 size(err,1)-1]);
-legend('Location', 'northwest');
+legend('Location', 'northwest', 'Interpreter', 'latex');
 
 % save the figure
-saveas(fig, 'IMAGES/TARGET_ESTIMATION/err_vs_number_robots.png');
-saveas(fig, 'IMAGES/TARGET_ESTIMATION/err_vs_number_robots.fig');
+saveas(fig1, 'IMAGES/TARGET_ESTIMATION/err_vs_number_robots.png');
+saveas(fig1, 'IMAGES/TARGET_ESTIMATION/err_vs_number_robots.fig');
 
 % compute the mean of the errors
 mean_err = mean(err,1);
 % Plot mean errors
-fig = figure(2); grid on; hold on;
+fig2 = figure(2); grid on; hold on; box on;
 set(gcf, 'Position', get(0, 'Screensize'));
-stem(mean_err, 'LineWidth', 1);
+stem(mean_err, 'LineWidth', 2);
 xticks(1:length(number_robots));
 xlim([1 length(number_robots)]);
-title("Mean target estimation error vs number of robots");
-xlabel('Number of robots');
-ylabel('Mean error [m]');
+title("Mean target estimation error vs number of robots", 'Interpreter', 'latex');
+xlabel('Number of robots', 'Interpreter', 'latex');
+ylabel('Mean error [m]', 'Interpreter', 'latex');
 
 % save the figure
-saveas(fig, 'IMAGES/TARGET_ESTIMATION/mean_err_vs_number_robots.png');
-saveas(fig, 'IMAGES/TARGET_ESTIMATION/mean_err_vs_number_robots.fig');
+saveas(fig2, 'IMAGES/TARGET_ESTIMATION/mean_err_vs_number_robots.png');
+saveas(fig2, 'IMAGES/TARGET_ESTIMATION/mean_err_vs_number_robots.fig');
 
 for i = 1:length(number_robots)
 	% create a latex macro to store the mean error for each number of robots
 	create_macro_latex("latex_macros.tex", "mean_err_"+num2str(number_robots(i))+"R", mean_err(i), "a")
 end
+
+
+% create a subplot with the same figures
+fig = figure(3); set(gcf, 'Position', get(0, 'Screensize'));
+subplot(2,1,1); grid on; hold on; box on;
+set(gcf, 'Position', get(0, 'Screensize'));
+color = ['k','r','b'];
+idx = 1;
+for i = 1:length(number_robots)
+	if number_robots(i) == 1 || number_robots(i) == 7 || number_robots(i) == 15
+		plot(0:(size(err,1)-1),err(:,i), 'LineWidth', 1, 'DisplayName', ['N = ', num2str(number_robots(i))], 'Color', color(idx));
+		idx = idx + 1;
+	end
+end
+title("Target estimation error vs number of robots", 'Interpreter', 'latex');
+xlabel('Time [s]', 'Interpreter', 'latex');
+ylabel('Error [m]', 'Interpreter', 'latex');
+xlim([0 size(err,1)-1]);
+legend('Location', 'northwest', 'Interpreter', 'latex', 'Orientation', 'horizontal');
+
+subplot(2,1,2); grid on; hold on; box on;
+set(gcf, 'Position', get(0, 'Screensize'));
+stem(mean_err, 'LineWidth', 2);
+xticks(1:length(number_robots));
+xlim([1 length(number_robots)]);
+title("Mean target estimation error vs number of robots", 'Interpreter', 'latex');
+xlabel('Number of robots', 'Interpreter', 'latex');
+ylabel('Mean error [m]', 'Interpreter', 'latex');
+
+saveas(fig, 'IMAGES/TARGET_ESTIMATION/subplot.png');
+saveas(fig, 'IMAGES/TARGET_ESTIMATION/subplot.fig');
+

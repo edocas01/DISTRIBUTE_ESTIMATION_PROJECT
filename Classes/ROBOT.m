@@ -272,6 +272,19 @@ classdef ROBOT < matlab.mixin.Copyable
 			plot([obj.x(1), obj.x(1) + cos(obj.th)*5*obj.volume], [obj.x(2), obj.x(2) + sin(obj.th)*5*obj.volume], 'k', 'LineWidth', 3, 'HandleVisibility', 'off');
 		end
 	end
+	
+	function plot_voronoi_edge(obj, style, color_matrix, name)
+		if ~exist('style', 'var')
+			style = '-';
+		end
+		vx = [obj.voronoi.Vertices(:,1); obj.voronoi.Vertices(1,1)];
+		vy = [obj.voronoi.Vertices(:,2); obj.voronoi.Vertices(1,2)];
+		if exist('name', 'var')
+			plot(vx, vy, style, 'Color', color_matrix(obj.id,:), 'DisplayName', name);
+		else
+			plot(vx, vy, style, 'Color', color_matrix(obj.id,:), 'HandleVisibility', 'off');
+		end
+	end
 
 	function Initialize_Position(obj)
 		obj.x = obj.x_in;

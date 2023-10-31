@@ -19,7 +19,8 @@ function show_simulation(results)
 				plot(datas.R{i}.x(1),datas.R{i}.x(2),'kx', 'LineWidth', 2, 'HandleVisibility', 'off');
             end
 		end
-		xlabel('x [m]'); ylabel('y [m]');
+		xlabel('x [m]', 'Interpreter', 'latex'); ylabel('y [m]', 'Interpreter', 'latex');
+		title('Simulation environment', 'Interpreter', 'latex');
 % 		legend('Location', 'EastOutside');
 		for i = 1:length(datas.O)
             datas.O{i}.plot();

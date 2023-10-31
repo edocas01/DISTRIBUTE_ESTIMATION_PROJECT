@@ -155,15 +155,9 @@ La riduzione della cella come avevamo pensato va bene.
 		- spostare i punti in base alle incertezze/volumi
 
 --------------------
-RESULTS:
-- definire delle metriche per valutare le performance:
-	- per le simulazioni ad hoc mettiamo la tabella dove confrontiamo i risultati di una simulazione dinamica lineare e non lineare (2 + 3) -> fatto 
-	- per una simulazione vera mettiamo un grafico che faccia vedere l'andamento delle metriche nel tempo accompagnato da una immagine dell'ambiente di simulazione
-	- std di localizzazione degli altri robot prima e dopo consenso
-- far vedere voronoi come funziona con tutti i possibili ostacoli
-
 PRESENTAZIONE:
-fare vedere dei casi in cui il target viene perso e dopo vanno da soli
+fare video con grafici dinamici -> FATTO 
+fare vedere dei casi in cui il target viene perso e dopo vanno da soli, con andamento della covarianza
 fare vedere una simulazione completa (anche con raggi diversi)
 fare vedere l'aggiornamento di voronoi dinamicamente
 
