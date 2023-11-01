@@ -7,7 +7,7 @@ The project consist in the distributed encirclement of a moving target (person, 
 </p>
 
 ## Code Management
-The code is writte in [_Matlab_](https://www.mathworks.com/products/matlab.html) and it is organized in the following way:
+The code is written in [_Matlab_](https://www.mathworks.com/products/matlab.html) and it is organized in the following way:
 - [_Classes_](/Classes/) contains the definition of the classes used in the project:
   - `ROBOT.m` is the class that defines the agents.
   - `TARGET.m` is the class that defines the target.
