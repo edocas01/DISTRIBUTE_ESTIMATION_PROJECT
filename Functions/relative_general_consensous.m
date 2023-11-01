@@ -1,5 +1,5 @@
 % This function is used to calculate the relative target consensus
-function relative_general_consensous(robots, target, param)
+function relative_general_consensous(robots, target, LO, param)
 	% Robots is a cell array of robots
 	n = length(robots);
 	% Number of consensous protocols messages
@@ -26,7 +26,7 @@ function relative_general_consensous(robots, target, param)
 					robot_measure = robots{i}.H * (robots{j}.x - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
 					% robotj in world frame
 					robots{i}.all_robots_pos(2*j-1:2*j, 1) = robot_measure + robots{i}.H * robots{i}.x_est;
-					robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = robots{i}.R_dist + robots{i}.H * robots{i}.P * robots{i}.H';
+					robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = robots{i}.R_dist + robots{i}.H * robots{i}.P(1:2,1:2) * robots{i}.H';
 					
 				else
 					% the roboti cannot measure the robotj so it uses the last estimate of the robot
@@ -42,7 +42,7 @@ function relative_general_consensous(robots, target, param)
 			else
 				% the robot insert its own position in the matrix
 				robots{i}.all_robots_pos(2*j-1:2*j, 1) = robots{i}.x_est;
-				robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = robots{i}.P;
+				robots{i}.all_cov_pos(2*j-1:2*j, 2*j-1:2*j) = robots{i}.P(1:2,1:2);
 			end
 		end
 		if count == 0 && param.DEBUG == true
@@ -50,14 +50,24 @@ function relative_general_consensous(robots, target, param)
 		end
 
 		% if the target can be measured by the robot
+		seen_target = true;
+		if ~isempty(LO) && length(LO) > 1
+			for k = 2:size(LO,2)
+				if ~isempty(intersect(LO{k}.poly, [robots{i}.x';target.x']))
+					seen_target = false;
+					break;
+				end
+			end
+		end
+
 		dits_robot_target = norm(target.x - robots{i}.x);
-		if dits_robot_target <= robots{i}.ComRadius
+		if dits_robot_target <= robots{i}.ComRadius && seen_target
 			% target in robot reference frame
 			target_measure = robots{i}.H * (target.x - robots{i}.x) + mvnrnd([0;0], robots{i}.R_dist)';
 			% target world frame
 			robots{i}.all_robots_pos(end-1:end, 1) = target_measure + robots{i}.H * robots{i}.x_est;
 			% covariance matrix on the target estimate
-			robots{i}.all_cov_pos(end-1:end,end-1:end) = robots{i}.R_dist + robots{i}.H * robots{i}.P * robots{i}.H';
+			robots{i}.all_cov_pos(end-1:end,end-1:end) = robots{i}.R_dist + robots{i}.H * robots{i}.P(1:2,1:2) * robots{i}.H';
 		else
 			% the robot cannot measure the target so it uses the last estimate of the target
 			% and the covariance matrix of the target estimate is set to a high value

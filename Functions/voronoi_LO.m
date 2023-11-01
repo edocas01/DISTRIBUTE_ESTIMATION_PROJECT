@@ -1,5 +1,6 @@
-function voronoi_LO(LO, robot, max_semiaxis, param)
-	poly_voronoi = robot.voronoi;
+function enlarged_LO = voronoi_LO(LO, robot, max_semiaxis, param)
+	enlarged_LO = [];
+    poly_voronoi = robot.voronoi;
 	x_r = robot.x(1);
 	y_r = robot.x(2);
 	x_e = robot.x_est(1);
@@ -75,7 +76,7 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 				for k = 1:size(intersection_voronoi,2)
 					intersection_obstacle = intersect(LO.poly, [x_r,y_r;intersection_voronoi(1,k), intersection_voronoi(2,k)]); % output given by row
 					distances = sum(abs(intersection_obstacle - [intersection_voronoi(1,k), intersection_voronoi(2,k)]).^2,2).^0.5;
-					intersection_obstacle(distances < 1e-4,:) = [];
+					intersection_obstacle(distances < 1e-5,:) = [];
 					% If after removing "itself" there are still intesections with the obstacle then the intersection with voronoi is not visible
 					% and then we proced with the reduction of the cell
 					if isempty(intersection_obstacle)
@@ -227,7 +228,7 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 				for k = 1:size(intersection_voronoi,2)
 					intersection_obstacle = intersect(LO.poly, [x_r,y_r;intersection_voronoi(1,k), intersection_voronoi(2,k)]); % output given by row
 					distances = sum(abs(intersection_obstacle - [intersection_voronoi(1,k), intersection_voronoi(2,k)]).^2, 2).^0.5;
-					intersection_obstacle(distances < 1e-4,:) = [];
+					intersection_obstacle(distances < 1e-5,:) = [];
 					% If after removing "itself" there are still intesections with the obstacle then the intersection with voronoi is not visible
 					% and then we proced with the reduction of the cell
 					if isempty(intersection_obstacle)
@@ -327,22 +328,22 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 					if isequal(couples_to_delete(i,:), couples_to_delete_before(i-1,:));
 						couples_to_delete(i,:) = couples_to_delete(i-1,:);
 					else
-						couples_to_delete(i,:) = (robot.H * (couples_to_delete(i,:)' - robot.x) + mvnrnd([0;0], robot.R_dist)')';
+						couples_to_delete(i,:) = (robot.H * (couples_to_delete(i,:)' - robot.x) + mvnrnd([0;0], robot.R_dist*0.5)')';
 						couples_to_delete(i,:) = (couples_to_delete(i,:)' + robot.H * robot.x_est)';
 					end
 				else
-					couples_to_delete(i,:) = (robot.H * (couples_to_delete(i,:)' - robot.x) + mvnrnd([0;0], robot.R_dist)')';
+					couples_to_delete(i,:) = (robot.H * (couples_to_delete(i,:)' - robot.x) + mvnrnd([0;0], robot.R_dist*0.5)')';
 					couples_to_delete(i,:) = (couples_to_delete(i,:)' + robot.H * robot.x_est)';
 				end
 				if i+1 == size(couples_to_delete,1)
 					if isequal(couples_to_delete(i+1,:),couples_to_delete_before(1,:))
 						couples_to_delete(i+1,:) = couples_to_delete(1,:);
 					else
-						couples_to_delete(i+1,:) = (robot.H * (couples_to_delete(i+1,:)' - robot.x) + mvnrnd([0;0], robot.R_dist)')';
+						couples_to_delete(i+1,:) = (robot.H * (couples_to_delete(i+1,:)' - robot.x) + mvnrnd([0;0], robot.R_dist*0.5)')';
 						couples_to_delete(i+1,:) = (couples_to_delete(i+1,:)' + robot.H * robot.x_est)';
 					end
 				else
-					couples_to_delete(i+1,:) = (robot.H * (couples_to_delete(i+1,:)' - robot.x) + mvnrnd([0;0], robot.R_dist)')';
+					couples_to_delete(i+1,:) = (robot.H * (couples_to_delete(i+1,:)' - robot.x) + mvnrnd([0;0], robot.R_dist*0.5)')';
 					couples_to_delete(i+1,:) = (couples_to_delete(i+1,:)' + robot.H * robot.x_est)';
 				end
 			    % define an area to delete for the first point
@@ -368,7 +369,7 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 			    total_region = union(region_to_delete{i},total_region);
 		    end
 		    % compute the reduction 
-		    covariance = robot.R_dist + robot.H * robot.P * robot.H'; % covariance of the measurement
+		    covariance = robot.R_dist*0.5 + robot.H * robot.P(1:2,1:2) * robot.H'; % covariance of the measurement
 		    [V, D] = eig(covariance * param.coverage);
 		    max_semiaxis_points = sqrt(max(diag(D))); % max semiaxis of the covariance for the measurement
 		    total_reduction = max_semiaxis + robot.volume + max_semiaxis_points;
@@ -390,6 +391,7 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 			    end
 			    
             end
+			enlarged_LO = tmp;
         
 		
 	        Num_prev = 0;
@@ -411,18 +413,18 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
             end
 		    
     
-            if new_poly_voronoi.NumRegions > 1
-                warning("Two regions in voronoi_LO")
-				figure(3)
-				hold on;
-				grid on;
-				axis equal;
-				plot(x_e,y_e,'*r');
-				plot(couples_to_delete(:,1),couples_to_delete(:,2),'*b');
-				plot(poly_voronoi);
-				LO.plot();
-				plot(new_poly_voronoi);
-            end
+%             if new_poly_voronoi.NumRegions > 1
+%                 warning("Two regions in voronoi_LO")
+% 				figure(3)
+% 				hold on;
+% 				grid on;
+% 				axis equal;
+% 				plot(x_e,y_e,'*r');
+% 				plot(couples_to_delete(:,1),couples_to_delete(:,2),'*b');
+% 				plot(poly_voronoi);
+% 				LO.plot();
+% 				plot(new_poly_voronoi);
+%             end
     
 		    %{
     

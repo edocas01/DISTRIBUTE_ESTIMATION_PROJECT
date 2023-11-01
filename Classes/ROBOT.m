@@ -71,7 +71,6 @@ classdef ROBOT < matlab.mixin.Copyable
 		random_direction    % for the control in case of random movement
 
 		robot_crash         % flag to check if the robot is crashed
-
 	end
 %{
 
@@ -99,7 +98,7 @@ classdef ROBOT < matlab.mixin.Copyable
 			obj.x_est = obj.x;
 			obj.th_est = obj.th;
 			obj.P = eye(2);
-			obj.Q = (rand(2,2) - 0.5) * param.std_relative_sensor;
+			obj.Q = (rand(2,2) - 0.5) * param.std_robots_model;
 			obj.Q = obj.Q * obj.Q';
 			obj.vmax = rand() * (param.MAX_LINEAR_VELOCITY - param.MIN_LINEAR_VELOCITY) + param.MIN_LINEAR_VELOCITY;
 		elseif strcmp(obj.type, 'unicycle')
@@ -112,9 +111,9 @@ classdef ROBOT < matlab.mixin.Copyable
 			obj.th_est = obj.th;
 			obj.P = eye(3);
 			obj.Q = zeros(3,3);
-			obj.Q(1:2,1:2) = (rand(2,2) - 0.5) * param.std_relative_sensor;
+			obj.Q(1:2,1:2) = (rand(2,2) - 0.5) * param.std_robots_model;
 			obj.Q(1:2,1:2) = obj.Q(1:2,1:2) * obj.Q(1:2,1:2)';
-			obj.Q(end,end) = (param.std_relative_sensor_theta)^2*rand(); 
+			obj.Q(end,end) = (param.std_robots_model_theta)^2*rand(); 
 			obj.vmax = [rand() * (param.MAX_LINEAR_VELOCITY - param.MIN_LINEAR_VELOCITY) + param.MIN_LINEAR_VELOCITY;...
 					    rand() * (param.MAX_ANGULAR_VELOCITY - param.MIN_ANGULAR_VELOCITY) + param.MIN_ANGULAR_VELOCITY];
 		else
@@ -164,7 +163,7 @@ classdef ROBOT < matlab.mixin.Copyable
 		if strcmp(obj.type, 'linear')   
 			% linear dynamics with noise
 			obj.x_est = obj.x_est + u + mvnrnd([0;0], obj.Q)';
-			% linear dynamics without noise used in the gps measurement
+			% real linear dynamics without noise used in the gps measurement
 			obj.x = obj.x + u;
 		elseif strcmp(obj.type, 'unicycle')
 			% we consider to have already v*dt and w*dt as inputs
@@ -179,7 +178,11 @@ classdef ROBOT < matlab.mixin.Copyable
 			tmp = [obj.x_est;obj.th_est] + R*u + mvnrnd([0;0;0], obj.Q)';
 			obj.x_est = tmp(1:2);
 			obj.th_est = wrapTo2Pi(tmp(3));
-			% unicycle dynamics without noise used in the gps measurement
+			% real unicycle dynamics without noise used in the gps measurement
+			th = obj.th;
+			R = [cos(th), 0;
+				 sin(th), 0;
+				 0, 1];
 			tmp = [obj.x;obj.th] + R*u;
 			obj.x = tmp(1:2);
 			obj.th = wrapTo2Pi(tmp(3));
@@ -210,9 +213,9 @@ classdef ROBOT < matlab.mixin.Copyable
 	% Jacobian of the measurement function
 	function J_H = jacobian_measurement(obj)
 		if strcmp(obj.type, 'linear')
-			J_H = eye(2);
+			J_H = eye(2); % 2x2
 		else
-			J_H = [eye(2),[0;0]];
+			J_H = [eye(2),[0;0]]; % 2*3
 		end
 
 	end
@@ -251,6 +254,9 @@ classdef ROBOT < matlab.mixin.Copyable
 			[x,y] = Circle(obj.x_est(1), obj.x_est(2), obj.ComRadius);
 			plot(x,y, '--k', 'HandleVisibility', 'off');
 		end
+		if strcmp(obj.type, 'unicycle')
+			plot([obj.x_est(1), obj.x_est(1) + cos(obj.th_est)*5*obj.volume], [obj.x_est(2), obj.x_est(2) + sin(obj.th_est)*5*obj.volume], 'k','LineWidth', 3, 'HandleVisibility', 'off');
+		end
 	end
 
 	function h = plot_real(obj, all_markers, color_matrix, plot_circle)
@@ -262,6 +268,22 @@ classdef ROBOT < matlab.mixin.Copyable
 		if plot_circle
 			[x,y] = Circle(obj.x(1), obj.x(2), obj.ComRadius);
 			plot(x,y, '--k', 'HandleVisibility', 'off');
+		end
+		if strcmp(obj.type, 'unicycle')
+			plot([obj.x(1), obj.x(1) + cos(obj.th)*5*obj.volume], [obj.x(2), obj.x(2) + sin(obj.th)*5*obj.volume], 'k', 'LineWidth', 3, 'HandleVisibility', 'off');
+		end
+	end
+	
+	function plot_voronoi_edge(obj, style, color_matrix, name)
+		if ~exist('style', 'var')
+			style = '-';
+		end
+		vx = [obj.voronoi.Vertices(:,1); obj.voronoi.Vertices(1,1)];
+		vy = [obj.voronoi.Vertices(:,2); obj.voronoi.Vertices(1,2)];
+		if exist('name', 'var')
+			plot(vx, vy, style, 'Color', color_matrix(obj.id,:), 'DisplayName', name);
+		else
+			plot(vx, vy, style, 'Color', color_matrix(obj.id,:), 'HandleVisibility', 'off');
 		end
 	end
 

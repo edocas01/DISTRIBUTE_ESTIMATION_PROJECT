@@ -1,21 +1,20 @@
 % This function runs the simulation of the robots
 function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
+    parameters_simulation.N = length(R);
 	Tmax = length(u_traj(1,:));
 	results = cell(1,Tmax);
-    
     % Initial localizations of the robots
     for i = 1:10
-        for j = 1:length(R)
-            EKF(R{j},0);
-        end
-        relative_general_consensous(R, T, parameters_simulation);
+        % for j = 1:length(R)
+        %     EKF(R{j},[0;0]);
+        % end
+        relative_general_consensous(R, T, LO, parameters_simulation);
     end
     % Simulation
     for t = 1:Tmax
-        [circx, circy] = Circle(T.x(1), T.x(2), parameters_simulation.DISTANCE_TARGET);
-        
 
-        relative_general_consensous(R, T, parameters_simulation);
+        [circx, circy] = Circle(T.x(1), T.x(2), parameters_simulation.DISTANCE_TARGET);
+        relative_general_consensous(R, T, LO, parameters_simulation);
         voronoi_map_consensous(parameters_simulation, R, T, O, LO);
         
         % Saving the results
@@ -34,6 +33,7 @@ function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
         for i = 1:length(LO)
             data.LO{i} = LO{i};
         end
+        data.LO = LO;
 
 		data.circle_target = [circx;circy];
 		
@@ -74,7 +74,11 @@ function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
 
         if mod(t,round(Tmax/4)) == 0
             fprintf("Percentage of simulation: %d%%\n",round(t/Tmax*100))
-            pause(0.5)
+            % destroy randomly a robot
+            if rand() < parameters_simulation.CRASH_PERCENTAGE
+                R{randi(length(R))}.robot_crash = true;
+                disp("Robot destroyed on purpose");
+            end
         end
     end
 

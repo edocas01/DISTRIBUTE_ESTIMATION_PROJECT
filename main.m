@@ -8,6 +8,7 @@ clearvars;
 rng default;
 
 addpath('Scripts');
+addpath('Scripts_for_report');
 addpath('Setup');
 addpath('Functions');
 addpath('Classes');
@@ -31,6 +32,7 @@ N = length(R);
 figure(1); clf
 T.plot();
 hold on; grid on; axis equal;
+axis(parameters_simulation.size_map * [-1 1 -1 1]);
 
 for i = 1:N
 	R{i}.plot_real(all_markers, color_matrix, true);
@@ -63,3 +65,4 @@ toc
 tic  
 show_simulation(results)
 toc
+display_results

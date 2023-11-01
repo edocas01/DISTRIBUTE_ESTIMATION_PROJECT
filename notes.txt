@@ -154,9 +154,14 @@ La riduzione della cella come avevamo pensato va bene.
 		- simulare le misure sui punti
 		- spostare i punti in base alle incertezze/volumi
 
-
 --------------------
-- non lineare
-- problemi in voronoi ogni tanto con le incertezze (segna una incertezza alta anche se i robot son visti)
-- problemi con il fatto che ogni tanto le celle di voronoi sono divise in due (in voronoi_LO)
-- ogni tanto i robot sbagliano il controllo e rimangono fermi
+PRESENTAZIONE:
+
+
+fare vedere l'aggiornamento di voronoi dinamicamente
+
+
+-------------
+IMPROVEMENTS:
+- Distributed kalman filter
+- controllo ottimo per la traiettoria

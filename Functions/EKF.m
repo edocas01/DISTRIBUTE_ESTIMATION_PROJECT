@@ -30,10 +30,10 @@ function EKF(robot, u) % u is already the delta_x and delta_y
 	robot.P = J_X * robot.P * J_X' + J_Q * robot.Q * J_Q';
 
 	% update step
-	S = J_H * robot.P * J_H' + robot.R_gps;
+	S = J_H * robot.P * J_H' + robot.R_gps; 
 	W = robot.P * J_H' / S;
-	tmp = [robot.x_est;robot.th_est] + W * (robot.GPS_measurement() - robot.x_est(1:2));
-	robot.x_est = tmp(1:2);
-	robot.th_est = wrapTo2Pi(tmp(3));
+	tmp = W * (robot.GPS_measurement() - robot.x_est(1:2));
+	robot.x_est = robot.x_est + tmp(1:2);
+	robot.th_est = wrapTo2Pi(robot.th_est + wrapTo2Pi(tmp(end)));
 	robot.P = (eye(size(robot.P)) - W * J_H) * robot.P;
 end
