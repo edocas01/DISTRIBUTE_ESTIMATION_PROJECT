@@ -30,6 +30,8 @@ myVideo = VideoWriter('IMAGES/VORONOI/voronoi.avi');
 duration = 10;
 myVideo.FrameRate = 6 / duration;  
 open(myVideo);
+set(gcf, 'Position', get(0, 'Screensize'));
+get(0,'defaultfigureposition');
 fig = figure(1); clf; hold on; grid on; axis equal;
 xlim(parameters_simulation.size_map * [-1 1] / 10);
 ylim(parameters_simulation.size_map * [-1 1] / 10);
@@ -100,10 +102,10 @@ end
 
 xticks([]);
 yticks([]);
+title('Voronoi explanation','Interpreter','latex');
 frame = getframe(gcf)
 writeVideo(myVideo, frame);
 % Initial condition
-title('Voronoi explanation','Interpreter','latex');
 
 
 
@@ -138,7 +140,7 @@ obstacles{1}.plot();
 plot(voronoi1,'FaceColor', color_matrix(R{1}.id,:), 'FaceAlpha', 0.25);
 plot(R{1}.voronoi,'FaceColor', color_matrix(R{1}.id,:))
 plot(points_exit(1,:), points_exit(2,:), 'xk', 'Markersize', 10, 'Linewidth', 2);
-plot(enlarged_LO,'FaceColor', 'k', 'FaceAlpha', 0.5);
+plot(union(enlarged_LO,large_obstacles{1}.poly),'FaceColor', 'k', 'FaceAlpha', 0.5);
 title('Volume reduction','Interpreter','latex');
 xlim(parameters_simulation.size_map * [-1 1] / 10);
 ylim(parameters_simulation.size_map * [-1 1] / 10);
@@ -165,7 +167,7 @@ plot(voronoi1,'FaceColor', color_matrix(R{1}.id,:), 'FaceAlpha', 0.11);
 plot(voronoi2,'FaceColor', color_matrix(R{1}.id,:), 'FaceAlpha', 0.25);
 plot(R{1}.voronoi,'FaceColor', color_matrix(R{1}.id,:))
 plot(points_exit(1,:), points_exit(2,:), 'xk', 'Markersize', 10, 'Linewidth', 2);
-plot(enlarged_LO,'FaceColor', 'k', 'FaceAlpha', 0.5);
+plot(union(enlarged_LO,large_obstacles{1}.poly),'FaceColor', 'k', 'FaceAlpha', 0.5);
 title('Volume reduction + uncertainty on measurements','Interpreter','latex');
 xlim(parameters_simulation.size_map * [-1 1] / 10);
 ylim(parameters_simulation.size_map * [-1 1] / 10);
@@ -192,7 +194,7 @@ plot(voronoi2,'FaceColor', color_matrix(R{1}.id,:), 'FaceAlpha', 0.17);
 plot(voronoi3,'FaceColor', color_matrix(R{1}.id,:), 'FaceAlpha', 0.25);
 plot(R{1}.voronoi,'FaceColor', color_matrix(R{1}.id,:))
 plot(points_exit(1,:), points_exit(2,:), 'xk', 'Markersize', 10, 'Linewidth', 2);
-plot(enlarged_LO,'FaceColor', 'k', 'FaceAlpha', 0.5);
+plot(union(enlarged_LO,large_obstacles{1}.poly),'FaceColor', 'k', 'FaceAlpha', 0.5);
 title('Volume reduction + uncertainty on measurements and self position','Interpreter','latex');
 xlim(parameters_simulation.size_map * [-1 1] / 10);
 ylim(parameters_simulation.size_map * [-1 1] / 10);
