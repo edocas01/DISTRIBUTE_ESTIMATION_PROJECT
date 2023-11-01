@@ -157,7 +157,7 @@ La riduzione della cella come avevamo pensato va bene.
 --------------------
 PRESENTAZIONE:
 
-fare vedere dei casi in cui il target viene perso e dopo vanno da soli, con andamento della covarianza
+
 fare vedere l'aggiornamento di voronoi dinamicamente
 
 

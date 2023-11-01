@@ -1,4 +1,4 @@
-function voronoi_map_consensous(param, robots, target, obstacles, LO)
+function [enlarged_LO, points_exit] = voronoi_map_consensous(param, robots, target, obstacles, LO)
 	N = length(robots);
 	% move the neighbors according to:
 	% - the uncertainty of j
@@ -64,7 +64,7 @@ function voronoi_map_consensous(param, robots, target, obstacles, LO)
 					% obstacle in world frame
 					obstacle_measure = obstacle_measure + robots{i}.H * robots{i}.x_est;
 					obstacle_covariance = robots{i}.R_dist + robots{i}.H * robots{i}.P(1:2,1:2) * robots{i}.H';
-
+					
 					% move the obstacle in the closest point to the agent i according to the uncertainty on the obstacle 
 					z = moving_closer_point(robots{i}.x_est, obstacle_measure, obstacle_covariance, param.coverage);
 					% move the obstacle according to the max uncertainty of i (max semiaxis of i)
@@ -135,6 +135,9 @@ function voronoi_map_consensous(param, robots, target, obstacles, LO)
 		else
 			% Save the positions of the agents and their neighbors in P (NOTE: the first row is the position of the agent itself)
 			P = [robots{i}.x_est modified_positions];
+			if i == 1
+				points_exit = P(:,2:end);
+			end
 			% Compute the voronoi tesselation
 			x_min = -param.size_map*1.5;
 			x_max = param.size_map*1.5;
@@ -161,10 +164,13 @@ function voronoi_map_consensous(param, robots, target, obstacles, LO)
 		% 	plot(robots{i}.x_est(1),robots{i}.x_est(2), 'r*')
 		% 	plot(modified_positions(1,:), modified_positions(2,:), 'b*')
 		% end
-
+        
 		% remove large obstacles
 		for z = 1:length(LO)
-			voronoi_LO(LO{z}, robots{i}, max_semiaxis, param);
+			tmp = voronoi_LO(LO{z}, robots{i}, max_semiaxis, param);
+			if i == 1
+				enlarged_LO = tmp;
+			end
 		end
 
 	end

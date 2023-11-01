@@ -3,7 +3,9 @@ function show_simulation(results)
 	config;
     size_map = parameters_simulation.size_map;
 	for t = 1:length(results)
-		clf
+		if length(results) > 1
+			clf
+		end
 		hold on; grid on; 
         axis equal
 		xlim([-size_map size_map]); ylim([-size_map size_map]);
@@ -29,6 +31,10 @@ function show_simulation(results)
 		for i = 1:length(datas.LO)
 			datas.LO{i}.plot();
         end
-    	drawnow
+
+		if length(results) > 1
+			drawnow
+		end
+			
 	end
 end

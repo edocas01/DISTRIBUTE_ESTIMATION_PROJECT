@@ -1,5 +1,6 @@
-function voronoi_LO(LO, robot, max_semiaxis, param)
-	poly_voronoi = robot.voronoi;
+function enlarged_LO = voronoi_LO(LO, robot, max_semiaxis, param)
+	enlarged_LO = [];
+    poly_voronoi = robot.voronoi;
 	x_r = robot.x(1);
 	y_r = robot.x(2);
 	x_e = robot.x_est(1);
@@ -390,6 +391,7 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
 			    end
 			    
             end
+			enlarged_LO = tmp;
         
 		
 	        Num_prev = 0;
@@ -411,18 +413,18 @@ function voronoi_LO(LO, robot, max_semiaxis, param)
             end
 		    
     
-            if new_poly_voronoi.NumRegions > 1
-                warning("Two regions in voronoi_LO")
-				figure(3)
-				hold on;
-				grid on;
-				axis equal;
-				plot(x_e,y_e,'*r');
-				plot(couples_to_delete(:,1),couples_to_delete(:,2),'*b');
-				plot(poly_voronoi);
-				LO.plot();
-				plot(new_poly_voronoi);
-            end
+%             if new_poly_voronoi.NumRegions > 1
+%                 warning("Two regions in voronoi_LO")
+% 				figure(3)
+% 				hold on;
+% 				grid on;
+% 				axis equal;
+% 				plot(x_e,y_e,'*r');
+% 				plot(couples_to_delete(:,1),couples_to_delete(:,2),'*b');
+% 				plot(poly_voronoi);
+% 				LO.plot();
+% 				plot(new_poly_voronoi);
+%             end
     
 		    %{
     
