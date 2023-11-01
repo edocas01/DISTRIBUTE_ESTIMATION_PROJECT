@@ -3,8 +3,10 @@ This repository contains the code developed by Edoardo Castioni and Massimiliano
 The project consist in the distributed encirclement of a moving target (person, wheeled robot, ...) via a set of agents that can interact with each other in a confined range. The main problem is to dispose the agents in a predefined formation and equally spaced. The whole algorithm is developed in a distributed manner. <br>
 ## Video of the simulation
 <p align="center">
-<img src="IMAGES/INITIAL_VIDEO/video.avi" width="350" height="350"/>
+<img src="IMAGES/INITIAL_VIDEO/video.gif" width="700" height="350"/>
 </p>
+
+## Code Management
 The code is writte in [_Matlab_](https://www.mathworks.com/products/matlab.html) and it is organized in the following way:
 - [_Classes_](/Classes/) contains the definition of the classes used in the project:
   - `ROBOT.m` is the class that defines the agents.
