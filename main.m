@@ -35,7 +35,7 @@ hold on; grid on; axis equal;
 axis(parameters_simulation.size_map * [-1 1 -1 1]);
 
 for i = 1:N
-	R{i}.plot_real(all_markers, color_matrix, true);
+	R{i}.plot_real(all_markers, color_matrix, true,'on');
 end
 
 for i = 1:length(O)
