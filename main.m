@@ -9,7 +9,7 @@ rng default;
 
 addpath('Scripts');
 addpath('Scripts_for_report');
-addpath('Setup');
+% addpath('Setup');
 addpath('Functions');
 addpath('Classes');
 addpath('Results');
