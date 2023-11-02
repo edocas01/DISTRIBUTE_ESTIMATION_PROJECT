@@ -39,7 +39,7 @@ for i = 1:Tmax
 	Y2 = [Y2; R2.x(2)];
 end
 
-fig = figure(1)
+fig = figure(1);
 fig.Color = [1 1 1];
 set(fig, 'ToolBar', 'none');
 set(fig,'Position', get(0, 'Screensize'));
@@ -51,7 +51,7 @@ plot(X_f(1),X_f(2),'o','Color',[0.9290 0.6940 0.1250],'LineWidth',3,'MarkerSize'
 legend('Location','northwest', 'Interpreter', 'latex');
 
 subplot(1,2,2); hold on; grid on; axis square; xlim([0 17]-3.5); ylim([0 17] - 6);
-xlabel('x [m]', 'Interpreter', 'latex'); ylabel('y [m]', 'Interpreter', 'latex'); title('Unweighted velocity', 'Interpreter', 'latex');
+xlabel('x [m]', 'Interpreter', 'latex'); ylabel('y [m]', 'Interpreter', 'latex'); title('Unweighted velocity (not implemented)', 'Interpreter', 'latex');
 R2.plot_real(all_markers, color_matrix, false, 'off');
 plot(X2,Y2,'-*k','LineWidth', 2, 'HandleVisibility','off');
 plot(X_f(1),X_f(2),'o','Color',[0.9290 0.6940 0.1250],'LineWidth',3,'MarkerSize',5, 'DisplayName','Goal');
