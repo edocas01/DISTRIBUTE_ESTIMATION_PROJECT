@@ -11,4 +11,3 @@ addpath('..');
 
 set(0,'defaultfigurecolor',[1 1 1])
 
-set(gcf, 'ToolBar', 'none'); 
