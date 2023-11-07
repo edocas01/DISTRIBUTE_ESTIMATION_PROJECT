@@ -259,6 +259,9 @@ classdef ROBOT < matlab.mixin.Copyable
 	end
 
 	function h = plot_real(obj, all_markers, color_matrix, plot_circle, leg)
+        if ~exist("leg", "var")
+            leg = "on";
+        end
 		h = plot(obj.x(1), obj.x(2), strcat(all_markers{obj.id},'b'), 'DisplayName', ['Robot ', num2str(obj.id)], 'MarkerSize', 10, 'Color', color_matrix(obj.id,:),'LineWidth', 1.5, 'HandleVisibility', leg);
 		hold on;
 		[ptsx, ptsy] = Circle(obj.x(1), obj.x(2), obj.volume);

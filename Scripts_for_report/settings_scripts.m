@@ -8,3 +8,7 @@ set(0,'DefaultLegendFontSize',16)
 addpath('Functions\');
 addpath('Classes\');
 addpath('..');
+
+set(0,'defaultfigurecolor',[1 1 1])
+
+set(gcf, 'ToolBar', 'none'); 

@@ -1,6 +1,7 @@
 clear all;
 close all;
 clc;
+settings_scripts;
 config;
 set(0,'defaulttextinterpreter','latex')
 set(groot, 'defaultAxesTickLabelInterpreter','latex');
@@ -115,7 +116,7 @@ plot(X3,Y3,'-*r','LineWidth',2,'DisplayName','Linear: (0,0)');
 plot(X_f(1),X_f(2),'o','Color',[0.9290 0.6940 0.1250],'LineWidth',4,'MarkerSize',10, 'DisplayName','Goal');
 legend('Location','northwest');
 % save the figure
-saveas(fig,'IMAGES/TRAJECTORY_PLANNING/trajectory_planning.png');
+export_fig(fig,'IMAGES/TRAJECTORY_PLANNING/trajectory_planning.png');
 saveas(fig,'IMAGES/TRAJECTORY_PLANNING/trajectory_planning.fig');
 
 
