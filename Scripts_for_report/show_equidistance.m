@@ -8,7 +8,7 @@ settings_scripts;
 r = 3;
 x_t = 0;
 y_t = 0;
-
+set(gcf, 'Position', get(0, 'Screensize'));
 func = @(x,y,r,x_t,y_t) exp(-r/4*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2); 
 fig = figure(1);
 fsurf(@(x,y)func(x,y,r,x_t,y_t),[-6,6,-6,6],'EdgeColor','none')
