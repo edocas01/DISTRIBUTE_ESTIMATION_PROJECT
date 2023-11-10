@@ -84,9 +84,9 @@ function relative_general_consensous(robots, target, LO, param)
 		% initialize the matrices for the maximum degree weighting
 		F{i} = H' * inv(robots{i}.all_cov_pos) * H;
 		a{i} = H' * inv(robots{i}.all_cov_pos) * robots{i}.all_robots_pos;
-
+        
 	end
-	
+	show_ellipses_consensus(robots{1},true);
 	D = A * ones(n,1);
 	for k = 1:m
 		% Maximum Degree Weighting
@@ -108,5 +108,5 @@ function relative_general_consensous(robots, target, LO, param)
 		robots{i}.all_robots_pos = inv(F{i}) * a{i};
 		robots{i}.all_cov_pos = inv(F{i});
 	end
-
+    show_ellipses_consensus(robots{1},false);
 end
