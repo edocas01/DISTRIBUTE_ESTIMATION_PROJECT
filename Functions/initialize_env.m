@@ -178,7 +178,7 @@ function [target, trajectory, u_trajectory, obstacles, large_obstacles, robots] 
 		else
 			robots{i} = ROBOT([x(i);y(i);rand()*2*pi], i, 'unicycle', param);
 		end
-		robots{i}.plot_real(all_markers, color_matrix, true);
+		robots{i}.plot_real(all_markers, color_matrix, true,'on');
 	end
 
 	print_title("Acquired robots positions", param.title_flags);

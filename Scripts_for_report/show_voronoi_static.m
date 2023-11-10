@@ -12,7 +12,7 @@ for i = 1:10
 		EKF(R{j},[0;0])
 	end
 end
-relative_general_consensous(R,T,parameters_simulation);
+relative_general_consensous(R,T,[],parameters_simulation);
 R{1}.all_robots_pos = R{1}.all_robots_pos(1:end-2);
 R{2}.all_robots_pos = R{2}.all_robots_pos(1:end-2);
 R{1}.all_cov_pos = R{1}.all_cov_pos(1:end-2,1:end-2);
@@ -25,7 +25,7 @@ volume1 = R{1}.volume;
 volume2 = R{2}.volume;
 
 % define an obstacle
-fig = figure(1); clf; hold on; grid on; axis equal;
+fig = figure(1); clf; hold on; grid on; axis equal; set(gcf, 'ToolBar', 'none'); 
 xlim(parameters_simulation.size_map * [-1 1] / 10);
 ylim(parameters_simulation.size_map * [-1 1] / 10);
 for i = 1:length(R)
@@ -129,5 +129,5 @@ settings_scripts;
 title('Voronoi cell construction','Interpreter','latex');
 legend('Location','southwest','Interpreter','latex', 'NumColumns', 2);
 set(gcf, 'Position', get(0, 'Screensize'));
-saveas(fig, 'IMAGES/VORONOI/voronoi_cell_construction.png');
+export_fig(fig, 'IMAGES/VORONOI/voronoi_cell_construction.png');
 saveas(fig, 'IMAGES/VORONOI/voronoi_cell_construction.fig');

@@ -5,19 +5,20 @@ config;
 settings_scripts;
 
 % show the function to keep a given distance with respect to the robot
-% r = 3;
-% x_t = 0;
-% y_t = 0;
-% 
-% func = @(x,y,r,x_t,y_t) exp(-r/4*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2); 
-% fig = figure(1);
-% fsurf(@(x,y)func(x,y,r,x_t,y_t),[-6,6,-6,6],'EdgeColor','none')
-% camlight
-% title('Formation control function');
-% xlabel('x [m]');
-% ylabel('y [m]');
-% zlabel('$\phi(x,y)$')
-
+r = 3;
+x_t = 0;
+y_t = 0;
+set(gcf, 'Position', get(0, 'Screensize'));
+func = @(x,y,r,x_t,y_t) exp(-r/4*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2); 
+fig = figure(1);
+fsurf(@(x,y)func(x,y,r,x_t,y_t),[-6,6,-6,6],'EdgeColor','none')
+camlight
+title('Formation control function');
+xlabel('x [m]');
+ylabel('y [m]');
+zlabel('$\phi(x,y)$')
+export_fig(fig,'IMAGES/CONTROL_PLANNING/formation_function.png');
+saveas(fig,'IMAGES/CONTROL_PLANNING/formation_function.fig');
 
 % show simulation on equidistance
 N = 8;

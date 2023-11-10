@@ -110,7 +110,7 @@ ax = gca;
 ax.YAxis(1).Color = 'k';
 ax.YAxis(2).Color = 'b';
 
-saveas(fig,'IMAGES/ROBOT_LOCALIZATION/robot_localization.png');
+export_fig(fig,'IMAGES/ROBOT_LOCALIZATION/robot_localization.png');
 saveas(fig,'IMAGES/ROBOT_LOCALIZATION/robot_localization.fig');
 
 
@@ -135,10 +135,10 @@ for i = 1:length(results)
 		values(i*4-1,j) = mean_err_angle;
 		values(i*4,j) = std_err_angle;
 		% create a latex file for the table
-		create_macro_latex("latex_macros.tex",strjoin(["meandist", num2str(i*4-3), num2str(j)],""),values(i*4-3,j),'a');
-		create_macro_latex("latex_macros.tex",strjoin(["stddist", num2str(i*4-2), num2str(j)],""),values(i*4-2,j),'a');
-		create_macro_latex("latex_macros.tex",strjoin(["meanangle", num2str(i*4-1), num2str(j)],""),values(i*4-1,j),'a');
-		create_macro_latex("latex_macros.tex",strjoin(["stdangle", num2str(i*4), num2str(j)],""),values(i*4,j),'a');
+% 		create_macro_latex("latex_macros.tex",strjoin(["meandist", num2str(i*4-3), num2str(j)],""),values(i*4-3,j),'a');
+% 		create_macro_latex("latex_macros.tex",strjoin(["stddist", num2str(i*4-2), num2str(j)],""),values(i*4-2,j),'a');
+% 		create_macro_latex("latex_macros.tex",strjoin(["meanangle", num2str(i*4-1), num2str(j)],""),values(i*4-1,j),'a');
+% 		create_macro_latex("latex_macros.tex",strjoin(["stdangle", num2str(i*4), num2str(j)],""),values(i*4,j),'a');
 	end
 end
 % %%
@@ -185,7 +185,7 @@ ylim("padded");
 xlim([0, length(metrics_for_plot{1}.err_dist)-1]);
 legend('Location','northwest', 'Interpreter', 'latex', 'Orientation','horizontal');
 
-saveas(fig,'IMAGES/SIMULATION_METRICS/simulation_metrics.png');
+export_fig(fig,'IMAGES/SIMULATION_METRICS/simulation_metrics.png');
 saveas(fig,'IMAGES/SIMULATION_METRICS/simulation_metrics.fig');
 
 

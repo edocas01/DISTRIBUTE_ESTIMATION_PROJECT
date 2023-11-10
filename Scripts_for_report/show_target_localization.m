@@ -67,7 +67,7 @@ for i = 1:length(u_trajectory(1,:))
 	Tx = [Tx, T.x(1)]; Ty = [Ty, T.x(2)];
 	
 	for j = 1:size(number_robots,2)
-		relative_general_consensous(R{j}, T, parameters_simulation);
+		relative_general_consensous(R{j}, T, [], parameters_simulation);
 		R{j}{1}.target_est_hist(end+1,:) = [R{j}{1}.all_robots_pos(end-1), R{j}{1}.all_robots_pos(end)];
 	end
 end
@@ -95,7 +95,7 @@ xlim([0 size(err,1)-1]);
 legend('Location', 'northwest', 'Interpreter', 'latex');
 
 % save the figure
-saveas(fig1, 'IMAGES/TARGET_ESTIMATION/err_vs_number_robots.png');
+export_fig(fig1, 'IMAGES/TARGET_ESTIMATION/err_vs_number_robots.png');
 saveas(fig1, 'IMAGES/TARGET_ESTIMATION/err_vs_number_robots.fig');
 
 % compute the mean of the errors
@@ -111,7 +111,7 @@ xlabel('Number of robots', 'Interpreter', 'latex');
 ylabel('Mean error [m]', 'Interpreter', 'latex');
 
 % save the figure
-saveas(fig2, 'IMAGES/TARGET_ESTIMATION/mean_err_vs_number_robots.png');
+export_fig(fig2, 'IMAGES/TARGET_ESTIMATION/mean_err_vs_number_robots.png');
 saveas(fig2, 'IMAGES/TARGET_ESTIMATION/mean_err_vs_number_robots.fig');
 
 for i = 1:length(number_robots)
@@ -147,6 +147,6 @@ title("Mean target estimation error vs number of robots", 'Interpreter', 'latex'
 xlabel('Number of robots', 'Interpreter', 'latex');
 ylabel('Mean error [m]', 'Interpreter', 'latex');
 
-saveas(fig, 'IMAGES/TARGET_ESTIMATION/subplot.png');
-saveas(fig, 'IMAGES/TARGET_ESTIMATION/subplot.fig');
+export_fig(fig, 'IMAGES/TARGET_ESTIMATION/T_est_err_and_mean_err.png');
+saveas(fig, 'IMAGES/TARGET_ESTIMATION/T_est_err_and_mean_err.fig');
 
