@@ -86,7 +86,10 @@ function relative_general_consensous(robots, target, LO, param)
 		a{i} = H' * inv(robots{i}.all_cov_pos) * robots{i}.all_robots_pos;
         
 	end
-	show_ellipses_consensus(robots{1},true);
+	all_pre = robots{1}.all_robots_pos;
+	cov_pre = robots{1}.all_cov_pos;
+
+% 	show_ellipses_consensus(robots{1},true);
 	D = A * ones(n,1);
 	for k = 1:m
 		% Maximum Degree Weighting
@@ -108,5 +111,11 @@ function relative_general_consensous(robots, target, LO, param)
 		robots{i}.all_robots_pos = inv(F{i}) * a{i};
 		robots{i}.all_cov_pos = inv(F{i});
 	end
-    show_ellipses_consensus(robots{1},false);
+%     show_ellipses_consensus(robots{1},false);
+	cov_post = robots{1}.all_cov_pos;
+	all_post = robots{1}.all_robots_pos;
+	for i = 1:10
+		cov_pre(i,i) = sqrt(cov_pre(i,i));
+		cov_post(i,i) = sqrt(cov_post(i,i));
+	end
 end
