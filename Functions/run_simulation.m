@@ -48,7 +48,7 @@ function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
                 end
             end
                      
-            EKF(R{i}, u(:,i)*0);
+            EKF(R{i}, u(:,i));
 
             if R{i}.robot_crash == false
                 for k = 1:length(LO)
@@ -66,7 +66,7 @@ function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
 		results{t} = data;
 
         % Move the target
-        T.dynamics(u_traj(:,t)*0);
+        T.dynamics(u_traj(:,t));
         % Move the obstacles
         for i = 1:length(O)
             O{i}.dynamics(parameters_simulation);
