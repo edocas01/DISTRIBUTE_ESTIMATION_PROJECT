@@ -25,10 +25,6 @@ fprintf("Target initial position: (%.2f m, %.2f m)\n", T.x(1), T.x(2));
 parameters_simulation.N = length(R);
 N = length(R);
 
-% range = 10;
-% dyn_type = repmat("linear",N,1);
-% R = select_shape(N, dyn_type, 'circle', [0;0], range, 0, parameters_simulation);
-
 figure(1); clf
 T.plot();
 hold on; grid on; axis equal;

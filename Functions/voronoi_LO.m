@@ -1,4 +1,4 @@
-function enlarged_LO = voronoi_LO(LO, robot, max_semiaxis, param)
+function [enlarged_LO] = voronoi_LO(LO, robot, max_semiaxis, param)
 	enlarged_LO = [];
     poly_voronoi = robot.voronoi;
 	x_r = robot.x(1);
@@ -19,7 +19,6 @@ function enlarged_LO = voronoi_LO(LO, robot, max_semiaxis, param)
  
 
 	%}
-
 
 	% check if the obstacle is inside the voronoi cell
 	count_visible_points = 0; % in order to se if there are visible vertices of the obstacle inside the voronoi cell
@@ -351,7 +350,7 @@ function enlarged_LO = voronoi_LO(LO, robot, max_semiaxis, param)
 			    dir = dir/norm(dir);
 			    % create a point 1000 meters behind the intersection
 			    points_to_delete = [couples_to_delete(i,:) + 1000*dir; couples_to_delete(i,:)]; % matrix n by 2
-    
+				
 			    % define an area to delete for the second point
 			    dir = couples_to_delete(i+1,1:2) - [x_e,y_e];
 			    dir = dir/norm(dir);
@@ -368,6 +367,8 @@ function enlarged_LO = voronoi_LO(LO, robot, max_semiaxis, param)
 		    for i = 2:length(region_to_delete)
 			    total_region = union(region_to_delete{i},total_region);
 		    end
+			reg_obs = total_region;
+
 		    % compute the reduction 
 		    covariance = robot.R_dist*0.5 + robot.H * robot.P(1:2,1:2) * robot.H'; % covariance of the measurement
 		    [V, D] = eig(covariance * param.coverage);

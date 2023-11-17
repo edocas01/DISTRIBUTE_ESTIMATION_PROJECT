@@ -117,6 +117,7 @@ function [enlarged_LO, points_exit] = voronoi_map_consensous(param, robots, targ
 			% (if a robot cannot see the target it uses the last estimate)
 			[pointsx, pointsy] = Circle(robots{i}.x_est(1), robots{i}.x_est(2), Rs);
     		robots{i}.voronoi = polyshape(pointsx, pointsy);
+            points_exit = [];
 		elseif len_neighbors == 1 % only one agent -> take the line in the middle of the agents
 			dir = modified_positions(:,1) - robots{i}.x_est; % direction of the line from robot to neighbor
 			dir = dir/norm(dir);                % normalization of the line
@@ -167,7 +168,7 @@ function [enlarged_LO, points_exit] = voronoi_map_consensous(param, robots, targ
         
 		% remove large obstacles
 		for z = 1:length(LO)
-			tmp = voronoi_LO(LO{z}, robots{i}, max_semiaxis, param);
+			[tmp] = voronoi_LO(LO{z}, robots{i}, max_semiaxis, param);
 			if i == 1
 				enlarged_LO = tmp;
 			end
