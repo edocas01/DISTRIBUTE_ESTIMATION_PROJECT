@@ -4,21 +4,21 @@ clc;
 config;
 settings_scripts;
 
-% show the function to keep a given distance with respect to the robot
-r = 3;
-x_t = 0;
-y_t = 0;
-set(gcf, 'Position', get(0, 'Screensize'));
-func = @(x,y,r,x_t,y_t) exp(-r/4*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2); 
-fig = figure(1);
-fsurf(@(x,y)func(x,y,r,x_t,y_t),[-6,6,-6,6],'EdgeColor','none')
-camlight
-title('Formation control function');
-xlabel('x [m]');
-ylabel('y [m]');
-zlabel('$\phi(x,y)$')
-export_fig(fig,'IMAGES/CONTROL_PLANNING/formation_function.png');
-saveas(fig,'IMAGES/CONTROL_PLANNING/formation_function.fig');
+% % show the function to keep a given distance with respect to the robot
+% r = 3;
+% x_t = 0;
+% y_t = 0;
+% set(gcf, 'Position', get(0, 'Screensize'));
+% func = @(x,y,r,x_t,y_t) exp(-r/4*(-r + sqrt((x-x_t)^2 + (y-y_t)^2))^2); 
+% fig = figure(1);
+% fsurf(@(x,y)func(x,y,r,x_t,y_t),[-6,6,-6,6],'EdgeColor','none')
+% camlight
+% title('Formation control function');
+% xlabel('x [m]');
+% ylabel('y [m]');
+% zlabel('$\phi(x,y)$')
+% export_fig(fig,'IMAGES/CONTROL_PLANNING/formation_function.png');
+% saveas(fig,'IMAGES/CONTROL_PLANNING/formation_function.fig');
 
 % show simulation on equidistance
 N = 8;
@@ -38,7 +38,7 @@ myVideo = VideoWriter('IMAGES/CONTROL_PLANNING/formation_control.avi');
 myVideo.FrameRate = 6;  
 open(myVideo);
 
-figure(1);
+figure(1); box on
 set(gcf, 'Position', get(0, 'Screensize'));
 hold on;
 grid on;
@@ -56,13 +56,14 @@ for i = 1:20
 	points = decide_circle_barycenter(points, r, target);
 	clf;
 	hold on;
+    box on;
 	grid on;
 	axis equal;
 	plot(points(:,1), points(:,2), 'o', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Robots');
 	plot(target(1), target(2), 'x', 'MarkerSize', 10, 'LineWidth', 2, 'DisplayName', 'Target');
-	plot(xc,yc,'-k', 'DisplayName', 'Formation cirlce');
-	xlim(["padded"])
-	ylim(["padded"])
+	plot(xc,yc,'-k', 'DisplayName', 'Formation circle');
+	xlim([-7,7])
+	ylim([-5,8])
 	xlabel('x [m]');
 	ylabel('y [m]');
 	title(['Iterarion: ', num2str(i)]);
