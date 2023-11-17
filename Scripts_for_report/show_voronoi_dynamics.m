@@ -27,12 +27,12 @@ P = R{1}.P;
 
 % define an obstacle
 myVideo = VideoWriter('IMAGES/VORONOI/voronoi.avi');
-duration = 10;
+duration = 20;
 myVideo.FrameRate = 6 / duration;  
 open(myVideo);
 set(gcf, 'Position', get(0, 'Screensize'));
 get(0,'defaultfigureposition');
-fig = figure(1); clf; hold on; grid on; axis equal;
+fig = figure(1); clf; hold on; grid on; axis equal;box on
 xlim(parameters_simulation.size_map * [-1 1] / 10);
 ylim(parameters_simulation.size_map * [-1 1] / 10);
 for i = 1:length(R)
@@ -122,7 +122,7 @@ ylim(parameters_simulation.size_map * [-1 1] / 10);
 
 frame = getframe(gcf);
 writeVideo(myVideo, frame);
-clf; hold on; grid on; axis equal;
+clf; hold on; grid on; axis equal;box on
 xticks([]);
 yticks([]);
 
@@ -147,7 +147,7 @@ ylim(parameters_simulation.size_map * [-1 1] / 10);
 
 frame = getframe(gcf);
 writeVideo(myVideo, frame);
-clf; hold on; grid on; axis equal;
+clf; hold on; grid on; axis equal;box on
 xticks([]);
 yticks([]);
 
@@ -174,7 +174,7 @@ ylim(parameters_simulation.size_map * [-1 1] / 10);
 
 frame = getframe(gcf);
 writeVideo(myVideo, frame);
-clf; hold on; grid on; axis equal;
+clf; hold on; grid on; axis equal;box on
 xticks([]);
 yticks([]);
 
@@ -203,7 +203,7 @@ yticks([]);
 
 frame = getframe(gcf);
 writeVideo(myVideo, frame);
-clf; hold on; grid on; axis equal;
+clf; hold on; grid on; axis equal; box on
 xticks([]);
 yticks([]);
 
@@ -220,10 +220,6 @@ ylim(parameters_simulation.size_map * [-1 1] / 10);
 xticks([]);
 yticks([]);
 
-frame = getframe(gcf);
-writeVideo(myVideo, frame);
-frame = getframe(gcf);
-writeVideo(myVideo, frame);
 frame = getframe(gcf);
 writeVideo(myVideo, frame);
 

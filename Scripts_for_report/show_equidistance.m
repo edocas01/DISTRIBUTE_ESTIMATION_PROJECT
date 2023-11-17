@@ -66,7 +66,7 @@ for i = 1:20
 	ylim([-5,8])
 	xlabel('x [m]');
 	ylabel('y [m]');
-	title(['Iterarion: ', num2str(i)]);
+	title(['Iteration: ', num2str(i)]);
     legend
 	pause(0.1);
 	frame = getframe(gcf); %get frame

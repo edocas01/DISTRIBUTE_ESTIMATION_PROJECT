@@ -114,8 +114,5 @@ function relative_general_consensous(robots, target, LO, param)
 %     show_ellipses_consensus(robots{1},false);
 	cov_post = robots{1}.all_cov_pos;
 	all_post = robots{1}.all_robots_pos;
-	for i = 1:10
-		cov_pre(i,i) = sqrt(cov_pre(i,i));
-		cov_post(i,i) = sqrt(cov_post(i,i));
-	end
+
 end
