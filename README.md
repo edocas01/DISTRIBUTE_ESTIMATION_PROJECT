@@ -17,6 +17,7 @@ The code is written in [_Matlab_](https://www.mathworks.com/products/matlab.html
 - `config.m` is the file that contains the parameters of the simulation, this file has to be tuned according to the user needs.
 - `main.m` is the main file of the repository. To start a simulation it is sufficient to run this file.
 - [_Scripts_](/Scripts/) and [_Scripts_for_report_](/Scripts_for_report/) contain the scripts used to generate the results of the report and to test the functions (mainly for plots and debugging purposes).
+- [_Report_](/Report/) contains the report of the project with the Latex source file.
 - [_Results_](/Results/) and [_IMAGES_](/IMAGES/) contain the results of the simulations with images and videos.
 
 # Papers and related works
