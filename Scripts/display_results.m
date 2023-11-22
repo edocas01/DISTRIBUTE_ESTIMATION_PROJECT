@@ -33,7 +33,7 @@ end
 time = 0:1:length(results)-1;
 
 % SELF LOCALIZATION 
-fig = figure(1); 
+fig = figure(10); 
 % set(gcf, 'Position', get(0, 'Screensize'));
 tiledlayout(3,1,'TileSpacing','compact', 'Padding','compact');
 
@@ -41,7 +41,7 @@ nexttile; hold on; grid on;
 box on; 
 plot(time, ERR(:,1), '-or','DisplayName','Error x');
 plot(time, ERR(:,2), '-ob','DisplayName','Error y');
-title('Localization error x and y', 'Interpreter', 'latex')
+title(['Localization error x and y of robot ', num2str(index)], 'Interpreter', 'latex')
 ylabel('Err. [m]','Interpreter', 'latex');
 legend('Location','northwest', 'Interpreter', 'latex', 'Orientation','horizontal');
 xlim([0, length(results)]);
@@ -106,8 +106,8 @@ col_names = [];
 for j = 1:length(metrics)
 	err_dist = metrics{j}.err_dist;
 	err_angle = metrics{j}.err_angles;
-	mean_err_dist = mean(err_dist);
-	std_err_dist = std(err_dist);
+	mean_err_dist = mean(err_dist(err_dist < 3*parameters_simulation.DISTANCE_TARGET));
+	std_err_dist = std(err_dist(err_dist < 3*parameters_simulation.DISTANCE_TARGET));
 	mean_err_angle = mean(err_angle(err_angle < 100));
 	std_err_angle = std(err_angle(err_angle < 100));
 	values(1,j) = mean_err_dist;
@@ -134,7 +134,7 @@ disp(T);
 
 % %%
 % ERROR ON THE DISTANCE FROM TARGET
-fig = figure(2);
+fig = figure(11);
 % set(gcf, 'Position', get(0, 'Screensize'));
 tiledlayout(2,1,'TileSpacing','compact', 'Padding','compact');
 
@@ -149,7 +149,7 @@ for i = 1:length(metrics)
 	end
 	tmp = metrics{i}.err_dist;
 	tmp(tmp > 3*parameters_simulation.DISTANCE_TARGET) = NaN;
-	plot(tmp, 'DisplayName', ['R.' num2str(i) dyn]);
+	plot(tmp, 'DisplayName', ['R.' num2str(i) dyn],'Color',color_matrix(i,:));
 end
 title('Distance on target error', 'Interpreter', 'latex'); 
 ylabel('Error [m]', 'Interpreter', 'latex');
@@ -169,7 +169,7 @@ for i = 1:length(metrics)
 	end
 	tmp = metrics{i}.err_angles;
 	tmp(tmp == 100) = NaN;
-	plot(time, tmp, 'DisplayName', ['R.' num2str(i) dyn]);
+	plot(time, tmp, 'DisplayName', ['R.' num2str(i) dyn],'Color',color_matrix(i,:));
 end
 title('Equidistance angle error', 'Interpreter', 'latex'); 
 ylabel('Error [rad]', 'Interpreter', 'latex');

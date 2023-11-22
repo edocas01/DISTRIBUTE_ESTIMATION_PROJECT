@@ -1,6 +1,7 @@
 % This function is used to show the simulation results
 function show_simulation(results)
 	config;
+    figure(5)
     size_map = parameters_simulation.size_map;
 	for t = 1:length(results)
 		if length(results) > 1
