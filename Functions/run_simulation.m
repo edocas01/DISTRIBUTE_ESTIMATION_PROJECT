@@ -40,6 +40,7 @@ function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
         for i = 1:parameters_simulation.N
             
             [u(:,i), barycenter(:,i)] = compute_control(R{i},parameters_simulation);
+            
 
             for j = 1:parameters_simulation.N
                 inters = intersect(R{i}.voronoi,R{j}.voronoi);

@@ -16,19 +16,21 @@ function [target, trajectory, u_trajectory, obstacles, large_obstacles, robots] 
 	grid on;
 	axis equal;
 	axis(param.size_map * [-1 1 -1 1]);
-	% create an obstacle to limit the map
-	size_map = param.size_map - 0.8;
-	th = 0.01;
-	X = [-size_map-30 size_map];
-	X = [X; [size_map size_map]];
-	X = [X; [size_map -size_map]];
-	X = [X; [-size_map -size_map]];
-	X = [X; [-size_map size_map-th]];
-	X = [X; [-size_map+th size_map-th]];
-	X = [X; [-size_map+th -size_map+th]];
-	X = [X; [size_map-th -size_map+th]];
-	X = [X; [size_map-th size_map-th/2]];
-	X = [X; [-size_map-30 size_map-th/2]];
+	
+    size_map = param.size_map - 0.08;
+    th = 0.01;
+    width = 1;
+
+    X = [-size_map size_map];
+    X = [X; [-size_map -size_map]];
+    X = [X; [size_map -size_map]];
+    X = [X; [size_map size_map+th]];
+    X = [X; [-size_map-30 size_map+th]];
+    X = [X; [-size_map-30 size_map+th+width]];
+    X = [X; [size_map+width size_map+th+width]];
+    X = [X; [size_map+width -size_map-width]];
+    X = [X; [-size_map-width -size_map-width]];
+    X = [X; [-size_map-width size_map]];
 
 	large_obstacles{1} = LARGE_OBSTACLE(X);
     large_obstacles{1}.plot();
