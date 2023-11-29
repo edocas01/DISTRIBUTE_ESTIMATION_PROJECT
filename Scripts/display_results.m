@@ -78,26 +78,6 @@ ax.YAxis(1).Color = 'k';
 ax.YAxis(2).Color = 'b';
 
 
-% display for each robot the error of localization on the target
-target_estimate = cell(length(results{1}.R),1);
-for i = 1:length(results)
-	for j = 1:length(results{1}.R)
-		if norm(results{i}.R{j}.all_cov_pos(end-1:end,end-1:end)) < 1e4
-			target_estimate{j}.err_loc(i) = norm(results{i}.R{j}.all_robots_pos(end-1:end) - results{i}.T.x);
-		else
-			target_estimate{j}.err_loc(i) = NaN;
-		end
-	end
-end
-clc;
-disp("Target localization error:")
-for i = 1:length(results{1}.R)
-	disp(['Robot ' num2str(i) ' mean error on target: ' num2str(mean(target_estimate{i}.err_loc, 'omitnan')), ', std: ' num2str(nanstd(target_estimate{i}.err_loc)), ' [m]']);
-end
-disp('');
-
-
-
 %%
 % define the metrics for the equidistance and for the distance w.r.t. the target
 values = [];

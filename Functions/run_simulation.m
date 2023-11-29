@@ -34,7 +34,7 @@ function results = run_simulation(R, T, O, LO, u_traj, parameters_simulation)
             data.LO{i} = LO{i};
         end
         data.LO = LO;
-
+        
 		data.circle_target = [circx;circy];
 		
         for i = 1:parameters_simulation.N
